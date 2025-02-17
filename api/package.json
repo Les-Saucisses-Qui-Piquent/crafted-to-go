@@ -8,8 +8,10 @@
   },
   "scripts": {
     "test": "node --test test/**/*.test.js",
-    "start": "fastify start -l info app.js",
-    "dev": "fastify start -w -l info -P app.js"
+    "start": "fastify start -l info ./app.js",
+    "dev": "fastify start -w -l info -P app.js",
+    "docker:build": "docker build -f Dockerfile -t crafted-api .",
+    "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api"
   },
   "keywords": [],
   "author": "",
