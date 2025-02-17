@@ -6,7 +6,8 @@
   "scripts": {
     "turbobite": "docker compose up",
     "turbostop": "docker compose down",
-    "turboclean": "docker compose down --rmi all"
+    "turboclean": "docker compose down --rmi all",
+    "turboreset": "docker compose down --rmi all -v && docker compose up"
   },
   "author": "",
   "license": "ISC"
