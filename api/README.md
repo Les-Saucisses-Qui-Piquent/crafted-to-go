@@ -29,5 +29,9 @@ https://www.prisma.io/docs/getting-started/prisma-postgres/from-the-cli
 npx prisma migrate dev --name init
 npx prisma studio
 
+npm run caching
+
+
+
 ## 1. Define your database schema
 Open the schema.prisma file and define your first models.
