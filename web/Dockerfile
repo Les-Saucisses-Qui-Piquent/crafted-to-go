@@ -1,11 +1,16 @@
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /web
 
-COPY ./package.json .
-COPY ./package-lock.json .
+COPY ./package*.json .
 
-RUN npm install
+# Clean install with native build
+RUN npm install --force && \
+    npm install -g expo-cli && \
+    npm cache clean --force
+
+# Rebuild nativewind dependencies
+RUN cd node_modules/lightningcss && npm rebuild --build-from-source
 
 COPY . .
 

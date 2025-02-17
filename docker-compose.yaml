@@ -3,6 +3,10 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./api
+        target: /api
     ports:
       - "3000:3000"
     environment:
@@ -12,6 +16,12 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+
+    depends_on:
+      - api
+    volumes:
+      - ./web:/web
+      - /web/node_modules
     ports:
       - "4000:4000"
     environment:

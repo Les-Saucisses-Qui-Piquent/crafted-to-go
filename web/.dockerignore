@@ -40,3 +40,11 @@ coverage
 # Logs
 logs
 *.log
+
+# Additional files
+*.md
+__tests__
+*.test.js
+*.spec.js
+.expo
+web-build
