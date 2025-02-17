@@ -11,7 +11,8 @@
     "start": "fastify start -l info ./app.js",
     "dev": "fastify start -w -l info -P app.js",
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
-    "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api"
+    "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api",
+    "docker:start": "npm run docker:build && npm run docker:run"
   },
   "keywords": [],
   "author": "",
