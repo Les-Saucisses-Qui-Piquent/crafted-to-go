@@ -4,7 +4,8 @@
   "description": "Crafted Beers with passion",
   "main": "index.js",
   "scripts": {
-    "turbobite": "docker compose up"
+    "turbobite": "docker compose up",
+    "turbostop": "docker compose down"
   },
   "author": "",
   "license": "ISC"
