@@ -21,3 +21,13 @@ Run the test cases.
 ## Learn More
 
 To learn Fastify, check out the [Fastify documentation](https://fastify.dev/docs/latest/).
+
+## prisma Orm
+
+https://www.prisma.io/docs/getting-started/prisma-postgres/from-the-cli
+
+npx prisma migrate dev --name init
+npx prisma studio
+
+## 1. Define your database schema
+Open the schema.prisma file and define your first models.
