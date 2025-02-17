@@ -1,0 +1,11 @@
+{
+  "name": "crafted-to-go",
+  "version": "1.0.0",
+  "description": "Crafted Beers with passion",
+  "main": "index.js",
+  "scripts": {
+    "turbobite": "docker compose up"
+  },
+  "author": "",
+  "license": "ISC"
+}
