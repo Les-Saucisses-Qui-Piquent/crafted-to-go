@@ -7,7 +7,8 @@
     "turbobite": "docker compose up",
     "turbostop": "docker compose down",
     "turboclean": "docker compose down --rmi all",
-    "turboreset": "docker compose down --rmi all -v && docker compose up"
+    "turboreset": "docker compose down --rmi all -v && docker compose up",
+    "install": "cd api && npm install && cd ../web && npm install && cd .."
   },
   "author": "",
   "license": "ISC"
