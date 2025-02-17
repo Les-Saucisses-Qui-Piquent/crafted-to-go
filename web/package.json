@@ -9,7 +9,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "docker:build": "docker build -f Dockerfile -t crafted-web .",
+    "docker:run": "docker run --name crafted-web -p 4000:8081 crafted-web"
   },
   "jest": {
     "preset": "jest-expo"
