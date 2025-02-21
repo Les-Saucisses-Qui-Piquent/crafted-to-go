@@ -1,10 +1,18 @@
-# Welcome friends
-coucou prout
-Ca marche???
-vive la binche & les amigos
+# Crafted to Go
 
-api => npm run docker:start 
-web => npm run docker:start 
-TURBO BITE => npm run turbobite
+A click'&'collect web app about artisanal beers and local economy!
 
-ceci est un test de la branche à popo
+## Available Root scripts
+
+Launch the project with docker compose with :  
+`npm run turbostart`
+
+Stop the project  
+`npm run turbostop`
+
+Stop and remove containers and images  
+`npm run turboclean`
+
+Rebuild from scratch and launch the project  
+⚠️ It removes containers, images and volumes ⚠️  
+`npm run turboreset`
