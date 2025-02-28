@@ -1,0 +1,76 @@
+# Version control
+.git
+.gitignore
+.github/
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+docs/
+*.md
+
+# Database data and backups
+/data/
+/pgdata/
+*.dump
+*.sql
+*.bak
+*.backup
+*.dmp
+
+# Logs
+*.log
+logs/
+pg_log/
+
+# Environment variables and configuration
+.env
+.env.*
+!.env.example
+*.conf
+*.cfg
+.pgpass
+
+# Development tools and IDE files
+.vscode/
+.idea/
+*.sublime-*
+.editorconfig
+.eslintrc
+.prettierrc
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Build artifacts and dependencies
+node_modules/
+vendor/
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Docker files (usually not needed inside the container)
+Dockerfile*
+docker-compose*.yml
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Secrets and credentials
+*.pem
+*.key
+*.cert
+*.crt 
