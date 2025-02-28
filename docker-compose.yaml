@@ -19,6 +19,7 @@ services:
 
     depends_on:
       - api
+      - database
     volumes:
       - ./web:/web
       - /web/node_modules
@@ -26,3 +27,30 @@ services:
       - "4000:4000"
     environment:
       - NODE_ENV=development
+
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres$
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - database
+    ports:
+      - "5555:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "postgres"
+    restart: unless-stopped
+
+volumes:
+  database-data:
