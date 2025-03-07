@@ -21,7 +21,7 @@ export function useAuth() {
         email: 'test@example.com',
         // Change this role to test different scenarios:
         // 'customer' | 'brewery' | 'admin' | null
-        role: 'brewery' as any
+        role: 'null' as any
       };
 
       setUser(mockUser);

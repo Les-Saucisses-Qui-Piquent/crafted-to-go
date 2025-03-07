@@ -1,17 +1,14 @@
 import { Stack, Tabs } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
 import { Redirect } from "expo-router/build/link/Link";
+import { Text } from "react-native";
 
 export default function RootLayout() {
   const { user, isLoading } = useAuth();
 
   // Show loading screen while checking auth status
   if (isLoading) {
-    return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="loading" options={{ title: "Loading..." }} />
-      </Stack>
-    );
+    return <Text>Loading...</Text>;
   }
 
   // If not authenticated, show auth routes only
@@ -19,12 +16,7 @@ export default function RootLayout() {
     return (
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
-        <Stack.Screen
-          name="index"
-          options={{
-            href: null,
-          }}
-        />
+        <Stack.Screen name="index" redirect={true} />
       </Stack>
     );
   }
