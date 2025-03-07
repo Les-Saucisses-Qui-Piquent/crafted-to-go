@@ -22,7 +22,7 @@ export default function RootLayout() {
         <Stack.Screen
           name="index"
           options={{
-            href: "/(auth)",
+            href: null,
           }}
         />
       </Stack>
@@ -83,7 +83,6 @@ export default function RootLayout() {
       );
 
     default:
-      // Invalid role or logged out - redirect to welcome
-      return <Redirect href="/(auth)/index" />;
+      return <Redirect href="/(auth)/AuthIndex" />;
   }
 }

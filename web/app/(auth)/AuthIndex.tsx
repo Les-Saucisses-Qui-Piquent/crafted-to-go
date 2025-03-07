@@ -1,16 +1,16 @@
-import { View, StyleSheet } from 'react-native';
-import Link from 'expo-router/link';
-import { Button } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { View, StyleSheet } from "react-native";
+import Link from "expo-router/link";
+import { Button } from "react-native";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
 
-export default function Index() {
+export default function AuthIndex() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
       </ThemedView>
-      
+
       <View style={styles.buttonContainer}>
         <ThemedText>Brewery</ThemedText>
         <Link href="/(auth)/sign-in?role=brewery" asChild>
@@ -34,11 +34,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   titleContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   buttonContainer: {
     marginVertical: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

@@ -21,21 +21,21 @@ export function useAuth() {
         email: 'test@example.com',
         // Change this role to test different scenarios:
         // 'customer' | 'brewery' | 'admin' | null
-        role: 'null' as any
+        role: 'brewery' as any
       };
 
       setUser(mockUser);
       // Uncomment next line to test unauthenticated state:
       // setUser(null);
-      
+
       setIsLoading(false);
     }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  return { 
-    user, 
+  return {
+    user,
     isLoading,
     // Add these methods for later use:
     signOut: () => setUser(null),

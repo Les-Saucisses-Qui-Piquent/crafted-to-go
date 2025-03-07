@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function AuthLayout() {
   return (
@@ -7,16 +7,10 @@ export default function AuthLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen 
-        name="index"
+      <Stack.Screen
+        name="AuthIndex"
         options={{
-          title: 'Welcome'
-        }}
-      />
-      <Stack.Screen 
-        name="welcome"
-        options={{
-          title: 'Welcome'
+          title: "Welcome",
         }}
       />
     </Stack>
