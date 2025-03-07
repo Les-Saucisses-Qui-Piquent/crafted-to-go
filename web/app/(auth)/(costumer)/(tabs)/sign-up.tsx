@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const inventary = () => {
+const signUp = () => {
   return (
     <View>
-      <Text>inventary</Text>
+      <Text>sign-out</Text>
     </View>
   )
 }
 
-export default inventary
+export default signUp
