@@ -8,7 +8,11 @@
     "turbostop": "docker compose down",
     "turboclean": "docker compose down --rmi all",
     "turboreset": "docker compose down --rmi all -v && docker compose up",
-    "install": "npm install && cd api && npm install && cd ../web && npm install && cd .."
+    "install": "npm install && cd api && npm install && cd ../web && npm install && cd ..",
+    "db:start": "cd database && docker compose up -d && cd ..",
+    "db:stop": "cd database && docker compose down && cd ..",
+    "db:clean": "cd database && docker compose down --rmi all && cd ..",
+    "db:reset": "cd database && docker compose down --rmi all -v && docker compose up -d && cd .."
   },
   "author": "",
   "license": "ISC",
