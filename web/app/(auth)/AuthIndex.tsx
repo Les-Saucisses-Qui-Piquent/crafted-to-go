@@ -19,13 +19,19 @@ export default function AuthIndex() {
         </ThemedText>
         <View style={styles.buttonGroup}>
           <Link href="/(auth)/(brewery)/(tabs)/sign-in" asChild>
-            <Pressable style={styles.button}>
+            <Pressable style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}>
               <ThemedText style={styles.buttonText}>Sign In</ThemedText>
             </Pressable>
           </Link>
           <Link href="/(auth)/(brewery)/(tabs)/sign-up" asChild>
-            <Pressable style={[styles.button, styles.secondaryButton]}>
-              <ThemedText style={styles.buttonText}>Create Account</ThemedText>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.secondaryButton,
+                pressed && styles.secondaryButtonPressed,
+              ]}
+            >
+              <ThemedText style={styles.secondaryButtonText}>Create Account</ThemedText>
             </Pressable>
           </Link>
         </View>
@@ -37,13 +43,19 @@ export default function AuthIndex() {
         </ThemedText>
         <View style={styles.buttonGroup}>
           <Link href="/(auth)/(costumer)/(tabs)/sign-in" asChild>
-            <Pressable style={styles.button}>
+            <Pressable style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}>
               <ThemedText style={styles.buttonText}>Sign In</ThemedText>
             </Pressable>
           </Link>
           <Link href="/(auth)/(costumer)/(tabs)/sign-up" asChild>
-            <Pressable style={[styles.button, styles.secondaryButton]}>
-              <ThemedText style={styles.buttonText}>Create Account</ThemedText>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.secondaryButton,
+                pressed && styles.secondaryButtonPressed,
+              ]}
+            >
+              <ThemedText style={styles.secondaryButtonText}>Create Account</ThemedText>
             </Pressable>
           </Link>
         </View>
@@ -77,20 +89,30 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   button: {
-    backgroundColor: "#FF7ea4",
+    backgroundColor: "#7EA4FF",
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
   },
+  buttonPressed: {
+    opacity: 0.8,
+  },
   secondaryButton: {
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#0a7ea4",
+    borderColor: "#7EA4FF",
+  },
+  secondaryButtonPressed: {
+    backgroundColor: "rgba(126, 164, 255, 0.1)",
   },
   buttonText: {
-    backgroundColor: "#FF00a4",
-    color: "#fEEfff",
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  secondaryButtonText: {
+    color: "#7EA4FF",
     fontSize: 16,
     fontWeight: "600",
   },
