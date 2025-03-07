@@ -1,4 +1,4 @@
-FROM postgres:16
+FROM postgis/postgis
 
 COPY ./init/test-init.sql /docker-entrypoint-initdb.d/
 
