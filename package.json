@@ -7,7 +7,7 @@
     "start": "npm run web:start && npm run db:start",
     "stop": "npm run web:stop && npm run db:stop",
     "reset": "npm run web:reset && npm run db:reset",
-    "clean:install": "npm install && cd api && npm install && cd ../web && npm install && cd ..",
+    "clean:install": "rm -rf node_modules && npm install && cd api && rm -rf node_modules && npm install && cd ../web && rm -rf node_modules && npm install && cd ..",
     "clean:volumes": "docker volume prune -f",
     "web:start": "docker compose up -d",
     "web:stop": "docker compose down",
