@@ -11,7 +11,7 @@ export default function CustomerTabsLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
         tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
-        headerShown: true
+        headerShown: false
       }}
     >
       <Tabs.Screen 

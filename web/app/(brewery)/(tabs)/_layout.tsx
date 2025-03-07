@@ -11,7 +11,7 @@ export default function BreweryTabsLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
         tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
-        headerShown: true
+        headerShown: false
       }}
     >
       <Tabs.Screen 
@@ -19,6 +19,27 @@ export default function BreweryTabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen 
+        name="dashboard"
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <IconSymbol name="dashboard" color={color} />,
+        }}
+      />
+      <Tabs.Screen 
+        name="inventory"
+        options={{
+          title: 'Inventory',
+          tabBarIcon: ({ color }) => <IconSymbol name="inventory" color={color} />,
+        }}
+      />
+      <Tabs.Screen 
+        name="orders"
+        options={{
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <IconSymbol name="orders" color={color} />,
         }}
       />
     </Tabs>

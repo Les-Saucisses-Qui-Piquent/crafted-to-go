@@ -6,6 +6,8 @@ export default function BreweryLayout() {
   const colorScheme = useColorScheme();
   
   return (
-    <Stack/>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
