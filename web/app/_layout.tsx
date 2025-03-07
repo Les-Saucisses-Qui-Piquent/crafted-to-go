@@ -1,40 +1,80 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-import "../global.css";
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { Stack, Tabs } from "expo-router";
+import { useAuth } from "@/hooks/useAuth";
+import { Redirect } from "expo-router/build/link/Link";
+import { Text } from "react-native";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const { user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
+  // Show loading screen while checking auth status
+  if (isLoading) {
+    return <Text>Loading...</Text>;
   }
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+  // If not authenticated, show auth routes only
+  if (!user || !["brewery", "customer", "admin"].includes(user.role)) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="index" redirect={true} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    );
+  }
+
+  // Handle role-based routing
+  switch (user.role) {
+    case "brewery":
+      return (
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(brewery)" />
+          <Stack.Screen name="index" redirect={true} />
+        </Stack>
+      );
+
+    case "customer":
+      return (
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(customer)" />
+          <Stack.Screen name="index" redirect={true} />
+        </Stack>
+      );
+
+    case "admin":
+      return (
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarLabelStyle: { fontSize: 12 },
+          }}
+        >
+          <Tabs.Screen
+            name="(auth)"
+            options={{
+              title: "Authentication",
+              tabBarLabel: "Auth",
+              href: "/(auth)/welcome",
+            }}
+          />
+          <Tabs.Screen
+            name="(brewery)"
+            options={{
+              title: "Breweries",
+              tabBarLabel: "Breweries",
+              href: "/(brewery)/(tabs)",
+            }}
+          />
+          <Tabs.Screen
+            name="(customer)"
+            options={{
+              title: "Customers",
+              tabBarLabel: "Customers",
+              href: "/(customer)/(tabs)",
+            }}
+          />
+        </Tabs>
+      );
+
+    default:
+      return <Redirect href="/(auth)/AuthIndex" />;
+  }
 }
