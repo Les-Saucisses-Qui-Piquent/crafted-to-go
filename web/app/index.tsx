@@ -1,6 +1,6 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, View, Text, Button } from 'react-native';
+import { Link } from 'expo-router';
 
-import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -17,7 +17,19 @@ export default function HomeScreen() {
       }>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
-      </ThemedView> 
+      </ThemedView>
+      <View style={styles.buttonContainer}>
+        <Text>Brewery</Text>
+        <Link href="/(brewery)" asChild>
+          <Button title="Go to Brewery" />
+        </Link>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Text>Customer</Text>
+        <Link href="/(customer)" asChild>
+          <Button title="Go to Customer" />
+        </Link>
+      </View>
     </ParallaxScrollView>
   );
 }
@@ -28,15 +40,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
   reactLogo: {
     height: 178,
     width: 290,
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: 'center',
   },
 });

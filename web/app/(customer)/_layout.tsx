@@ -1,12 +1,22 @@
 import { Tabs } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 export default function CustomerLayout() {
+  const colorScheme = useColorScheme();
+  
   return (
-    <Tabs>
-      <Tabs.Screen name="explore" options={{ title: 'Explore' }} />
-      <Tabs.Screen name="basket" options={{ title: 'Basket' }} />
-      <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+    <Tabs screenOptions={{
+      tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
+      tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+      headerShown: false
+    }}>
+      <Tabs.Screen 
+        name="(tabs)"
+        options={{
+          href: "/(customer)/(tabs)/",
+        }}
+      />
     </Tabs>
   );
 }

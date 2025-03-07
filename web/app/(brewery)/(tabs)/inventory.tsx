@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const inventary = () => {
+const inventory = () => {
   return (
     <View>
-      <Text>inventary</Text>
+      <Text>inventory</Text>
     </View>
   )
 }
 
-export default inventary
+export default inventory

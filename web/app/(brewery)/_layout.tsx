@@ -1,12 +1,11 @@
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 export default function BreweryLayout() {
+  const colorScheme = useColorScheme();
+  
   return (
-    <Tabs>
-      <Tabs.Screen name="dashboard" options={{ title: 'Dashboard' }} />
-      <Tabs.Screen name="inventory" options={{ title: 'Inventory' }} />
-      <Tabs.Screen name="orders" options={{ title: 'Orders' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-    </Tabs>
+    <Stack/>
   );
 }

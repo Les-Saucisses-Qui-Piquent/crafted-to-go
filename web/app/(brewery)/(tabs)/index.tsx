@@ -1,12 +1,12 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from 'react-native';
+import React from 'react';
 
-const index = () => {
+const BreweryIndex = () => {
   return (
     <View>
-      <Text>index</Text>
+      <Text>Brewery Index</Text>
     </View>
-  )
-}
+  );
+};
 
-export default index
+export default BreweryIndex;
