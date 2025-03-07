@@ -1,0 +1,61 @@
+# PostgreSQL Database Project .gitignore
+
+# Database data directories
+/data/
+/pgdata/
+
+# Database dumps and backups
+*.dump
+*.bak
+*.backup
+*.dmp
+
+# Database logs
+*.log
+pg_log/
+postgresql-*.log
+
+# Configuration files that may contain sensitive information
+*.conf
+*.cfg
+pg_hba.conf
+postgresql.conf
+pgpass
+.pgpass
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-*
+.project
+.settings/
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Build artifacts
+/dist/
+/build/
+
+# Docker volumes
+docker-volumes/
+
+# Secrets and credentials
+*.pem
+*.key
+*.cert
+*.crt

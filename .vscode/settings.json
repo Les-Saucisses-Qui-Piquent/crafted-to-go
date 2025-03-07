@@ -1,8 +1,10 @@
 {
   "cSpell.words": [
+    "dpage",
     "forwardslash",
     "nativewind",
     "paperplane",
+    "pgadmin",
     "turbobite",
     "turboclean",
     "turboreset",
@@ -12,7 +14,14 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "always",
+    "source.fixAll": "always"
   },
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "[sql]": {
+    "editor.defaultFormatter": "ReneSaarsoo.sql-formatter-vsc",
+    "editor.formatOnSave": true
+  },
+  "SQL-Formatter-VSCode.dialect": "postgresql",
+  "SQL-Formatter-VSCode.keywordCase": "upper"
 }
