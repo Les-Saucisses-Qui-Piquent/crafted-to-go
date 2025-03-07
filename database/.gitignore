@@ -6,7 +6,6 @@
 
 # Database dumps and backups
 *.dump
-*.sql
 *.bak
 *.backup
 *.dmp
