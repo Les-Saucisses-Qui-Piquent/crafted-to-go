@@ -1,6 +1,6 @@
-import { Stack, Tabs } from 'expo-router';
-import { useAuth } from '@/hooks/useAuth';
-import { Redirect } from 'expo-router';
+import { Stack, Tabs } from "expo-router";
+import { useAuth } from "@/hooks/useAuth";
+import { Redirect } from "expo-router/build/link/Link";
 
 export default function RootLayout() {
   const { user, isLoading } = useAuth();
@@ -9,21 +9,21 @@ export default function RootLayout() {
   if (isLoading) {
     return (
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="loading" options={{ title: 'Loading...' }} />
+        <Stack.Screen name="loading" options={{ title: "Loading..." }} />
       </Stack>
     );
   }
 
   // If not authenticated, show auth routes only
-  if (!user) {
+  if (!user || !["brewery", "customer", "admin"].includes(user.role)) {
     return (
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
-        {/* Redirect any other routes to welcome */}
-        <Stack.Screen 
-          name="index" 
-          options={{ title: 'Welcome' }}
-          redirect="/(auth)/welcome"
+        <Stack.Screen
+          name="index"
+          options={{
+            href: "/(auth)",
+          }}
         />
       </Stack>
     );
@@ -31,7 +31,7 @@ export default function RootLayout() {
 
   // Handle role-based routing
   switch (user.role) {
-    case 'brewery':
+    case "brewery":
       return (
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(brewery)" />
@@ -39,7 +39,7 @@ export default function RootLayout() {
         </Stack>
       );
 
-    case 'customer':
+    case "customer":
       return (
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(customer)" />
@@ -47,41 +47,43 @@ export default function RootLayout() {
         </Stack>
       );
 
-      case 'admin':
-        return (
-          <Tabs screenOptions={{ 
+    case "admin":
+      return (
+        <Tabs
+          screenOptions={{
             headerShown: false,
             tabBarLabelStyle: { fontSize: 12 },
-          }}>
-            <Tabs.Screen 
-              name="(auth)"
-              options={{
-                title: 'Authentication',
-                tabBarLabel: 'Auth',
-                href: "/(auth)/welcome"
-              }}
-            />
-            <Tabs.Screen 
-              name="(brewery)"
-              options={{
-                title: 'Breweries',
-                tabBarLabel: 'Breweries',
-                href: "/(brewery)/(tabs)"
-              }}
-            />
-            <Tabs.Screen 
-              name="(customer)"
-              options={{
-                title: 'Customers',
-                tabBarLabel: 'Customers',
-                href: "/(customer)/(tabs)"
-              }}
-            />
-          </Tabs>
-        );
+          }}
+        >
+          <Tabs.Screen
+            name="(auth)"
+            options={{
+              title: "Authentication",
+              tabBarLabel: "Auth",
+              href: "/(auth)/welcome",
+            }}
+          />
+          <Tabs.Screen
+            name="(brewery)"
+            options={{
+              title: "Breweries",
+              tabBarLabel: "Breweries",
+              href: "/(brewery)/(tabs)",
+            }}
+          />
+          <Tabs.Screen
+            name="(customer)"
+            options={{
+              title: "Customers",
+              tabBarLabel: "Customers",
+              href: "/(customer)/(tabs)",
+            }}
+          />
+        </Tabs>
+      );
 
     default:
       // Invalid role or logged out - redirect to welcome
-      return <Redirect href="(auth)" />;
+      return <Redirect href="/(auth)/index" />;
   }
 }

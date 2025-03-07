@@ -25,9 +25,9 @@ export default function HomeScreen() {
         </Link>
       </View>
       <View style={styles.buttonContainer}>
-        <Text>Customer</Text>
+        <Text>Custodedededmer</Text>
         <Link href="/(customer)" asChild>
-          <Button title="Go to Customer" />
+          <Button title="Go to Custededomer" />
         </Link>
       </View>
     </ParallaxScrollView>

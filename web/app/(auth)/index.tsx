@@ -1,26 +1,44 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, StyleSheet } from 'react-native';
+import Link from 'expo-router/link';
+import { Button } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
-const welcome = () => {
+export default function Index() {
   return (
-    <View>
-       <ThemedView style={styles.titleContainer}>
+    <ThemedView style={styles.container}>
+      <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
       </ThemedView>
+      
       <View style={styles.buttonContainer}>
-        <Text>Brewery</Text>
-        <Link href="/(brewery)" asChild>
-          <Button title="Go to Brewery" />
+        <ThemedText>Brewery</ThemedText>
+        <Link href="/(auth)/sign-in?role=brewery" asChild>
+          <Button title="Sign in as Brewery" />
         </Link>
       </View>
+
       <View style={styles.buttonContainer}>
-        <Text>Customer</Text>
-        <Link href="/(customer)" asChild>
-          <Button title="Go to Customer" />
+        <ThemedText>Customer</ThemedText>
+        <Link href="/(auth)/sign-in?role=customer" asChild>
+          <Button title="Sign in as Customer" />
         </Link>
-        </View>
-    </View>
-  )
+      </View>
+    </ThemedView>
+  );
 }
 
-export default welcome
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  titleContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  buttonContainer: {
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+});
