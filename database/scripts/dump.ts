@@ -3,7 +3,7 @@ import fs from "fs";
 
 const prisma = new PrismaClient();
 
-type Table =
+export type Table =
   | "test"
   | "brewery"
   | "brewery_detail"
@@ -79,7 +79,7 @@ const dumpData = async (): Promise<void> => {
   const data = Object.fromEntries(await Promise.all(tablePromises));
 
   // Write to file
-  fs.writeFileSync("./dump/seed-data.json", JSON.stringify(data, null, 2));
+  fs.writeFileSync("./tmp/dump-data.json", JSON.stringify(data, null, 2));
   console.log("-== Dump completed successfully ==-");
 };
 

@@ -6,8 +6,11 @@
     "db:pull": "prisma db pull",
     "db:client": "prisma generate",
     "db:migrate": "prisma migrate dev --name",
+    "db:migrate:new": "prisma migrate dev --create-only --name",
     "db:apply-migrations": "prisma migrate deploy && npm run db:client",
-    "db:dump": "tsx scripts/dump.ts"
+    "db:dump": "tsx scripts/dump.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reset:prisma": "prisma migrate reset && npm run db:client"
   },
   "keywords": [],
   "author": "",
