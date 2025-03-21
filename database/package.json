@@ -10,7 +10,8 @@
     "db:apply-migrations": "prisma migrate deploy && npm run db:client",
     "db:dump": "tsx scripts/dump.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "db:reset:prisma": "prisma migrate reset && npm run db:client"
+    "db:reset:prisma": "prisma migrate reset && npm run db:client",
+    "studio": "prisma studio"
   },
   "keywords": [],
   "author": "",
