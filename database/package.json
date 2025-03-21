@@ -4,9 +4,10 @@
   "main": "index.js",
   "scripts": {
     "db:pull": "prisma db pull",
-    "client:generate": "prisma generate",
+    "db:client": "prisma generate",
     "db:migrate": "prisma migrate dev --name",
-    "db:apply-migrations": "prisma migrate deploy"
+    "db:apply-migrations": "prisma migrate deploy && npm run db:client",
+    "db:dump": "tsx scripts/dump.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   },
   "devDependencies": {
