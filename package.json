@@ -13,10 +13,10 @@
     "web:stop": "docker compose down",
     "web:clean": "docker compose down --rmi all",
     "web:reset": "docker compose down --rmi all -v",
-    "db:start": "cd database && docker compose up -d && cd ..",
+    "db:start": "cd database && docker compose up -d && npm run db:apply-migrations && cd ..",
     "db:stop": "cd database && docker compose down && cd ..",
-    "db:clean": "cd database && docker compose down --rmi all && cd ..",
-    "db:reset": "cd database && docker compose down --rmi all -v && cd .."
+    "db:clean": "cd database && docker compose down --rmi all && npm run db:reset:prisma && cd ..",
+    "db:reset": "cd database && docker compose down --rmi all -v && npm run db:reset:prisma && cd .."
   },
   "author": "",
   "license": "ISC",
