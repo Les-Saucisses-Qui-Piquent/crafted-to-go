@@ -5,7 +5,7 @@
   "scripts": {
     "db:pull": "prisma db pull",
     "client:generate": "prisma generate",
-    "migration:new": "prisma migrate dev --name",
+    "db:migrate": "prisma migrate dev --name",
     "db:apply-migrations": "prisma migrate deploy"
   },
   "keywords": [],
@@ -14,6 +14,12 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.5.0",
-    "prisma": "^6.5.0"
+    "prisma": "^6.5.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0"
   }
 }
