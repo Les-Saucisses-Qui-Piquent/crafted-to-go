@@ -11,7 +11,9 @@
     "db:dump": "tsx scripts/dump.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:reset:prisma": "prisma migrate reset && npm run db:client",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "lint": "eslint \"./**/*.ts\"",
+    "lint:fix": "eslint \"./**/*.ts\" --fix"
   },
   "keywords": [],
   "author": "",

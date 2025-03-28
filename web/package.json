@@ -12,7 +12,9 @@
     "lint": "expo lint",
     "docker:build": "docker build -f Dockerfile -t crafted-web .",
     "docker:run": "docker run --name crafted-web -p 4000:4000 crafted-web",
-    "docker:start": "npm run docker:build && npm run docker:run"
+    "docker:start": "npm run docker:build && npm run docker:run",
+    "web:lint": "eslint \"./**/*.ts\"",
+    "web:lint:fix": "eslint \"./**/*.ts\" --fix"
   },
   "jest": {
     "preset": "jest-expo"

@@ -12,7 +12,9 @@
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
     "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api",
     "docker:start": "npm run docker:build && npm run docker:run",
-    "db:client": "prisma generate"
+    "db:client": "prisma generate",
+    "lint": "eslint \"./**/*.ts\"",
+    "lint:fix": "eslint \"./**/*.ts\" --fix"
   },
   "keywords": [],
   "author": "",

@@ -16,9 +16,6 @@ export default [
     },
     files: ["**/*.ts"],
     rules: {
-      // Turn off the base rule as it can report incorrect errors with TypeScript
-      "no-unused-vars": "off",
-      // Use the TypeScript-specific rule instead with strict settings
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
@@ -30,6 +27,7 @@ export default [
         },
       ],
       "no-console": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
 ];

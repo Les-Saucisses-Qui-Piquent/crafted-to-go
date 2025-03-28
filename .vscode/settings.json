@@ -1,6 +1,7 @@
 {
   "cSpell.language": "en,fr",
   "cSpell.words": [
+    "autoload",
     "dpage",
     "forwardslash",
     "initdb",
@@ -8,12 +9,14 @@
     "paperplane",
     "pgadmin",
     "postgis",
+    "postgres",
     "setaf",
     "turbobite",
     "turboclean",
     "turboreset",
     "turbostart",
-    "turbostop"
+    "turbostop",
+    "typebox"
   ],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
