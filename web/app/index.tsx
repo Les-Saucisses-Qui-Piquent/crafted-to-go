@@ -1,8 +1,7 @@
-import { Image, StyleSheet, View, Text, Button } from "react-native";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import Link from "expo-router/link";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "expo-router";
 
 export default function HomeScreen() {
   return (
@@ -51,22 +50,99 @@ export default function HomeScreen() {
     </ParallaxScrollView>
   );
 }
+type Nav = {
+    navigate: (value: string) => void
+}
+
+// Add Welcome Screen
+const index = () => {
+    const { navigate } = useNavigation<Nav>();
+
+    return (
+        <SafeAreaView style={[styles.area, ]}>
+            <View style={[styles.container, ]}>
+                <Text style={styles.title}>Welcome Back!</Text>
+                <Text style={[styles.subtitle, { color: "black" }]}>
+                    Hello there, continue with and search the movies from around the world.
+                </Text>
+           
+                <View style={{ flexDirection: "row" }}>
+                    <Text style={[styles.loginTitle, {
+                        color: "black"
+                    }]}>Already have account? </Text>
+                    <TouchableOpacity
+                        onPress={() => navigate("login")}>
+                        <Text style={styles.loginSubtitle}>Log In</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            <View style={styles.bottomContainer}>
+                <Text style={[styles.bottomTitle, ]}>
+                    By continuing, you accept the Terms Of Use and
+                </Text>
+                <TouchableOpacity onPress={() => navigate("login")}>
+                    <Text style={[styles.bottomSubtitle,]}>Privacy Policy.</Text>
+                </TouchableOpacity>
+            </View>
+        </SafeAreaView>
+    );
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-  buttonContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
+    area: {
+        flex: 1,
+    },
+    container: {
+        flex: 1,
+        padding: 16,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    logo: {
+        width: 72,
+        height: 72,
+        marginBottom: 22,
+        marginTop: -22,
+    },
+    title: {
+        fontSize: 28,
+        fontFamily: "bold",
+        marginVertical: 12,
+        textAlign: "center",
+    },
+    subtitle: {
+        fontSize: 12,
+        fontFamily: "regular",
+        color: "black",
+        textAlign: "center",
+        paddingHorizontal: 16,
+    },
+    loginTitle: {
+        fontSize: 14,
+        fontFamily: "regular",
+        color: "black",
+    },
+    loginSubtitle: {
+        fontSize: 14,
+        fontFamily: "semiBold",
+    },
+    bottomContainer: {
+        position: "absolute",
+        bottom: 32,
+        right: 0,
+        left: 0,
+        alignItems: "center",
+    },
+    bottomTitle: {
+        fontSize: 12,
+        fontFamily: "regular",
+    },
+    bottomSubtitle: {
+        fontSize: 12,
+        fontFamily: "regular",
+        textDecorationLine: "underline",
+        marginTop: 2,
+    },
 });
+
+export default index;
