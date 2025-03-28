@@ -10,7 +10,7 @@
     "es2021": true
   },
   "rules": {
-    "prettier/prettier": "warn",
+    "prettier/prettier": "error",
     "quotes": ["error", "double"]
   }
 }
