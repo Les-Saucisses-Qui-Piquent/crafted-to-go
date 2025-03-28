@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const profile = () => {
+const berrcardSmall = () => {
   return (
     <View>
-      <Text>profile</Text>
+      <Text>berrcardSmall</Text>
     </View>
   )
 }
 
-export default profile
+export default berrcardSmall

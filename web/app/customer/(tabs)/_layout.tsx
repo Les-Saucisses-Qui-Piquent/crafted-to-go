@@ -15,6 +15,15 @@ export default function CustomerTabsLayout() {
       }}
     >
       <Tabs.Screen
+        name="index"
+        options={{
+          title: "index",
+          tabBarIcon: ({ color }: { color: string }) => (
+            <IconSymbol name="house.fill" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="explore"
         options={{
           title: "Explore",
