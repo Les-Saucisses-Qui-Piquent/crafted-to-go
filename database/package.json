@@ -1,0 +1,31 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "db:pull": "prisma db pull",
+    "db:client": "prisma generate",
+    "db:migrate": "prisma migrate dev --name",
+    "db:migrate:new": "prisma migrate dev --create-only --name",
+    "db:apply-migrations": "prisma migrate deploy && npm run db:client",
+    "db:dump": "tsx scripts/dump.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reset:prisma": "prisma migrate reset && npm run db:client",
+    "studio": "prisma studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0"
+  }
+}

@@ -1,6 +1,6 @@
 FROM postgis/postgis
 
-COPY ./init/init-schema.sql /docker-entrypoint-initdb.d/
+COPY . .
 
 EXPOSE 5432
 

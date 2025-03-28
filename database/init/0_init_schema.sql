@@ -13,6 +13,8 @@ VALUES
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+
 CREATE EXTENSION IF NOT EXISTS postgis_topology;
 
 CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;
@@ -22,8 +24,6 @@ CREATE EXTENSION IF NOT EXISTS postgis_raster;
 CREATE EXTENSION IF NOT EXISTS postgis_sfcgal;
 
 CREATE EXTENSION IF NOT EXISTS address_standardizer;
-
-CREATE EXTENSION IF NOT EXISTS address_standardizer_data_us;
 
 -- BASE SCHEMA --
 CREATE TABLE "favorite_brewery" (

@@ -1,5 +1,7 @@
 {
   "extends": ["../.eslintrc.json"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   }
