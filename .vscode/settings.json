@@ -16,7 +16,11 @@
     "turboreset",
     "turbostart",
     "turbostop",
-    "typebox"
+    "typebox",
+    "Erneson",
+    "greyscale",
+    "Nathalie",
+    "tansparent"
   ],
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",

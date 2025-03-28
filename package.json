@@ -13,11 +13,11 @@
     "web:stop": "docker compose down",
     "web:clean": "docker compose down --rmi all",
     "web:reset": "docker compose down --rmi all -v",
-    "db:start": "cd database && docker compose up -d && echo -e '\n💤 Waiting for database to be ready... 💤' && sleep 4 && npm run db:apply-migrations && cd ..",
+    "db:start": "cd database && docker compose up -d && echo '\n💤 Waiting for database to be ready... 💤' && sleep 4 && npm run db:apply-migrations && cd ..",
     "db:stop": "cd database && docker compose down && cd ..",
     "db:clean": "cd database && docker compose down --rmi all && npm run db:reset:prisma && cd ..",
     "db:reset": "cd database && docker compose down --rmi all -v && cd ..",
-    "lint": "cd api && npm run lint && cd ../database && npm run lint && cd ../web && npm run lint"
+    "lint": "cd api && npm run lint && cd ../database && npm run lint && cd ../web && npm run web:lint"
   },
   "author": "",
   "license": "ISC",
