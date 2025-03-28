@@ -24,6 +24,24 @@ export default function HomeScreen() {
           <Button title="Go to Brewery" />
         </Link>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <Text>API TEST</Text>
+        <Button
+          title="FETCH API TEST"
+          onPress={() => {
+            fetch("http://localhost:3000/test", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => console.log(data));
+          }}
+        />
+      </View>
+
       <View style={styles.buttonContainer}>
         <Text>Custodedededmer</Text>
         <Link href="/(customer)" asChild>
