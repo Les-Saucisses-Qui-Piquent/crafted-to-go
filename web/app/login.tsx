@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES} from '../constants';
 import { useNavigation, useRouter } from 'expo-router';
 import Checkbox from 'expo-checkbox';
+import Button from '@/components/Button';
 
 const isTestMode = true;
 
@@ -84,17 +85,15 @@ const Login = () => {
                     </TouchableOpacity>
 
                     <View>
-                        <TouchableOpacity
-                            onPress={() => router.push("/customer/(tabs)")}>
+                        <Button title="COSTUMER"  onPress={() => router.push("/customer/(tabs)")}>
+                    
                             <Text>PAGE COSTUMER</Text>
-                        </TouchableOpacity>
-
+                        </Button>
                 
-                        <TouchableOpacity
-                            onPress={() => router.push("/brewery/(tabs)")}>
+                        <Button title="BREWERY" onPress={() => router.push("/brewery/(tabs)")}>
+                        
                             <Text>PAGE BREWERY</Text>
-                        </TouchableOpacity>
-                 
+                        </Button>
 
                     </View>
 
