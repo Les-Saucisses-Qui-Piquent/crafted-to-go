@@ -5,11 +5,13 @@ WORKDIR /api
 COPY ./package.json .
 COPY ./package-lock.json .
 
-RUN npm install
+RUN npm ci --include=dev
 
 COPY . .
 
 EXPOSE 3000
+
+RUN npm run build
 
 RUN npx prisma generate
 
