@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Button } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
@@ -61,20 +61,45 @@ const index = () => {
     return (
         <SafeAreaView style={[styles.area, ]}>
             <View style={[styles.container, ]}>
-                <Text style={styles.title}>Welcome Back!</Text>
+                <Text style={styles.title}>Bienvenue</Text>
                 <Text style={[styles.subtitle, { color: "black" }]}>
-                    Hello there, continue with and search the movies from around the world.
-                </Text>
+                              BIERE COUCOU                </Text>
            
-                <View style={{ flexDirection: "row" }}>
-                    <Text style={[styles.loginTitle, {
-                        color: "black"
-                    }]}>Already have account? </Text>
-                    <TouchableOpacity
+                
+                <TouchableOpacity
                         onPress={() => navigate("login")}>
-                        <Text style={styles.loginSubtitle}>Log In</Text>
-                    </TouchableOpacity>
+                  <View style={[styles.boutton, { flexDirection: "row" }]}>
+                  
+                      <Text style={[styles.loginTitle, {
+                          color: "white"
+                      }]}>Already have account? </Text>
+                      
+                          <Text style={styles.loginSubtitle}>Log In</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                        onPress={() => navigate("registerBrewery")}>
+                <View style={[styles.boutton, { flexDirection: "row" }]}>
+                    <Text style={[styles.loginTitle, {
+                        color: "white"
+                    }]}>Vous êtes une brasserie </Text>
+                  
+                        <Text style={styles.loginSubtitle}>REGISTER</Text>
                 </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                        onPress={() => navigate("registerClient")}>
+                <View style={[styles.boutton, { flexDirection: "row" }]}>
+                    <Text style={[styles.loginTitle, {
+                        color: "white"
+                    }]}>Vous voulez des bières ? </Text>
+                   
+                        <Text style={styles.loginSubtitle}>REGISTER</Text>
+                </View>
+                </TouchableOpacity>
+
             </View>
             <View style={styles.bottomContainer}>
                 <Text style={[styles.bottomTitle, ]}>
@@ -97,6 +122,7 @@ const styles = StyleSheet.create({
         padding: 16,
         alignItems: "center",
         justifyContent: "center",
+        gap : 10,
     },
     logo: {
         width: 72,
@@ -120,11 +146,11 @@ const styles = StyleSheet.create({
     loginTitle: {
         fontSize: 14,
         fontFamily: "regular",
-        color: "black",
     },
     loginSubtitle: {
         fontSize: 14,
         fontFamily: "semiBold",
+        color: "yellow",
     },
     bottomContainer: {
         position: "absolute",
@@ -143,6 +169,13 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline",
         marginTop: 2,
     },
+    boutton: {
+      width:400,
+      height:50,
+      padding:10,
+      backgroundColor:"red",
+      borderRadius:15,
+    }
 });
 
 export default index;
