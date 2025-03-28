@@ -1,18 +1,17 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "This project was bootstrapped with Fastify-CLI.",
+  "description": "Crafted-to-Go API",
   "main": "app.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "node --test test/**/*.test.js",
-    "start": "fastify start -l info ./app.js",
-    "dev": "fastify start -w -l info -P app.js",
+    "debug": "ls -la && echo 'END' && ls -la ./dist && echo 'END2' && node ./dist/server.js",
+    "start": "echo '-== STARTING MANUAL BUILD ==-' && echo '-== DONE ==-' && npx tsc && node ./dist/server.js",
+    "dev": "tsx --watch server.ts",
+    "build": "npx tsc",
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
     "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api",
-    "docker:start": "npm run docker:build && npm run docker:run"
+    "docker:start": "npm run docker:build && npm run docker:run",
+    "db:client": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -21,14 +20,22 @@
     "@fastify/autoload": "^6.0.0",
     "@fastify/postgres": "^6.0.2",
     "@fastify/sensible": "^6.0.0",
+    "@prisma/client": "^6.5.0",
     "fastify": "^5.0.0",
-    "fastify-cli": "^7.3.0",
-    "fastify-plugin": "^5.0.0"
+    "fastify-plugin": "^5.0.1",
+    "prisma": "^6.5.0"
   },
   "devDependencies": {
+    "@fastify/type-provider-typebox": "^5.1.0",
+    "@types/node": "^22.13.11",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "prettier": "^3.2.5"
+    "fastify-tsconfig": "^3.0.0",
+    "prettier": "^3.2.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
   }
 }
