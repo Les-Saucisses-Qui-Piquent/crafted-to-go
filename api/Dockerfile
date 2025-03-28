@@ -13,6 +13,6 @@ EXPOSE 3000
 
 RUN npm run build
 
-RUN npx prisma generate
+RUN npm run db:client
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

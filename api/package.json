@@ -4,8 +4,7 @@
   "description": "Crafted-to-Go API",
   "main": "app.js",
   "scripts": {
-    "debug": "ls -la && echo 'END' && ls -la ./dist && echo 'END2' && node ./dist/server.js",
-    "start": "npm run db:client && ((node ./dist/server.js) || (npm run build && node ./dist/server.js))",
+    "start": "node ./dist/server.js",
     "dev": "tsx --watch server.ts",
     "build": "tsc",
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
