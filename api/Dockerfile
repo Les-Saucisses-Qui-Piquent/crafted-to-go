@@ -5,13 +5,11 @@ WORKDIR /api
 COPY ./package.json .
 COPY ./package-lock.json .
 
-RUN npm ci --include=dev
+RUN npm ci
 
 COPY . .
 
 EXPOSE 3000
-
-RUN npm run build
 
 RUN npm run db:client
 
