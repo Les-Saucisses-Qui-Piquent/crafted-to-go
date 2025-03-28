@@ -83,15 +83,6 @@ const Login = () => {
                     </TouchableOpacity>
 
                 </ScrollView>
-                <View style={styles.bottomContainer}>
-                    <Text style={[styles.bottomLeft, {
-                        color: COLORS.black
-                    }]}>Don't have an account ?</Text>
-                    <TouchableOpacity
-                        onPress={() => navigate("signup")}>
-                        <Text style={styles.bottomRight}>{"  "}Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
         </SafeAreaView>
     )
