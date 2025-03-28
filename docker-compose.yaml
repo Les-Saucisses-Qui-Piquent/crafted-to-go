@@ -16,7 +16,8 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
-
+    volumes:
+      - ./web/app:/web/app
     depends_on:
       - api
     ports:
