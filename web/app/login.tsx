@@ -5,6 +5,7 @@ import { COLORS, SIZES} from '../constants';
 import { useNavigation, useRouter } from 'expo-router';
 import Checkbox from 'expo-checkbox';
 import Button from '@/components/Button';
+import Input from '@/components/Input';
 
 const isTestMode = true;
 
@@ -51,6 +52,10 @@ const Login = () => {
         console.log("Google Authentication")
     };
 
+    function inputChangedHandler(id: string, text: string): void {
+        throw new Error('Function not implemented.');
+    }
+
     return (
         <SafeAreaView style={[styles.area, {
             backgroundColor: COLORS.white
@@ -64,6 +69,18 @@ const Login = () => {
                         color: COLORS.black
                     }]}>Login to Your Account</Text>
                    
+                   <View>
+                   <Input
+                        id="email"
+                        onInputChanged={inputChangedHandler}
+                        placeholder="Email"
+                        placeholderTextColor={COLORS.black}
+                        keyboardType="email-address"
+                    />
+
+                   </View>
+
+
                     <View style={styles.checkBoxContainer}>
                         <View style={{ flexDirection: 'row' }}>
                             <Checkbox
@@ -75,7 +92,7 @@ const Login = () => {
                             <View style={{ flex: 1 }}>
                                 <Text style={[styles.privacy, {
                                     color: COLORS.black
-                                }]}>Remenber me</Text>
+                                }]}>Remember me</Text>
                             </View>
                         </View>
                     </View>
