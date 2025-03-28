@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } fr
 import React, { useCallback, useEffect, useReducer, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SIZES} from '../constants';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import Checkbox from 'expo-checkbox';
 
 const isTestMode = true;
@@ -27,7 +27,8 @@ const Login = () => {
     const { navigate } = useNavigation<Nav>();
     const [error, setError] = useState(null);
     const [isChecked, setChecked] = useState(false);
-
+    const router = useRouter();
+    
     useEffect(() => {
         if (error) {
             Alert.alert('An error occured', error)
@@ -84,13 +85,13 @@ const Login = () => {
 
                     <View>
                         <TouchableOpacity
-                            onPress={() => navigate("")}>
+                            onPress={() => router.push("/customer/(tabs)")}>
                             <Text>PAGE COSTUMER</Text>
                         </TouchableOpacity>
 
                 
                         <TouchableOpacity
-                            onPress={() => navigate("")}>
+                            onPress={() => router.push("/brewery/(tabs)")}>
                             <Text>PAGE BREWERY</Text>
                         </TouchableOpacity>
                  
