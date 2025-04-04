@@ -5,12 +5,12 @@ WORKDIR /api
 COPY ./package.json .
 COPY ./package-lock.json .
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 EXPOSE 3000
 
-RUN npx prisma generate
+RUN npm run db:client
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

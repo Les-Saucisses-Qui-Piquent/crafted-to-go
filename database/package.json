@@ -11,12 +11,15 @@
     "db:dump": "tsx scripts/dump.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:reset:prisma": "prisma migrate reset && npm run db:client",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "lint": "eslint \"./**/*.ts\"",
+    "lint:fix": "eslint \"./**/*.ts\" --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Database container for Crafted To Go",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "prisma": "^6.5.0",
@@ -24,8 +27,12 @@
     "typescript": "^5.8.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "@types/node": "^22.13.11",
     "@typescript-eslint/eslint-plugin": "^8.27.0",
-    "@typescript-eslint/parser": "^8.27.0"
+    "@typescript-eslint/parser": "^8.27.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "typescript-eslint": "^8.28.0"
   }
 }

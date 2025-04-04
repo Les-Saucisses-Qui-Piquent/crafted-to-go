@@ -1,6 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import fs from "fs";
-import type { Table } from "./dump";
 
 const prisma = new PrismaClient();
 const seedData = JSON.parse(fs.readFileSync("./tmp/dump-data.json", "utf-8"));

@@ -20,7 +20,7 @@ export type Table =
   | "beer_style"
   | "address";
 
-const config: Record<Table, Function> = {
+const config: Record<Table, () => Promise<any>> = {
   test: async () => {
     return prisma.test.findMany();
   },

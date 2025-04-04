@@ -4,24 +4,22 @@ services:
       context: ./api
       dockerfile: Dockerfile
     volumes:
-      - type: bind
-        source: ./api
-        target: /api
+      - ./api/src:/api/src
+      - ./api/server.ts:/api/server.ts
+      - ./api/prisma:/api/prisma
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
+    env_file:
+      - ./api/.env
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-
+    volumes:
+      - ./web/app:/web/app
     depends_on:
       - api
-    volumes:
-      - ./web:/web
-      - /web/node_modules
     ports:
       - "4000:4000"
     environment:

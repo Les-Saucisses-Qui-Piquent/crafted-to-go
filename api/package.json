@@ -3,15 +3,18 @@
   "version": "1.0.0",
   "description": "Crafted-to-Go API",
   "main": "app.js",
+  "type": "module",
   "scripts": {
-    "debug": "ls -la && echo 'END' && ls -la ./dist && echo 'END2' && node ./dist/server.js",
-    "start": "echo '-== STARTING MANUAL BUILD ==-' && echo '-== DONE ==-' && npx tsc && node ./dist/server.js",
-    "dev": "tsx --watch server.ts",
-    "build": "npx tsc",
+    "start": "node ./dist/server.js",
+    "dev": "tsx server.ts",
+    "dev:watch": "tsx --watch server.ts",
+    "build": "tsc",
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
     "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api",
     "docker:start": "npm run docker:build && npm run docker:run",
-    "db:client": "prisma generate"
+    "db:client": "prisma generate",
+    "lint": "eslint \"./**/*.ts\"",
+    "lint:fix": "eslint \"./**/*.ts\" --fix"
   },
   "keywords": [],
   "author": "",
@@ -24,9 +27,12 @@
     "@prisma/client": "^6.5.0",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.1",
-    "prisma": "^6.5.0"
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "@fastify/type-provider-typebox": "^5.1.0",
     "@types/node": "^22.13.11",
     "@typescript-eslint/eslint-plugin": "^8.27.0",
@@ -36,7 +42,6 @@
     "eslint-plugin-prettier": "^5.1.3",
     "fastify-tsconfig": "^3.0.0",
     "prettier": "^3.2.5",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript-eslint": "^8.28.0"
   }
 }
