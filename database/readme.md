@@ -125,6 +125,7 @@ npm run db:reset:prisma
 - **Database connection issues**: Check `.env` file for correct DATABASE_URL
 - **PostGIS errors**: Ensure extensions are enabled in `schema.prisma`
 - **Migration conflicts**: Use `npx prisma migrate resolve` to manually resolve. You may need to reset the database.
+- **P1010 User 'postgres' was denied access**: Ensure local postgreSQL service is stopped.
 
 ## Advanced Commands
 
