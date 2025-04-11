@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Crafted-to-Go API",
   "main": "app.js",
-  "type": "module",
   "scripts": {
     "start": "node ./dist/server.js",
     "dev": "tsx server.ts",
