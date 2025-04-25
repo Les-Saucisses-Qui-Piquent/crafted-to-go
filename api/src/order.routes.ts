@@ -100,4 +100,30 @@ export default async function (fastify: FastifyInstance) {
       }
     },
   );
+
+  fastify.delete(
+    "/orders/:id",
+    async (request: FastifyRequest<{ Params: { id: string } }>, response) => {
+      const prisma = new PrismaClient();
+      try {
+        const { id } = request.params;
+
+        if (!id) {
+          response.status(400).send({ message: "Order ID is required" });
+          return;
+        }
+
+        await prisma.order.delete({
+          where: { id },
+        });
+        fastify.log.warn({ id }, "Deleted order");
+        response.send({ message: "Order deleted" });
+      } catch (error) {
+        fastify.log.error(error);
+        response.status(500).send({ message: "Internal server error" });
+      } finally {
+        prisma.$disconnect();
+      }
+    },
+  );
 }
