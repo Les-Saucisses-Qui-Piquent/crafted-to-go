@@ -37,7 +37,7 @@ model beer {
   ibu_rate       Float
   quantity       Int
   price          Float
-  beer_style_ids String[] @db.Uuid
+  beer_style_ids String @db.Uuid
   is_public      Boolean  @default(false)
   created_at     DateTime @default(now()) @db.Timestamp(3)
   updated_at     DateTime @default(now()) @db.Timestamp(3)
