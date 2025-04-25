@@ -1,0 +1,34 @@
+-- AlterTable
+ALTER TABLE "address" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "beer" ALTER COLUMN "is_public" SET DEFAULT false,
+ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "brewery" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "brewery_detail" ALTER COLUMN "has_taproom" SET DEFAULT false,
+ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "brewery_owner" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "order" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "order_detail" ALTER COLUMN "is_ready" SET DEFAULT false,
+ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "test" ALTER COLUMN "created_at" SET DATA TYPE TIMESTAMP(0),
+ALTER COLUMN "updated_at" SET DATA TYPE TIMESTAMP(0);
+
+-- AlterTable
+ALTER TABLE "user" ALTER COLUMN "birth_date" SET DATA TYPE TIMESTAMP(0),
+ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "user_detail" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP;

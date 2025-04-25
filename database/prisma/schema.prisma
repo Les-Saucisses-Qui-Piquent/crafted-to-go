@@ -11,33 +11,37 @@ datasource db {
 }
 
 model address {
-  id            String                    @id @db.Uuid
-  line_1        String
-  line_2        String?
-  postal_code   Int
-  city          String
-  country       String
-  GPS           Unsupported("geography")?
-  updated_at    DateTime?                 @db.Timestamp(0)
-  created_at    DateTime                  @db.Timestamp(0)
-  brewery       brewery[]
+  id          String                    @id @default(uuid()) @db.Uuid
+  line_1      String
+  line_2      String?
+  postal_code Int
+  city        String
+  country     String
+  GPS         Unsupported("geography")?
+  updated_at  DateTime?                 @db.Timestamp(0)
+  created_at  DateTime                  @default(now()) @db.Timestamp(0)
+
+  //Relations
   brewery_owner brewery_owner[]
   user_detail   user_detail[]
+  brewery       brewery[]
 }
 
 model beer {
-  id              String            @id @db.Uuid
-  name            String
-  image           String
-  beer_color_id   String            @db.Uuid
-  brewery_id      String            @db.Uuid
-  abv_rate        Float
-  ibu_rate        Float
-  quantity        Int
-  price           Float
-  is_public       Boolean
-  created_at      DateTime          @db.Timestamp(0)
-  updated_at      DateTime?         @db.Timestamp(0)
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String
+  image         String
+  beer_color_id String    @db.Uuid
+  brewery_id    String    @db.Uuid
+  abv_rate      Float
+  ibu_rate      Float
+  quantity      Int
+  price         Float
+  is_public     Boolean   @default(false)
+  created_at    DateTime  @default(now()) @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+
+  //Relations
   beer_color      beer_color        @relation(fields: [beer_color_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_color_id_foreign")
   brewery         brewery           @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_brewery_id_foreign")
   beer_beer_style beer_beer_style[]
@@ -46,39 +50,45 @@ model beer {
 }
 
 model beer_beer_style {
-  id            String     @id @db.Uuid
-  beer_id       String     @db.Uuid
-  beer_style_id String     @db.Uuid
-  beer          beer       @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_style_beer_id_foreign")
-  beer_style    beer_style @relation(fields: [beer_style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_style_beer_style_id_foreign")
+  id            String @id @default(uuid()) @db.Uuid
+  beer_id       String @db.Uuid
+  beer_style_id String @db.Uuid
+
+  //Relations
+  beer       beer       @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_style_beer_id_foreign")
+  beer_style beer_style @relation(fields: [beer_style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_style_beer_style_id_foreign")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model beer_color {
-  id             String @id @db.Uuid
+  id             String @id @default(uuid()) @db.Uuid
   label          String @db.VarChar(255)
   ARR_beer_level String @db.VarChar(255)
-  beer           beer[]
+
+  //Relations
+  beer beer[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model beer_style {
-  id              String            @id @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
   label           String            @db.VarChar(255)
   ARR_beer_level  String            @db.VarChar(255)
   beer_beer_style beer_beer_style[]
 }
 
 model brewery {
-  id               String             @id @db.Uuid
+  id               String    @id @default(uuid()) @db.Uuid
   name             String
   RIB              String
   siren            String
-  address_id       String             @db.Uuid
-  brewery_owner_id String             @db.Uuid
-  created_at       DateTime           @db.Timestamp(0)
-  updated_at       DateTime?          @db.Timestamp(0)
+  address_id       String    @db.Uuid
+  brewery_owner_id String    @db.Uuid
+  created_at       DateTime  @default(now()) @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
   beer             beer[]
+
+  //Relations
   address          address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_address_id_foreign")
   brewery_owner    brewery_owner      @relation(fields: [brewery_owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_brewery_owner_id_foreign")
   brewery_detail   brewery_detail[]
@@ -87,9 +97,9 @@ model brewery {
 }
 
 model brewery_detail {
-  id            String    @id @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
   brewery_id    String    @db.Uuid
-  has_taproom   Boolean
+  has_taproom   Boolean   @default(false)
   image         String
   logo          String
   description   String
@@ -98,14 +108,16 @@ model brewery_detail {
   opening_hours String
   phone_number  String
   email         String
-  created_at    DateTime  @db.Timestamp(0)
+  created_at    DateTime  @default(now()) @db.Timestamp(0)
   updated_at    DateTime? @db.Timestamp(0)
+
+  //Relations
   brewery       brewery   @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_detail_brewery_id_foreign")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model brewery_owner {
-  id           String    @id @db.Uuid
+  id           String    @id @default(uuid()) @db.Uuid
   first_name   String
   last_name    String
   address_id   String    @db.Uuid
@@ -113,56 +125,66 @@ model brewery_owner {
   phone_number String
   email        String
   password     String
-  created_at   DateTime  @db.Timestamp(0)
+  created_at   DateTime  @default(now()) @db.Timestamp(0)
   updated_at   DateTime? @db.Timestamp(0)
   role         String    @db.VarChar(255)
+
+  //Relations
   brewery      brewery[]
   address      address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
 }
 
 model favorite_beer {
-  id       String   @id @db.Uuid
+  id       String   @id @default(uuid()) @db.Uuid
   beer_id  String   @db.Uuid
   user_id  String   @db.Uuid
   liked_at DateTime @db.Timestamp(0)
+
+  //Relations
   beer     beer     @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_beer_beer_id_foreign")
   user     user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_beer_user_id_foreign")
 }
 
 model favorite_brewery {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   brewery_id String   @db.Uuid
   user_id    String   @db.Uuid
   liked_at   DateTime @db.Timestamp(0)
+
+  //Relations
   brewery    brewery  @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_brewery_brewery_id_foreign")
   user       user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "favorite_brewery_user_id_foreign")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model order {
-  id           String         @id @db.Uuid
+  id           String         @id @default(uuid()) @db.Uuid
   user_id      String         @db.Uuid
   brewery_id   String         @db.Uuid
   final_price  Float
   status       String         @db.VarChar(255)
   pickup_day   DateTime       @db.Date
   pickup_time  String
-  created_at   DateTime       @db.Timestamp(0)
+  created_at   DateTime       @default(now()) @db.Timestamp(0)
   updated_at   DateTime?      @db.Timestamp(0)
+
+  //Relations
   brewery      brewery        @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_brewery_id_foreign")
   user         user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_user_id_foreign")
   order_detail order_detail[]
 }
 
 model order_detail {
-  id         String    @id @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   order_id   String    @db.Uuid
   beer_id    String    @db.Uuid
   quantity   Int
   price      Float
-  is_ready   Boolean
-  created_at DateTime  @db.Timestamp(0)
+  is_ready   Boolean   @default(false)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
+
+  //Relations
   beer       beer      @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_detail_beer_id_foreign")
   order      order     @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_detail_order_id_foreign")
 }
@@ -180,23 +202,25 @@ model test {
   id         Int      @id @default(autoincrement())
   first_name String
   last_name  String
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model user {
-  id               String             @id @db.Uuid
+  id               String             @id @default(uuid()) @db.Uuid
   first_name       String
   last_name        String
-  birth_date       DateTime           @db.Date
+  birth_date       DateTime           @db.Timestamp(0)
   email            String
   phone_number     String
   password         String
   paiement_method  String
-  created_at       DateTime           @db.Timestamp(0)
+  created_at       DateTime           @default(now()) @db.Timestamp(0)
   updated_at       DateTime?          @db.Timestamp(0)
   role             String             @db.VarChar(255)
+
+  //Relations
   favorite_beer    favorite_beer[]
   favorite_brewery favorite_brewery[]
   order            order[]
@@ -205,15 +229,17 @@ model user {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model user_detail {
-  id         String    @id @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   user_id    String    @db.Uuid
   image      String
   ARR_color  String    @db.VarChar(255)
   ARR_style  String    @db.VarChar(255)
   beer_level String    @db.VarChar(255)
   address_id String    @db.Uuid
-  created_at DateTime  @db.Timestamp(0)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
-  address    address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
-  user       user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
+
+  //Relations
+  address address @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
+  user    user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
 }
