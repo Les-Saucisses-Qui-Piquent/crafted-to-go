@@ -7,6 +7,8 @@ services:
       - ./api/src:/api/src
       - ./api/server.ts:/api/server.ts
       - ./api/prisma:/api/prisma
+      - ./api/package.json:/api/package.json
+      - ./api/package-lock.json:/api/package-lock.json
     ports:
       - "3000:3000"
     env_file:
