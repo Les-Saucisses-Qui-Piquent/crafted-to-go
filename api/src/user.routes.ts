@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { FastifyInstance, FastifyRequest } from "fastify";
 
 type UserInsert = Prisma.userCreateInput;
+type UserUpdate = Prisma.userUpdateInput;
 
 export default async function (fastify: FastifyInstance) {
   // Route GET pour récupérer tous les utilisateurs
@@ -55,6 +56,31 @@ export default async function (fastify: FastifyInstance) {
     }
   });
 
+  // Route PUT pour modifier un utilisateur
+  fastify.put(
+    "/users/:id",
+    async (request: FastifyRequest<{ Params: { id: string }; Body: UserUpdate }>, response) => {
+      const prisma = new PrismaClient();
+      const { id } = request.params;
+      const data = request.body;
+      try {
+        const user = await prisma.user.update({
+          where: { id: id },
+          data: data,
+        });
+        if (!user) {
+          response.status(404).send({ message: "Utilisateur non trouvé" });
+          return;
+        }
+        response.send(user);
+      } catch (error) {
+        response.status(500).send({ message: "Erreur serveur", error });
+      } finally {
+        prisma.$disconnect();
+      }
+    },
+  );
+
   // Route DELETE pour supprimer un utilisateur
   fastify.delete(
     "/users/:id",
@@ -68,6 +94,8 @@ export default async function (fastify: FastifyInstance) {
         response.send({ message: "Utilisateur supprimé avec succès" });
       } catch (error) {
         response.status(500).send({ message: "Erreur serveur", error });
+      } finally {
+        prisma.$disconnect();
       }
     },
   );
