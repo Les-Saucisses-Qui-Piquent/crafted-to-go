@@ -12,7 +12,8 @@ export default async function (fastify: FastifyInstance) {
       const users = await prisma.user.findMany();
       response.send(users);
     } catch (error) {
-      response.status(500).send({ message: "Erreur serveur", error });
+      fastify.log.error(error);
+      response.status(500).send({ message: "Server Error", error });
     } finally {
       prisma.$disconnect();
     }
@@ -29,12 +30,14 @@ export default async function (fastify: FastifyInstance) {
           where: { id: id },
         });
         if (!user) {
-          response.status(404).send({ message: "Utilisateur non trouvé" });
+          fastify.log.warn({ id }, "User not found");
+          response.status(404).send({ message: "User not found" });
           return;
         }
         response.send(user);
       } catch (error) {
-        response.status(500).send({ message: "Erreur serveur", error });
+        fastify.log.error(error);
+        response.status(500).send({ message: "Server Error", error });
       } finally {
         prisma.$disconnect();
       }
@@ -50,7 +53,7 @@ export default async function (fastify: FastifyInstance) {
       response.send(user);
     } catch (error) {
       fastify.log.error(error);
-      response.status(500).send({ message: "Internal server error" });
+      response.status(500).send({ message: "Server Error" });
     } finally {
       prisma.$disconnect();
     }
@@ -69,12 +72,13 @@ export default async function (fastify: FastifyInstance) {
           data: data,
         });
         if (!user) {
-          response.status(404).send({ message: "Utilisateur non trouvé" });
+          response.status(404).send({ message: "User not found" });
           return;
         }
         response.send(user);
       } catch (error) {
-        response.status(500).send({ message: "Erreur serveur", error });
+        fastify.log.error(error);
+        response.status(500).send({ message: "Server Error", error });
       } finally {
         prisma.$disconnect();
       }
@@ -91,9 +95,11 @@ export default async function (fastify: FastifyInstance) {
         const user = await prisma.user.delete({
           where: { id: id },
         });
-        response.send({ message: "Utilisateur supprimé avec succès" });
+        fastify.log.warn({ id }, "Deleted user");
+        response.send({ message: "User deleted" });
       } catch (error) {
-        response.status(500).send({ message: "Erreur serveur", error });
+        fastify.log.error(error);
+        response.status(500).send({ message: "Server Error", error });
       } finally {
         prisma.$disconnect();
       }
