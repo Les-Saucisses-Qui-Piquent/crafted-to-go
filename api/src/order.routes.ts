@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { Prisma, PrismaClient } from "@prisma/client";
+import { z } from "zod";
 
 type OrderInsert = Prisma.orderCreateInput;
 type OrderUpdate = Prisma.orderUpdateInput;
@@ -24,10 +25,10 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
       try {
         const { id } = request.params;
+        const { success } = z.string().uuid().safeParse(id);
 
-        if (!id) {
-          response.status(400).send({ message: "Order ID is required" });
-          return;
+        if (!success) {
+          response.status(400).send({ message: "Invalid order uuid" });
         }
 
         const order = await prisma.order.findUnique({
@@ -76,9 +77,10 @@ export default async function (fastify: FastifyInstance) {
         const { id } = request.params;
         const valuesToUpdate = request.body;
 
-        if (!id) {
-          response.status(400).send({ message: "Order ID is required" });
-          return;
+        const { success } = z.string().uuid().safeParse(id);
+
+        if (!success) {
+          response.status(400).send({ message: "Invalid order uuid" });
         }
 
         const updatedOrder = await prisma.order.update({
@@ -107,10 +109,10 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
       try {
         const { id } = request.params;
+        const { success } = z.string().uuid().safeParse(id);
 
-        if (!id) {
-          response.status(400).send({ message: "Order ID is required" });
-          return;
+        if (!success) {
+          response.status(400).send({ message: "Invalid order uuid" });
         }
 
         await prisma.order.delete({
