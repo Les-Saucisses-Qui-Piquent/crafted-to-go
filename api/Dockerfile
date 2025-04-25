@@ -11,6 +11,4 @@ COPY . .
 
 EXPOSE 3000
 
-RUN npm run db:client
-
-CMD ["npm", "run", "dev:watch"]
+CMD ["npm", "run", "dev"]

@@ -5,13 +5,13 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./dist/server.js",
-    "dev": "tsx server.ts",
-    "dev:watch": "tsx --watch server.ts",
+    "dev": "npm run db:pull && npm run db:client && tsx --watch server.ts",
     "build": "tsc",
     "docker:build": "docker build -f Dockerfile -t crafted-api .",
     "docker:run": "docker run --name crafted-api -p 3000:3000 crafted-api",
     "docker:start": "npm run docker:build && npm run docker:run",
     "db:client": "prisma generate",
+    "db:pull": "prisma db pull",
     "lint": "eslint \"./**/*.ts\"",
     "lint:fix": "eslint \"./**/*.ts\" --fix"
   },
