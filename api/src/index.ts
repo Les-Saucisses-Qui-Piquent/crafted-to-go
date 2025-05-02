@@ -11,6 +11,10 @@ import breweryRoutes from "./brewery.routes";
 import addressRoutes from "./address.routes";
 import beerColorRoutes from "./beer-color.routes";
 import beerStyleRoutes from "./beer-style.routes";
+import userDetailRoutes from "./user-detail.routes";
+import breweryDetailRoutes from "./brewery-detail.routes";
+import breweryOwnerRoutes from "./brewery-owner.routes";
+import orderDetailRoutes from "./order-detail.routes";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   // Register plugins
@@ -26,4 +30,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   await fastify.register(addressRoutes);
   await fastify.register(beerColorRoutes);
   await fastify.register(beerStyleRoutes);
+  await fastify.register(userDetailRoutes);
+  await fastify.register(breweryDetailRoutes);
+  await fastify.register(breweryOwnerRoutes);
+  await fastify.register(orderDetailRoutes);
 };
