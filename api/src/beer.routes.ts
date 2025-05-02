@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { FastifyInstance, FastifyRequest } from "fastify";
+import { z } from "zod";
 
 type BeerInsert = Prisma.beerCreateInput;
 type BeerUpdate = Prisma.beerUpdateInput;
@@ -26,6 +27,11 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
       const { id } = request.params;
       try {
+        const { success } = z.string().uuid().safeParse(id);
+
+        if (!success) {
+          response.status(400).send({ message: "Invalid uuid" });
+        }
         const beer = await prisma.beer.findUnique({
           where: { id: id },
         });
@@ -67,6 +73,11 @@ export default async function (fastify: FastifyInstance) {
       const { id } = request.params;
       const data = request.body;
       try {
+        const { success } = z.string().uuid().safeParse(id);
+
+        if (!success) {
+          response.status(400).send({ message: "Invalid uuid" });
+        }
         const beer = await prisma.beer.update({
           where: { id: id },
           data: data,
@@ -92,6 +103,11 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
       const { id } = request.params;
       try {
+        const { success } = z.string().uuid().safeParse(id);
+
+        if (!success) {
+          response.status(400).send({ message: "Invalid uuid" });
+        }
         await prisma.beer.delete({
           where: { id: id },
         });
