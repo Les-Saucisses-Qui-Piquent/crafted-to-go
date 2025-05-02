@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
@@ -6,25 +6,26 @@ type OrderInsert = Prisma.orderCreateInput;
 type OrderUpdate = Prisma.orderUpdateInput;
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get("/orders", async (_request, response) => {
+  fastify.get("/orders", async (_request, response: FastifyReply) => {
     const prisma = new PrismaClient();
     try {
       const orders = await prisma.order.findMany();
       response.send(orders);
     } catch (error) {
-      fastify.log.error(error);
+      fastify.log.error(error, "Error fetching orders");
       response.status(500).send({ message: "Internal server error" });
     } finally {
-      prisma.$disconnect();
+      await prisma.$disconnect();
     }
   });
 
   fastify.get(
     "/orders/:id",
-    async (request: FastifyRequest<{ Params: { id: string } }>, response) => {
+    async (request: FastifyRequest<{ Params: { id: string } }>, response: FastifyReply) => {
       const prisma = new PrismaClient();
+      const { id } = request.params;
+
       try {
-        const { id } = request.params;
         const { success } = z.string().uuid().safeParse(id);
 
         if (!success) {
@@ -42,44 +43,48 @@ export default async function (fastify: FastifyInstance) {
           response.send(order);
         }
       } catch (error) {
-        fastify.log.error(error);
+        fastify.log.error({ error, id }, "Error fetching order");
         response.status(500).send({ message: "Internal server error" });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
 
-  fastify.post("/orders", async (request: FastifyRequest<{ Body: OrderInsert }>, response) => {
-    const prisma = new PrismaClient();
-
-    try {
+  fastify.post(
+    "/orders",
+    async (request: FastifyRequest<{ Body: OrderInsert }>, response: FastifyReply) => {
+      const prisma = new PrismaClient();
       const order = request.body;
 
-      const newOrder = await prisma.order.create({
-        data: order,
-      });
+      try {
+        const newOrder = await prisma.order.create({
+          data: order,
+        });
 
-      response.send(newOrder);
-    } catch (error) {
-      fastify.log.error(error);
-      response.status(500).send({ message: "Internal server error" });
-    } finally {
-      prisma.$disconnect();
-    }
-  });
+        response.send(newOrder);
+      } catch (error) {
+        fastify.log.error({ error, order }, "Error creating order");
+        response.status(500).send({ message: "Internal server error" });
+      } finally {
+        await prisma.$disconnect();
+      }
+    },
+  );
 
   fastify.put(
     "/orders/:id",
-    async (request: FastifyRequest<{ Params: { id: string }; Body: OrderUpdate }>, response) => {
+    async (
+      request: FastifyRequest<{ Params: { id: string }; Body: OrderUpdate }>,
+      response: FastifyReply,
+    ) => {
       const prisma = new PrismaClient();
+      const { id } = request.params;
+      const valuesToUpdate = request.body;
+
       try {
-        const { id } = request.params;
-        const valuesToUpdate = request.body;
-
-        const { success } = z.string().uuid().safeParse(id);
-
-        if (!success) {
+        const { success: isIdValid } = z.string().uuid().safeParse(id);
+        if (!isIdValid) {
           response.status(400).send({ message: "Invalid order uuid" });
         }
 
@@ -95,20 +100,21 @@ export default async function (fastify: FastifyInstance) {
           response.send(updatedOrder);
         }
       } catch (error) {
-        fastify.log.error(error);
+        fastify.log.error({ error, valuesToUpdate }, "Error updating order");
         response.status(500).send({ message: "Internal server error" });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
 
   fastify.delete(
     "/orders/:id",
-    async (request: FastifyRequest<{ Params: { id: string } }>, response) => {
+    async (request: FastifyRequest<{ Params: { id: string } }>, response: FastifyReply) => {
       const prisma = new PrismaClient();
+      const { id } = request.params;
+
       try {
-        const { id } = request.params;
         const { success } = z.string().uuid().safeParse(id);
 
         if (!success) {
@@ -121,10 +127,10 @@ export default async function (fastify: FastifyInstance) {
         fastify.log.warn({ id }, "Deleted order");
         response.send({ message: "Order deleted" });
       } catch (error) {
-        fastify.log.error(error);
+        fastify.log.error({ error, id }, "Error deleting order");
         response.status(500).send({ message: "Internal server error" });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
