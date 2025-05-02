@@ -29,7 +29,7 @@ export default async function (fastify: FastifyInstance) {
         const { success } = z.string().uuid().safeParse(id);
 
         if (!success) {
-          response.status(400).send({ message: "Invalid order uuid" });
+          response.status(400).send({ message: "Invalid uuid" });
         }
 
         const order = await prisma.order.findUnique({
@@ -85,7 +85,7 @@ export default async function (fastify: FastifyInstance) {
       try {
         const { success: isIdValid } = z.string().uuid().safeParse(id);
         if (!isIdValid) {
-          response.status(400).send({ message: "Invalid order uuid" });
+          response.status(400).send({ message: "Invalid uuid" });
         }
 
         const updatedOrder = await prisma.order.update({
@@ -118,7 +118,7 @@ export default async function (fastify: FastifyInstance) {
         const { success } = z.string().uuid().safeParse(id);
 
         if (!success) {
-          response.status(400).send({ message: "Invalid order uuid" });
+          response.status(400).send({ message: "Invalid uuid" });
         }
 
         await prisma.order.delete({
