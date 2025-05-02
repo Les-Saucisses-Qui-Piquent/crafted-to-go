@@ -15,7 +15,7 @@ export default async function (fastify: FastifyInstance) {
       fastify.log.error(error);
       response.status(500).send({ message: "Server Error", error });
     } finally {
-      prisma.$disconnect();
+      await prisma.$disconnect();
     }
   });
 
@@ -39,7 +39,7 @@ export default async function (fastify: FastifyInstance) {
         fastify.log.error(error);
         response.status(500).send({ message: "Server Error", error });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
@@ -55,7 +55,7 @@ export default async function (fastify: FastifyInstance) {
       fastify.log.error(error);
       response.status(500).send({ message: "Server Error" });
     } finally {
-      prisma.$disconnect();
+      await prisma.$disconnect();
     }
   });
 
@@ -80,7 +80,7 @@ export default async function (fastify: FastifyInstance) {
         fastify.log.error(error);
         response.status(500).send({ message: "Server Error", error });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
@@ -92,7 +92,7 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
       const { id } = request.params;
       try {
-        const user = await prisma.user.delete({
+        await prisma.user.delete({
           where: { id: id },
         });
         fastify.log.warn({ id }, "Deleted user");
@@ -101,7 +101,7 @@ export default async function (fastify: FastifyInstance) {
         fastify.log.error(error);
         response.status(500).send({ message: "Server Error", error });
       } finally {
-        prisma.$disconnect();
+        await prisma.$disconnect();
       }
     },
   );
