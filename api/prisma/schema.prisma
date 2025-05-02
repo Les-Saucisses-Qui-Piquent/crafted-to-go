@@ -51,7 +51,7 @@ model beer_color {
   label       String        @db.VarChar(255)
   beer_levels String[]      @db.VarChar(255)
   beer        beer[]
-  user_detail user_detail[]
+  user_detail user_detail[] @relation("beer_colorTouser_detail")
 }
 
 model beer_style {
@@ -59,7 +59,7 @@ model beer_style {
   label       String        @db.VarChar(255)
   beer_level  String[]      @db.VarChar(255)
   beer        beer[]
-  user_detail user_detail[]
+  user_detail user_detail[] @relation("beer_styleTouser_detail")
 }
 
 model brewery {
@@ -205,6 +205,6 @@ model user_detail {
   style_ids  String[]     @db.Uuid
   address    address      @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
   user       user         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
-  beer_color beer_color[]
-  beer_style beer_style[]
+  beer_color beer_color[] @relation("beer_colorTouser_detail")
+  beer_style beer_style[] @relation("beer_styleTouser_detail")
 }
