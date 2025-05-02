@@ -9,10 +9,10 @@ export default async function (fastify: FastifyInstance) {
   fastify.get("/brewery-details", async (_request, response: FastifyReply) => {
     const prisma = new PrismaClient();
     try {
-      const orders = await prisma.brewery_detail.findMany();
-      response.send(orders);
+      const breweryDetails = await prisma.brewery_detail.findMany();
+      response.send(breweryDetails);
     } catch (error) {
-      fastify.log.error(error, "Error fetching orders");
+      fastify.log.error(error, "Error fetching brewery details");
       response.status(500).send({ message: "Internal server error" });
     } finally {
       await prisma.$disconnect();
