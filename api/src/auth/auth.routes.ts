@@ -1,16 +1,26 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { useHash } from "../../utils/hash";
 import { useToken } from "../../utils/token";
 import { z } from "zod";
 import { capitalize, allCaps } from "../../utils";
 
-type UserInsert = Prisma.userCreateInput;
 type UserLogin = z.infer<typeof userLoginSchema>;
+type UserRegister = z.infer<typeof userRegisterSchema>;
 
 const userLoginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(12, "Password must be at least 12 characters long"),
+});
+
+const userRegisterSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(12, "Password must be at least 12 characters long"),
+  first_name: z.string().min(3, "First name is required"),
+  last_name: z.string().min(3, "Last name is required"),
+  birth_date: z.string().min(10, "Birth date is required"),
+  phone_number: z.string().length(10, "Phone number is required"),
+  paiement_method: z.string().min(3, "Paiement method is required"),
 });
 
 export default async function (fastify: FastifyInstance) {
@@ -19,7 +29,8 @@ export default async function (fastify: FastifyInstance) {
 
   fastify.post(
     "/auth/register",
-    async (request: FastifyRequest<{ Body: UserInsert }>, reply: FastifyReply) => {
+    { preHandler: validateRegister },
+    async (request: FastifyRequest<{ Body: UserRegister }>, reply: FastifyReply) => {
       const { email, password, first_name, last_name, ...rest } = request.body;
       const prisma = new PrismaClient();
 
@@ -93,6 +104,21 @@ export default async function (fastify: FastifyInstance) {
 const validateLogin = async (request: FastifyRequest<{ Body: UserLogin }>, reply: FastifyReply) => {
   try {
     const validatedBody = userLoginSchema.parse(request.body);
+    request.body = validatedBody;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
+    }
+    throw error;
+  }
+};
+
+const validateRegister = async (
+  request: FastifyRequest<{ Body: UserRegister }>,
+  reply: FastifyReply,
+) => {
+  try {
+    const validatedBody = userRegisterSchema.parse(request.body);
     request.body = validatedBody;
   } catch (error) {
     if (error instanceof z.ZodError) {
