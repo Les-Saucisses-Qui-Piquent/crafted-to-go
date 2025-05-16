@@ -15,12 +15,14 @@ import userDetailRoutes from "./user-detail.routes";
 import breweryDetailRoutes from "./brewery-detail.routes";
 import breweryOwnerRoutes from "./brewery-owner.routes";
 import orderDetailRoutes from "./order-detail.routes";
+import authRoutes from "./auth/auth.routes";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   // Register plugins
   await fastify.register(corsPlugin);
 
   // Register all route modules
+  await fastify.register(authRoutes);
   await fastify.register(rootRoutes);
   await fastify.register(userRoutes);
   await fastify.register(testRoutes);
