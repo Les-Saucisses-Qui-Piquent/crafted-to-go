@@ -10,6 +10,12 @@ datasource db {
   extensions = [address_standardizer, fuzzystrmatch, postgis, postgis_raster, postgis_sfcgal, postgis_tiger_geocoder, postgis_topology]
 }
 
+enum UserRole {
+  client
+  brewer
+  admin
+}
+
 model address {
   id          String                    @id @default(uuid()) @db.Uuid
   line_1      String
@@ -122,7 +128,7 @@ model brewery_owner {
   password     String
   created_at   DateTime @default(now()) @db.Timestamp(3)
   updated_at   DateTime @default(now()) @db.Timestamp(3)
-  role         String   @db.VarChar(255)
+  role         UserRole @default(brewer)
 
   //Relations
   brewery_fk brewery[]
@@ -213,7 +219,7 @@ model user {
   paiement_method String
   created_at      DateTime @default(now()) @db.Timestamp(3)
   updated_at      DateTime @default(now()) @db.Timestamp(3)
-  role            String   @db.VarChar(255)
+  role            UserRole @default(client)
 
   //Relations
   favorite_beer_fk    favorite_beer[]
