@@ -180,7 +180,7 @@ model user {
   first_name       String
   last_name        String
   birth_date       DateTime           @db.Date
-  email            String
+  email            String             @unique
   phone_number     String
   password         String
   paiement_method  String
