@@ -2,12 +2,16 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { useHash } from "../../utils/hash";
 import { useToken } from "../../utils/token";
+import { z } from "zod";
+import { capitalize, allCaps } from "../../utils";
 
 type UserInsert = Prisma.userCreateInput;
-type UserLogin = {
-  email: string;
-  password: string;
-};
+type UserLogin = z.infer<typeof userLoginSchema>;
+
+const userLoginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(12, "Password must be at least 12 characters long"),
+});
 
 export default async function (fastify: FastifyInstance) {
   const { hashPassword, verifyPassword } = useHash();
@@ -20,6 +24,15 @@ export default async function (fastify: FastifyInstance) {
       const prisma = new PrismaClient();
 
       try {
+        const alreadyExistingUser = await prisma.user.findUnique({
+          where: { email: email.toLowerCase().trim() },
+        });
+        if (alreadyExistingUser) {
+          return reply.status(400).send({
+            error: "User already exists",
+          });
+        }
+
         const hashedPassword = await hashPassword(password);
 
         const user = await prisma.user.create({
@@ -27,8 +40,8 @@ export default async function (fastify: FastifyInstance) {
             ...rest,
             password: hashedPassword,
             email: email.toLowerCase().trim(),
-            first_name: first_name.trim(),
-            last_name: last_name.trim(),
+            first_name: capitalize(first_name.trim()),
+            last_name: allCaps(last_name.trim()),
           },
         });
 
@@ -46,6 +59,7 @@ export default async function (fastify: FastifyInstance) {
 
   fastify.post(
     "/auth/login",
+    { preHandler: validateLogin },
     async (request: FastifyRequest<{ Body: UserLogin }>, reply: FastifyReply) => {
       const { email, password } = request.body;
       const prisma = new PrismaClient();
@@ -75,3 +89,15 @@ export default async function (fastify: FastifyInstance) {
     },
   );
 }
+
+const validateLogin = async (request: FastifyRequest<{ Body: UserLogin }>, reply: FastifyReply) => {
+  try {
+    const validatedBody = userLoginSchema.parse(request.body);
+    request.body = validatedBody;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
+    }
+    throw error;
+  }
+};
