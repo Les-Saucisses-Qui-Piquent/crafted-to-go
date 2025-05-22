@@ -1,5 +1,6 @@
 import { preHandlerHookHandler } from "fastify";
 import { useToken } from "../../utils/token";
+import { CustomJwtPayload } from "../../types";
 
 export const authMiddleware: preHandlerHookHandler = async (request, reply) => {
   try {
@@ -10,12 +11,14 @@ export const authMiddleware: preHandlerHookHandler = async (request, reply) => {
 
     // Here split's the "Bearer <token>"
     const token = authHeader.split(" ")[1];
-
     const { verifyToken } = useToken();
     const decodedToken = verifyToken(token);
 
-    // Decorate the request with token infos (userId, token)
-    request.authUser = decodedToken;
+    // Decorate the request with token infos
+    const { authUser } = decodedToken as CustomJwtPayload;
+
+    request.token = token;
+    request.authUser = authUser;
   } catch (error) {
     return reply.status(401).send({ message: "Unauthorized", error: "Invalid token", info: error });
   }
