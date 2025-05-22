@@ -56,7 +56,13 @@ export default async function (fastify: FastifyInstance) {
           },
         });
 
-        const token = generateToken(user.id);
+        const tokenizedUser = {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
+
+        const token = generateToken(tokenizedUser);
 
         return reply.status(201).send({ token });
       } catch (error) {
@@ -78,17 +84,25 @@ export default async function (fastify: FastifyInstance) {
       try {
         const user = await prisma.user.findUnique({
           where: { email: email.toLowerCase().trim() },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            password: true,
+          },
         });
         if (!user) {
           return reply.status(401).send({ message: "Invalid credentials" });
         }
 
-        const isPasswordValid = await verifyPassword(password, user.password);
+        const { password: hashedPassword, ...userWithoutPassword } = user;
+
+        const isPasswordValid = await verifyPassword(password, hashedPassword);
         if (!isPasswordValid) {
           return reply.status(401).send({ message: "Password not valid" });
         }
 
-        const token = generateToken(user.id);
+        const token = generateToken(userWithoutPassword);
 
         return reply.status(200).send({ token });
       } catch (error) {
