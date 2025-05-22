@@ -1,5 +1,11 @@
 import * as argon2 from "argon2";
 
+const config = {
+  type: argon2.argon2id,
+  timeCost: 3,
+  parallelism: 1,
+};
+
 export const useHash = () => {
   /**
    * Hash a string using argon2
@@ -10,11 +16,8 @@ export const useHash = () => {
     if (!process.env.ARGON2_SECRET) {
       throw new Error("ARGON2_SECRET is not defined");
     }
-
     return await argon2.hash(password, {
-      type: argon2.argon2id,
-      timeCost: 3,
-      parallelism: 1,
+      ...config,
       secret: Buffer.from(process.env.ARGON2_SECRET),
     });
   };
@@ -26,9 +29,15 @@ export const useHash = () => {
    * @returns True if the string is correct, false otherwise
    */
   const verifyPassword = async (password: string, hash: string) => {
-    return await argon2.verify(hash, password);
+    if (!process.env.ARGON2_SECRET) {
+      throw new Error("ARGON2_SECRET is not defined");
+    }
+    return await argon2.verify(hash, password, {
+      ...config,
+      secret: Buffer.from(process.env.ARGON2_SECRET),
+    });
   };
-
+  // /$argon2id$v=19$m=65536,t=3,p=1$IyaCSikPiWjhVf8Io01nng$H1UurKnsw1a9HUyt9AZPSBoYCb49ISaH+Bv57gsVbvQ
   return {
     hashPassword,
     verifyPassword,
