@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import routes from "./src/index.js";
+import routes from "./src/index";
 
 const fastify = Fastify({
   logger: true,
