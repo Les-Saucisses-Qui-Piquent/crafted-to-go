@@ -1,11 +1,22 @@
 import jwt from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
+
+type TokenPayload = Prisma.userGetPayload<{
+  select: {
+    id: true;
+    email: true;
+    role: true;
+  };
+}>;
 
 export const useToken = () => {
-  const generateToken = (userId: string) => {
+  const generateToken = (payload: TokenPayload) => {
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is not defined");
     }
-    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "24h" });
+
+    // Here extends the base token with the authUser object
+    return jwt.sign({ authUser: payload }, process.env.JWT_SECRET, { expiresIn: "24h" });
   };
 
   const verifyToken = (token: string) => {
