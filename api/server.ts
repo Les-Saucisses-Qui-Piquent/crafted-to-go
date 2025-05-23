@@ -1,6 +1,11 @@
 import Fastify from "fastify";
 import routes from "./src/index";
 
+if (!process.env.FRONTEND_URL) {
+  console.error("FRONTEND_URL is not defined. Server will not start.");
+  process.exit(1);
+}
+
 const fastify = Fastify({
   logger: true,
 });
