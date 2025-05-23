@@ -7,7 +7,7 @@ COPY ./package-lock.json .
 
 RUN npm ci
 
-COPY . .
+# COPY . .
 
 EXPOSE 3000
 

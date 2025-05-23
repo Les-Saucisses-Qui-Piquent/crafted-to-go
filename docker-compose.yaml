@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./api/src:/api/src
+      - ./api/utils:/api/utils
       - ./api/server.ts:/api/server.ts
       - ./api/prisma:/api/prisma
       - ./api/package.json:/api/package.json

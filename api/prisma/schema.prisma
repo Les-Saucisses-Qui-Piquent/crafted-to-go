@@ -107,7 +107,7 @@ model brewery_owner {
   password     String
   created_at   DateTime  @default(now())
   updated_at   DateTime  @default(now())
-  role         String    @db.VarChar(255)
+  role         UserRole  @default(brewer)
   brewery      brewery[]
   address      address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
 }
@@ -180,13 +180,13 @@ model user {
   first_name       String
   last_name        String
   birth_date       DateTime           @db.Date
-  email            String
+  email            String             @unique
   phone_number     String
   password         String
   paiement_method  String
   created_at       DateTime           @default(now())
   updated_at       DateTime           @default(now())
-  role             String             @db.VarChar(255)
+  role             UserRole           @default(client)
   favorite_beer    favorite_beer[]
   favorite_brewery favorite_brewery[]
   order            order[]
@@ -207,4 +207,10 @@ model user_detail {
   user       user         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
   beer_color beer_color[] @relation("beer_colorTouser_detail")
   beer_style beer_style[] @relation("beer_styleTouser_detail")
+}
+
+enum UserRole {
+  client
+  brewer
+  admin
 }
