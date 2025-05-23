@@ -104,7 +104,7 @@ export default async function (fastify: FastifyInstance) {
 
         const token = generateToken(userWithoutPassword);
 
-        return reply.status(200).send({ token });
+        return reply.status(200).send({ token, user: userWithoutPassword });
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ message: "Internal server error" });

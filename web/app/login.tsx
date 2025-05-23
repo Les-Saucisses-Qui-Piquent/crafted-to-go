@@ -17,7 +17,7 @@ export const Login = () => {
   const [error, setError] = useState(null);
   const [isChecked, setChecked] = useState(false);
   const router = useRouter();
-  const { test, user } = useAuth();
+  const { login, setUser, setToken } = useAuth();
 
   const [formState, setFormState] = useState({
     email: "",
@@ -39,26 +39,31 @@ export const Login = () => {
   };
 
   const handleLogin = async () => {
-    console.log("handleLogin");
     try {
       const { email, password } = formState;
-      await test(email, password);
+      const response = await login(email, password);
 
-      if (!user) {
+      if (!response || !response.token || !response.user) {
         console.warn("User not found");
         return;
       }
+      setUser(response.user);
+      setToken(response.token);
 
-      if (user.role === "member") {
+      if (response.user.role === "client") {
         router.push("/customer/(tabs)");
       }
 
-      if (user.role === "brewer") {
+      if (response.user.role === "brewer") {
         router.push("/brewery/(tabs)");
       }
+
+      if (response.user.role === "admin") {
+        console.log("Admin role detected");
+      }
     } catch (error) {
-      console.log(error);
-      throw new Error("Login failed from front");
+      console.error(error);
+      console.error("Login failed from front");
     }
   };
 
