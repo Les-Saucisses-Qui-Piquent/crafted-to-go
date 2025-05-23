@@ -1,8 +1,11 @@
-import { preHandlerHookHandler } from "fastify";
+import { FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify";
 import { useToken } from "../../utils/token";
 import { CustomJwtPayload } from "../../types";
 
-export const authMiddleware: preHandlerHookHandler = async (request, reply) => {
+export const authMiddleware: preHandlerHookHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
   try {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
