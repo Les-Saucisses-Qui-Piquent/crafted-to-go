@@ -18,9 +18,15 @@ const userRegisterSchema = z.object({
   password: z.string().min(12, "Password must be at least 12 characters long"),
   first_name: z.string().min(3, "First name is required"),
   last_name: z.string().min(3, "Last name is required"),
-  birth_date: z.string().min(10, "Birth date is required"),
+  birth_date: z.coerce
+    .date({
+      required_error: "Birth date is required",
+      invalid_type_error: "Invalid birth date format",
+    })
+    .max(new Date(new Date().setFullYear(new Date().getFullYear() - 18)), {
+      message: "You must be at least 18 years old",
+    }),
   phone_number: z.string().length(10, "Phone number is required"),
-  paiement_method: z.string().min(3, "Paiement method is required"),
 });
 
 export default async function (fastify: FastifyInstance) {
@@ -128,16 +134,16 @@ const validateLogin = async (request: FastifyRequest<{ Body: UserLogin }>, reply
 };
 
 const validateRegister = async (
-  request: FastifyRequest<{ Body: UserRegister }>,
+  request: FastifyRequest<{ Body: unknown }>,
   reply: FastifyReply,
 ) => {
-  try {
-    const validatedBody = userRegisterSchema.parse(request.body);
-    request.body = validatedBody;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
-    }
-    throw error;
+  const { success, data, error } = userRegisterSchema.safeParse(request.body);
+  if (!success || error) {
+    return reply.status(400).send({
+      message: "Invalid request body",
+      error: (error as unknown as z.ZodError).issues.map((issue) => issue.message),
+    });
   }
+
+  request.body = data;
 };
