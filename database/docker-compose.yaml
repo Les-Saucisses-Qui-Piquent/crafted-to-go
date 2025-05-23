@@ -18,20 +18,21 @@ services:
       timeout: 5s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
+  adminer:
+    image: ghcr.io/jeliebig/adminer-autologin
+    platform: linux/amd64
+    ports:
+      - "5050:8080"
+    environment:
+      ADMINER_PLUGINS: login-env-vars
+      ADMINER_DRIVER: pgsql
+      ADMINER_SERVER: host.docker.internal:5432
+      ADMINER_USERNAME: ${POSTGRES_USER}
+      ADMINER_PASSWORD: ${POSTGRES_PASSWORD}
+      ADMINER_DB: ${POSTGRES_DB}
+      ADMINER_DESIGN: dracula
     depends_on:
       - database
-    ports:
-      - "5555:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-    configs:
-      - source: servers.json
-        target: /pgadmin4/servers.json
     restart: unless-stopped
 
 configs:
