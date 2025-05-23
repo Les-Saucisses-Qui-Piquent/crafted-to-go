@@ -4,10 +4,10 @@ export const useApiClient = () => {
   const { token } = useAuth();
 
   const apiClient = async (endpoint: string, options: RequestInit) => {
-    const apiUrl = process.env.API_URL;
+    const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
     if (!apiUrl) {
-      throw new Error("API_URL is not defined");
+      throw new Error("EXPO_PUBLIC_API_URL is not defined");
     }
 
     const response = await fetch(`${apiUrl}${endpoint}`, {
