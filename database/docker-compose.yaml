@@ -23,6 +23,8 @@ services:
     platform: linux/amd64
     ports:
       - "5050:8080"
+    depends_on:
+      - database
     environment:
       ADMINER_PLUGINS: login-env-vars
       ADMINER_DRIVER: pgsql
@@ -31,8 +33,6 @@ services:
       ADMINER_PASSWORD: ${POSTGRES_PASSWORD}
       ADMINER_DB: ${POSTGRES_DB}
       ADMINER_DESIGN: dracula
-    depends_on:
-      - database
     restart: unless-stopped
 
 configs:
