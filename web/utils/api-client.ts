@@ -3,8 +3,14 @@ import { useAuth } from "@/contexts/AuthContext";
 export const useApiClient = () => {
   const { token } = useAuth();
 
-  const apiClient = async (url: string, options: RequestInit) => {
-    const response = await fetch(url, {
+  const apiClient = async (endpoint: string, options: RequestInit) => {
+    const apiUrl = process.env.API_URL;
+
+    if (!apiUrl) {
+      throw new Error("API_URL is not defined");
+    }
+
+    const response = await fetch(`${apiUrl}${endpoint}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",

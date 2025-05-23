@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch("http://localhost:3000/auth/login", {
+    const response = await fetch(`${process.env.API_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
