@@ -15,7 +15,7 @@
     "lint": "eslint \"./**/*.ts\"",
     "lint:fix": "eslint \"./**/*.ts\" --fix",
     "test": "vitest",
-    "test:api": "tsx server.ts"
+    "test:api": "tsx server.ts > /dev/null 2>&1 &"
   },
   "keywords": [],
   "author": "",
