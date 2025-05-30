@@ -22,6 +22,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
 
   const login = async (email: string, password: string) => {
+    if (!process.env.EXPO_PUBLIC_API_URL) {
+      throw new Error("API URL is not set");
+    }
+
     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
       method: "POST",
       headers: {
