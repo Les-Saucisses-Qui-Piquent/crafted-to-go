@@ -13,7 +13,8 @@
     "db:client": "prisma generate",
     "db:pull": "prisma db pull",
     "lint": "eslint \"./**/*.ts\"",
-    "lint:fix": "eslint \"./**/*.ts\" --fix"
+    "lint:fix": "eslint \"./**/*.ts\" --fix",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
