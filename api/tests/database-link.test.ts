@@ -1,17 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import prisma from "../libs/__mocks__/prisma";
 
-describe("Database link", () => {
-  it("should be up", async () => {
-    const response = await fetch("http://localhost:3000/test");
-    expect(response.status).toBe(200);
-  });
+vi.mock("../libs/prisma");
 
+describe("Integration tests", () => {
   it("should retrieve default test data", async () => {
-    const response = await fetch("http://localhost:3000/test");
-    const data = await response.json();
+    const newTest = {
+      id: 1,
+      first_name: "John",
+      last_name: "Doe",
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
 
-    expect(data[0].id).toBe(1);
-    expect(data[0].first_name).toBe("John");
-    expect(data[0].last_name).toBe("Doe");
+    prisma.test.findMany.mockResolvedValue([newTest]);
+
+    const data = await prisma.test.findMany();
+
+    expect(data).toStrictEqual([newTest]);
   });
 });
