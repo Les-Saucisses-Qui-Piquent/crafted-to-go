@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FRONTEND_URL: http://127.0.0.1:3000
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
