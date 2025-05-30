@@ -27,7 +27,7 @@ jobs:
 
       - name: Start API
         working-directory: api
-        run: npm run test:api
+        run: npm run test:api-start
 
       - name: Wait for server to be ready
         run: npx wait-on http://127.0.0.1:3000
