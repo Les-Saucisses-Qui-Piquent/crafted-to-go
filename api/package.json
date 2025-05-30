@@ -14,7 +14,8 @@
     "db:pull": "prisma db pull",
     "lint": "eslint \"./**/*.ts\"",
     "lint:fix": "eslint \"./**/*.ts\" --fix",
-    "test": "vitest"
+    "test": "npm run test:api && vitest",
+    "test:api": "tsx --watch server.ts > /dev/null 2>&1&"
   },
   "keywords": [],
   "author": "",
