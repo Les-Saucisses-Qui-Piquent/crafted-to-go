@@ -1,6 +1,4 @@
-import { AddressFactory } from "./address-factory";
-import { BeerColorFactory } from "./beer-color-factory";
-import { UserFactory } from "./user-factory";
+import { UserFactory, AddressFactory, BeerColorFactory, BeerStyleFactory } from "./factories";
 import { PrismaClient } from "@prisma/client";
 
 /* eslint-disable no-console */
@@ -21,6 +19,9 @@ const main = async (dbclient: PrismaClient) => {
 
     const beerColorFaker = new BeerColorFactory(dbclient);
     await beerColorFaker.createMany(10);
+
+    const beerStyleFaker = new BeerStyleFactory(dbclient);
+    await beerStyleFaker.createMany(10);
 
     console.log("-== Completed fake seeding ==-");
   } catch (error) {
