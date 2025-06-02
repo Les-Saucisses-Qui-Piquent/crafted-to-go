@@ -1,10 +1,13 @@
 import { fakerFR as faker } from "@faker-js/faker";
 import { Prisma, PrismaClient } from "@prisma/client";
+import type { FakerImplementation } from "./types";
 
 type User = Prisma.userCreateInput;
 
-export const userFactory = (dbClient: PrismaClient) => {
-  const generateUser = (): User => {
+export class UserFactory implements FakerImplementation {
+  constructor(private readonly dbClient: PrismaClient) {}
+
+  private generate = (): User => {
     return {
       email: faker.internet.email(),
       password: faker.internet.password(),
@@ -15,19 +18,17 @@ export const userFactory = (dbClient: PrismaClient) => {
     };
   };
 
-  const createOne = async () => {
-    const user = generateUser();
-    const createdUser = await dbClient.user.create({ data: user });
+  createOne = async () => {
+    const user = this.generate();
+    const createdUser = await this.dbClient.user.create({ data: user });
 
     return createdUser;
   };
 
-  const createMany = async (count: number) => {
-    const users = Array.from({ length: count }, () => generateUser());
-    const createdUsers = await dbClient.user.createMany({ data: users });
+  createMany = async (count: number) => {
+    const users = Array.from({ length: count }, () => this.generate());
+    const createdUsers = await this.dbClient.user.createMany({ data: users });
 
     return createdUsers;
   };
-
-  return { createOne, createMany };
-};
+}

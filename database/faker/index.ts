@@ -1,10 +1,10 @@
-import { userFactory } from "./user-factory";
+import { UserFactory } from "./user-factory";
 import { PrismaClient } from "@prisma/client";
 
 const main = async (dbclient: PrismaClient) => {
   console.log("-== Starting faker ==-");
 
-  const userFaker = userFactory(dbclient);
+  const userFaker = new UserFactory(dbclient);
 
   await userFaker.createMany(10);
 };
