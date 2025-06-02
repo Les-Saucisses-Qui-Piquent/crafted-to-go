@@ -1,69 +1,83 @@
-import {useStyles, createStyleSheet} from 'styles';
-import {useVariants} from 'react-exo/utils';
-import {View, Text} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
-export interface MainButtonProps {
-  secondary: typeof MainButtonVariants.secondary[number],
-  /** Used to locate this view in end-to-end tests. */
-  testID?: string,
+interface MainButtonProps {
+  onPress: () => void;
+  title: string;
+  subtitle?: string;
+  isBlack?: boolean;
+  isSecondary?: boolean;
 }
 
-export const MainButtonVariants = {
-  secondary: ['False', 'True'],
-} as const;
+export default function MainButton({
+  onPress,
+  title,
+  subtitle,
+  isBlack = false,
+  isSecondary = false,
+}: MainButtonProps) {
+  // Determine background color
+  let backgroundColor = "rgba(201, 227, 217, 1)";
+  if (isBlack) backgroundColor = "#000";
+  else if (isSecondary) backgroundColor = "#FDFFD0";
 
-export function MainButton(props: MainButtonProps) {
-  const {secondary} = props;
-  const {styles} = useStyles(stylesheet);
-  const {vstyles} = useVariants(MainButtonVariants, {secondary}, styles);
+  // Determine text color
+  let textColor = isBlack ? "#FFF" : "#000";
 
   return (
-    <View style={vstyles.root()} testID={props.testID ?? "100:2007"}>
-      <View style={vstyles.group16()} testID="100:1646">
-        <View style={vstyles.rectangle20()} testID="100:1647"/>
-        <Text style={vstyles.ajouterAuPanier()} testID="100:1648">
-          {`Ajouter au panier`}
-        </Text>
-      </View>
-    </View>
+    <TouchableOpacity style={styles.mainButtonContainer} onPress={onPress}>
+      <View style={[styles.rectangle20, { backgroundColor }]} />
+      <Text style={[styles.mainButton, { color: textColor }]}>{title}</Text>
+      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+    </TouchableOpacity>
   );
 }
 
-const stylesheet = createStyleSheet(theme => ({
-  root: {
-    flexDirection: 'row',
-    width: 208,
-    height: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
+const styles = StyleSheet.create({
+  mainButtonContainer: {
+    position: "relative",
     flexShrink: 0,
+    height: 36,
+    width: 208,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    rowGap: 0,
   },
   rectangle20: {
+    position: "absolute",
+    flexShrink: 0,
     width: 208,
     height: 36,
-    flexShrink: 0,
-    backgroundColor: 'rgba(201, 227, 217, 1)',
-    shadowColor: 'rgba(0, 0, 0, 0.250980406999588)',
+    backgroundColor: "rgba(201, 227, 217, 1)",
+    shadowColor: "rgba(0, 0, 0, 0.25)",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
     shadowRadius: 4,
-    shadowOffset: {"width":0,"height":4},
   },
-  rectangle20SecondaryTrue: {
-    backgroundColor: 'rgba(253, 255, 208, 1)',
-  },
-  ajouterAuPanier: {
+  mainButton: {
+    position: "absolute",
+    flexShrink: 0,
+    top: 8,
+    left: 29,
     width: 158,
     height: 20,
-    flexShrink: 0,
-    color: 'rgba(0, 0, 0, 1)',
-    textAlign: 'center',
-    fontFamily: 'Hanken Grotesk',
+    textAlign: "center",
+    color: "rgba(0, 0, 0, 1)",
+    fontFamily: "HankenGrotesk",
     fontSize: 14,
-    fontStyle: 'normal',
-    fontWeight: '800',
+    fontWeight: "800",
   },
-  group16: {
-    width: 208,
-    height: 36,
-    flexShrink: 0,
+  subtitle: {
+    position: "absolute",
+    top: 24,
+    left: 29,
+    width: 158,
+    textAlign: "center",
+    color: "#333",
+    fontFamily: "HankenGrotesk",
+    fontSize: 12,
+    fontWeight: "600",
   },
-}));
+});
