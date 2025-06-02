@@ -7,8 +7,8 @@ import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    HankenGrotesk: require("./assets/fonts/HankenGrotesk-VariableFont_wght.ttf"),
-    "HankenGrotesk-italic": require("./assets/fonts/HankenGrotesk-Italic-VariableFont_wght.ttf"),
+    HankenGrotesk: require("../assets/fonts/HankenGrotesk-VariableFont_wght.ttf"),
+    "HankenGrotesk-italic": require("../assets/fonts/HankenGrotesk-Italic-VariableFont_wght.ttf"),
     // Add other weights/styles as needed
   });
 
