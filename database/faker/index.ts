@@ -1,3 +1,4 @@
+import { AddressFactory } from "./address-factory";
 import { UserFactory } from "./user-factory";
 import { PrismaClient } from "@prisma/client";
 
@@ -13,6 +14,9 @@ const main = async (dbclient: PrismaClient) => {
   try {
     const userFaker = new UserFactory(dbclient);
     await userFaker.createMany(10);
+
+    const addressFaker = new AddressFactory(dbclient);
+    await addressFaker.createMany(10);
 
     console.log("-== Completed fake seeding ==-");
   } catch (error) {
