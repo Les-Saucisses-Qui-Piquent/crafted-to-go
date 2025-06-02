@@ -13,7 +13,8 @@
     "db:reset:prisma": "prisma migrate reset && npm run db:client",
     "studio": "prisma studio",
     "lint": "eslint \"./**/*.ts\"",
-    "lint:fix": "eslint \"./**/*.ts\" --fix"
+    "lint:fix": "eslint \"./**/*.ts\" --fix",
+    "db:faker": "tsx ./faker/index.ts"
   },
   "keywords": [],
   "author": "",
