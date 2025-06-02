@@ -14,7 +14,7 @@
     "web:stop": "docker compose down",
     "web:clean": "docker compose down --rmi all",
     "web:reset": "docker compose down --rmi all -v",
-    "db:start": "cd database && docker compose up -d && npx tsx ../scripts/wait.ts && npm run db:apply-migrations && cd ..",
+    "db:start": "cd database && docker compose up -d && npx tsx ../scripts/wait.ts && npm run db:apply-migrations && npm run db:faker && cd ..",
     "db:stop": "cd database && docker compose down && cd ..",
     "db:clean": "cd database && docker compose down --rmi all && npm run db:reset:prisma && cd ..",
     "db:reset": "cd database && docker compose down --rmi all -v && cd ..",

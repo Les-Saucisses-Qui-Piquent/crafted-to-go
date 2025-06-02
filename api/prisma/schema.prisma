@@ -131,18 +131,19 @@ model favorite_brewery {
 }
 
 model order {
-  id           String         @id @default(uuid()) @db.Uuid
-  user_id      String         @db.Uuid
-  brewery_id   String         @db.Uuid
-  final_price  Float
-  status       String         @db.VarChar(255)
-  pickup_day   DateTime       @db.Date
-  pickup_time  String
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @default(now())
-  brewery      brewery        @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_brewery_id_foreign")
-  user         user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_user_id_foreign")
-  order_detail order_detail[]
+  id             String         @id @default(uuid()) @db.Uuid
+  user_id        String         @db.Uuid
+  brewery_id     String         @db.Uuid
+  final_price    Float
+  status         String         @db.VarChar(255)
+  pickup_day     DateTime       @db.Date
+  pickup_time    String
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+  payment_method String?
+  brewery        brewery        @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_brewery_id_foreign")
+  user           user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_user_id_foreign")
+  order_detail   order_detail[]
 }
 
 model order_detail {
@@ -183,7 +184,6 @@ model user {
   email            String             @unique
   phone_number     String
   password         String
-  paiement_method  String
   created_at       DateTime           @default(now())
   updated_at       DateTime           @default(now())
   role             UserRole           @default(client)
@@ -194,19 +194,20 @@ model user {
 }
 
 model user_detail {
-  id         String       @id @default(uuid()) @db.Uuid
-  user_id    String       @db.Uuid
-  image      String
-  beer_level String       @db.VarChar(255)
-  address_id String       @db.Uuid
-  created_at DateTime     @default(now())
-  updated_at DateTime     @default(now())
-  color_ids  String[]     @db.Uuid
-  style_ids  String[]     @db.Uuid
-  address    address      @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
-  user       user         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
-  beer_color beer_color[] @relation("beer_colorTouser_detail")
-  beer_style beer_style[] @relation("beer_styleTouser_detail")
+  id             String       @id @default(uuid()) @db.Uuid
+  user_id        String       @db.Uuid
+  image          String
+  beer_level     String       @db.VarChar(255)
+  address_id     String       @db.Uuid
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @default(now())
+  color_ids      String[]     @db.Uuid
+  style_ids      String[]     @db.Uuid
+  payment_method String?
+  address        address      @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
+  user           user         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
+  beer_color     beer_color[] @relation("beer_colorTouser_detail")
+  beer_style     beer_style[] @relation("beer_styleTouser_detail")
 }
 
 enum UserRole {
