@@ -4,6 +4,7 @@ import {
   BeerColorFactory,
   BeerStyleFactory,
   BreweryOwnerFactory,
+  BreweryFactory,
 } from "./factories";
 import { PrismaClient } from "@prisma/client";
 
@@ -25,7 +26,11 @@ const main = async (dbclient: PrismaClient) => {
     const addressIds = addresses.map((address) => address.id);
 
     const breweryOwnerFaker = new BreweryOwnerFactory(dbclient);
-    await breweryOwnerFaker.createMany(addressIds);
+    const breweryOwners = await breweryOwnerFaker.createMany(addressIds);
+    const breweryOwnerIds = breweryOwners.map((breweryOwner) => breweryOwner.id);
+
+    const breweryFaker = new BreweryFactory(dbclient);
+    await breweryFaker.createMany(addressIds, breweryOwnerIds);
 
     const beerColorFaker = new BeerColorFactory(dbclient);
     await beerColorFaker.createMany(10);

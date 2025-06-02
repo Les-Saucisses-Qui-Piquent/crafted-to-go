@@ -3,5 +3,13 @@ import { AddressFactory } from "./address-factory";
 import { BeerColorFactory } from "./beer-color-factory";
 import { BeerStyleFactory } from "./beer-style-factory";
 import { BreweryOwnerFactory } from "./brewery-owner-factory";
+import { BreweryFactory } from "./brewery-factory";
 
-export { UserFactory, AddressFactory, BeerColorFactory, BeerStyleFactory, BreweryOwnerFactory };
+export {
+  UserFactory,
+  AddressFactory,
+  BeerColorFactory,
+  BeerStyleFactory,
+  BreweryOwnerFactory,
+  BreweryFactory,
+};
