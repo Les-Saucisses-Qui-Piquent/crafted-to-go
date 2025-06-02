@@ -4,6 +4,11 @@ import { PrismaClient } from "@prisma/client";
 /* eslint-disable no-console */
 
 const main = async (dbclient: PrismaClient) => {
+  if (process.env.NODE_ENV !== "develop") {
+    console.log("-== Skipping faker  ==-");
+    return;
+  }
+
   console.log("-== Starting faker ==-");
   try {
     const userFaker = new UserFactory(dbclient);
