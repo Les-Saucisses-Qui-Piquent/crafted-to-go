@@ -37,7 +37,7 @@ export const useHash = () => {
       secret: Buffer.from(process.env.ARGON2_SECRET),
     });
   };
-  // /$argon2id$v=19$m=65536,t=3,p=1$IyaCSikPiWjhVf8Io01nng$H1UurKnsw1a9HUyt9AZPSBoYCb49ISaH+Bv57gsVbvQ
+
   return {
     hashPassword,
     verifyPassword,
