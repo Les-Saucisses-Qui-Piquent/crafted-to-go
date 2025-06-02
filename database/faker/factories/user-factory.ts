@@ -26,9 +26,8 @@ export class UserFactory implements FakerImplementation {
   };
 
   createMany = async (count: number) => {
-    const users = Array.from({ length: count }, () => this.generate());
-    const createdUsers = await this.dbClient.user.createMany({ data: users });
+    const users = await Promise.all(Array.from({ length: count }, () => this.createOne()));
 
-    return createdUsers;
+    return users;
   };
 }

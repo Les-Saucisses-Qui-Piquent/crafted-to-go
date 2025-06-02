@@ -1,4 +1,4 @@
 export interface FakerImplementation {
-  createOne: () => Promise<T>;
-  createMany: (count: number) => Promise<T>;
+  createOne: (...args: T[]) => Promise<T>;
+  createMany: (...args: T[]) => Promise<T>;
 }

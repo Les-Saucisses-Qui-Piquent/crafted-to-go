@@ -22,9 +22,8 @@ export class BeerColorFactory implements FakerImplementation {
   };
 
   createMany = async (count: number) => {
-    const beerColors = Array.from({ length: count }, () => this.generate());
-    const createdBeerColors = await this.dbClient.beer_color.createMany({ data: beerColors });
+    const beerColors = await Promise.all(Array.from({ length: count }, () => this.createOne()));
 
-    return createdBeerColors;
+    return beerColors;
   };
 }

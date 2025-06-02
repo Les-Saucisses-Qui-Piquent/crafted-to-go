@@ -25,9 +25,8 @@ export class AddressFactory implements FakerImplementation {
   };
 
   createMany = async (count: number) => {
-    const addresses = Array.from({ length: count }, () => this.generate());
-    const createdAddresses = await this.dbClient.address.createMany({ data: addresses });
+    const addresses = await Promise.all(Array.from({ length: count }, () => this.createOne()));
 
-    return createdAddresses;
+    return addresses;
   };
 }
