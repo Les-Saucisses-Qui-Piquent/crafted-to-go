@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FRONTEND_URL: http://127.0.0.1:3000
+      FRONTEND_URL: http://127.0.0.1:3000 # Needed for cors plugin
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
