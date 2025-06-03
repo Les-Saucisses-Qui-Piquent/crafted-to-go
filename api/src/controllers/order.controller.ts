@@ -5,8 +5,8 @@ import { z } from "zod";
 type OrderInsert = Prisma.orderCreateInput;
 type OrderUpdate = Prisma.orderUpdateInput;
 
-export const OrderController = {
-  getOrders: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class OrderController {
+  static async getOrders(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const orders = await prisma.order.findMany();
@@ -17,9 +17,9 @@ export const OrderController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getOrder: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async getOrder(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -40,9 +40,9 @@ export const OrderController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createOrder: async (request: FastifyRequest<{ Body: OrderInsert }>, reply: FastifyReply) => {
+  static async createOrder(request: FastifyRequest<{ Body: OrderInsert }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const order = await prisma.order.create({ data: request.body });
@@ -53,12 +53,12 @@ export const OrderController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateOrder: async (
+  static async updateOrder(
     request: FastifyRequest<{ Params: { id: string }; Body: OrderUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -82,9 +82,12 @@ export const OrderController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteOrder: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async deleteOrder(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -101,5 +104,5 @@ export const OrderController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

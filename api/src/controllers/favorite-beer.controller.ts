@@ -5,11 +5,11 @@ import { z } from "zod";
 type FavoriteBeerInsert = Prisma.favorite_beerCreateInput;
 type FavoriteBeerUpdate = Prisma.favorite_beerUpdateInput;
 
-export const FavoriteBeerController = {
-  getFavoriteBeers: async (
+export default class FavoriteBeerController {
+  static async getFavoriteBeers(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id: userId } = request.params;
     try {
@@ -32,12 +32,12 @@ export const FavoriteBeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createFavoriteBeer: async (
+  static async createFavoriteBeer(
     request: FastifyRequest<{ Body: FavoriteBeerInsert }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     try {
       const favoriteBeer = await prisma.favorite_beer.create({
@@ -51,12 +51,12 @@ export const FavoriteBeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateFavoriteBeer: async (
+  static async updateFavoriteBeer(
     request: FastifyRequest<{ Params: { id: string }; Body: FavoriteBeerUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -78,12 +78,12 @@ export const FavoriteBeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteFavoriteBeer: async (
+  static async deleteFavoriteBeer(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -101,5 +101,5 @@ export const FavoriteBeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

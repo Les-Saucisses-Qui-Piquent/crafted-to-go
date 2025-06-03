@@ -5,8 +5,8 @@ import { z } from "zod";
 type UserInsert = Prisma.userCreateInput;
 type UserUpdate = Prisma.userUpdateInput;
 
-export const UserController = {
-  getUsers: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class UserController {
+  static async getUsers(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const users = await prisma.user.findMany();
@@ -17,9 +17,9 @@ export const UserController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getUser: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async getUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -42,9 +42,9 @@ export const UserController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createUser: async (request: FastifyRequest<{ Body: UserInsert }>, reply: FastifyReply) => {
+  static async createUser(request: FastifyRequest<{ Body: UserInsert }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const user = await prisma.user.create({ data: request.body });
@@ -55,12 +55,12 @@ export const UserController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateUser: async (
+  static async updateUser(
     request: FastifyRequest<{ Params: { id: string }; Body: UserUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -85,9 +85,12 @@ export const UserController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteUser: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async deleteUser(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -105,5 +108,5 @@ export const UserController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

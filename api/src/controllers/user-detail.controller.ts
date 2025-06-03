@@ -5,8 +5,8 @@ import { z } from "zod";
 type UserDetailInsert = Prisma.user_detailCreateInput;
 type UserDetailUpdate = Prisma.user_detailUpdateInput;
 
-export const UserDetailController = {
-  getUserDetails: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class UserDetailController {
+  static async getUserDetails(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const userDetails = await prisma.user_detail.findMany();
@@ -17,12 +17,12 @@ export const UserDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getUserDetail: async (
+  static async getUserDetail(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id: userId } = request.params;
     try {
@@ -47,12 +47,12 @@ export const UserDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createUserDetail: async (
+  static async createUserDetail(
     request: FastifyRequest<{ Body: UserDetailInsert }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     try {
       const userDetail = await prisma.user_detail.create({
@@ -65,12 +65,12 @@ export const UserDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateUserDetail: async (
+  static async updateUserDetail(
     request: FastifyRequest<{ Params: { id: string }; Body: UserDetailUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -94,12 +94,12 @@ export const UserDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteUserDetail: async (
+  static async deleteUserDetail(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -116,5 +116,5 @@ export const UserDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

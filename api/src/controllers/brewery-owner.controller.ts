@@ -5,8 +5,8 @@ import { z } from "zod";
 type BreweryOwnerInsert = Prisma.brewery_ownerCreateInput;
 type BreweryOwnerUpdate = Prisma.brewery_ownerUpdateInput;
 
-export const BreweryOwnerController = {
-  getBreweryOwners: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class BreweryOwnerController {
+  static async getBreweryOwners(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const breweryOwners = await prisma.brewery_owner.findMany();
@@ -17,12 +17,12 @@ export const BreweryOwnerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getBreweryOwner: async (
+  static async getBreweryOwner(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -43,12 +43,12 @@ export const BreweryOwnerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createBreweryOwner: async (
+  static async createBreweryOwner(
     request: FastifyRequest<{ Body: BreweryOwnerInsert }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     try {
       const breweryOwner = await prisma.brewery_owner.create({
@@ -61,12 +61,12 @@ export const BreweryOwnerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateBreweryOwner: async (
+  static async updateBreweryOwner(
     request: FastifyRequest<{ Params: { id: string }; Body: BreweryOwnerUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -90,12 +90,12 @@ export const BreweryOwnerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteBreweryOwner: async (
+  static async deleteBreweryOwner(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -112,5 +112,5 @@ export const BreweryOwnerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

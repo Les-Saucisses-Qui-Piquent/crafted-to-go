@@ -5,8 +5,8 @@ import { z } from "zod";
 type OrderDetailInsert = Prisma.order_detailCreateInput;
 type OrderDetailUpdate = Prisma.order_detailUpdateInput;
 
-export const OrderDetailController = {
-  getOrderDetails: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class OrderDetailController {
+  static async getOrderDetails(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const orderDetails = await prisma.order_detail.findMany();
@@ -17,12 +17,12 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getOrderDetail: async (
+  static async getOrderDetail(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -43,12 +43,12 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getDetailFromOrder: async (
+  static async getDetailFromOrder(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id: orderId } = request.params;
     try {
@@ -73,12 +73,12 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createOrderDetail: async (
+  static async createOrderDetail(
     request: FastifyRequest<{ Body: OrderDetailInsert }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     try {
       const orderDetail = await prisma.order_detail.create({
@@ -91,12 +91,12 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateOrderDetail: async (
+  static async updateOrderDetail(
     request: FastifyRequest<{ Params: { id: string }; Body: OrderDetailUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -120,12 +120,12 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteOrderDetail: async (
+  static async deleteOrderDetail(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -142,5 +142,5 @@ export const OrderDetailController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}
