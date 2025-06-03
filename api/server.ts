@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import routes from "./src/index";
+import server from "./src/index";
 
 if (!process.env.FRONTEND_URL) {
   console.error("FRONTEND_URL is not defined. Server will not start.");
@@ -10,7 +10,7 @@ const fastify = Fastify({
   logger: true,
 });
 
-fastify.register(routes);
+fastify.register(server);
 
 fastify.listen({ host: "0.0.0.0", port: 3000 }, (err, address) => {
   if (err) {

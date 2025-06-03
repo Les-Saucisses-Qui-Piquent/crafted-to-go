@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { authMiddleware } from "./middlewares/auth.middleware";
+import { authMiddleware } from "../middlewares/auth.middleware";
 import { FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface } from "fastify";
 
 interface TestInsert extends RouteGenericInterface {
