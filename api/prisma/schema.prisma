@@ -49,7 +49,7 @@ model beer {
 model beer_color {
   id          String        @id @default(uuid()) @db.Uuid
   label       String        @db.VarChar(255)
-  beer_levels String[]      @db.VarChar(255)
+  beer_levels Int[]
   beer        beer[]
   user_detail user_detail[] @relation("beer_colorTouser_detail")
 }
@@ -57,7 +57,7 @@ model beer_color {
 model beer_style {
   id          String        @id @default(uuid()) @db.Uuid
   label       String        @db.VarChar(255)
-  beer_level  String[]      @db.VarChar(255)
+  beer_levels Int[]
   beer        beer[]
   user_detail user_detail[] @relation("beer_styleTouser_detail")
 }
