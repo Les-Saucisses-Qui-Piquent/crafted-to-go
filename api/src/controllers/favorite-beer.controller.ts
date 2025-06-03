@@ -7,11 +7,11 @@ type FavoriteBeerUpdate = Prisma.favorite_beerUpdateInput;
 
 export default class FavoriteBeerController {
   static async getFavoriteBeers(
-    request: FastifyRequest<{ Params: { id: string } }>,
+    request: FastifyRequest<{ Params: { userId: string } }>,
     reply: FastifyReply,
   ) {
     const prisma = new PrismaClient();
-    const { id: userId } = request.params;
+    const { userId } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(userId);
       if (!success) {
