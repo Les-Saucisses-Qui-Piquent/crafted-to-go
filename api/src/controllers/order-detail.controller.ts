@@ -46,11 +46,11 @@ export default class OrderDetailController {
   }
 
   static async getDetailFromOrder(
-    request: FastifyRequest<{ Params: { id: string } }>,
+    request: FastifyRequest<{ Params: { orderId: string } }>,
     reply: FastifyReply,
   ) {
     const prisma = new PrismaClient();
-    const { id: orderId } = request.params;
+    const { orderId } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(orderId);
       if (!success) {
