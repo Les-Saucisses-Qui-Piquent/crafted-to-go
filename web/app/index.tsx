@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Button } from "react-n
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
-import MainButton from "../components/buttons/MainButton";
+import MainButton from "../components/Buttons/MainButton";
+import TextCTA from "../components/Buttons/TextCTA";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -16,17 +17,16 @@ const index = () => {
     <SafeAreaView style={[styles.area]}>
       <View style={[styles.container]}>
         <Text style={styles.title}>Bienvenue</Text>
-        <Text style={[styles.subtitle, { color: "black" }]}>BIERE COUCOU</Text>
-
-        <MainButton onPress={() => navigate("login")} title="LOGIN" isBlack />
 
         <MainButton
           onPress={() => navigate("registerBrewery")}
-          title="BREWERY REGISTER"
+          title="CRÉATION COMPTE BRASSERIE"
           isSecondary
         />
 
-        <MainButton onPress={() => navigate("registerClient")} title="CLIENT REGISTER" />
+        <MainButton onPress={() => navigate("registerClient")} title="CRÉATION COMPTE CLIENT" />
+
+        <TextCTA title="J'AI DÉJÀ UN COMPTE" onPress={() => navigate("login")} />
       </View>
       <View style={styles.bottomContainer}>
         <Text style={[styles.bottomTitle]}>By continuing, you accept the Terms Of Use and</Text>

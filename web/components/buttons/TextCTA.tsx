@@ -1,4 +1,3 @@
-import AppIcon from "@/utils/AppIcon";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -10,34 +9,58 @@ interface TextCTAProps {
 export default function TextCTA({ title, onPress }: TextCTAProps) {
   return (
     <TouchableOpacity style={styles.primaryCTAContainer} onPress={onPress}>
-      <Text style={styles.orders}>{title}</Text>
-      <AppIcon name="arrow-forward" size={23} color="#000" />
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>{title}</Text>
+        <View style={styles.arrowContainer}>
+          <Text style={styles.arrowText}>→</Text>
+        </View>
+      </View>
+      <View style={styles.underline} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   primaryCTAContainer: {
-    position: "relative",
     flexShrink: 0,
-    height: 29,
-    width: 252,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    rowGap: 0,
+    width: 300,
+    paddingVertical: 10,
+    alignItems: "center",
   },
-  orders: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 4,
-    right: 26,
-    bottom: 10,
-    left: 0,
+  contentContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  title: {
     textAlign: "left",
     color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 15,
-    fontWeight: 500,
+    fontFamily: "HankenGrotesk",
+    fontSize: 16,
+    fontWeight: "400",
+    flex: 1,
+  },
+  arrowContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 0, 0, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  arrowText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  underline: {
+    width: "90%",
+    height: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    marginTop: 8,
   },
 });

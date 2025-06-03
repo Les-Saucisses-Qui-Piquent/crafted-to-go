@@ -1,4 +1,3 @@
-
 import Ionicons from "@react-native-vector-icons/ionicons";
 
 export type IconData = {
