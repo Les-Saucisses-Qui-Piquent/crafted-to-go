@@ -13,5 +13,7 @@ export const icons: Record<string, IconData> = {
     "arrow-forward": {
         component: Ionicons, name: "arrow-forward",
     },
-
+    "cloud-upload-outline": {
+        component: Ionicons, name: "cloud-upload-outline",
+    }
 }
