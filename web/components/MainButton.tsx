@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 interface MainButtonProps {
   onPress: () => void;
   title: string;
-  subtitle?: string;
   isBlack?: boolean;
   isSecondary?: boolean;
 }
@@ -11,7 +10,6 @@ interface MainButtonProps {
 export default function MainButton({
   onPress,
   title,
-  subtitle,
   isBlack = false,
   isSecondary = false,
 }: MainButtonProps) {
@@ -27,7 +25,6 @@ export default function MainButton({
     <TouchableOpacity style={styles.mainButtonContainer} onPress={onPress}>
       <View style={[styles.rectangle20, { backgroundColor }]} />
       <Text style={[styles.mainButton, { color: textColor }]}>{title}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
     </TouchableOpacity>
   );
 }
@@ -68,16 +65,5 @@ const styles = StyleSheet.create({
     fontFamily: "HankenGrotesk",
     fontSize: 14,
     fontWeight: "800",
-  },
-  subtitle: {
-    position: "absolute",
-    top: 24,
-    left: 29,
-    width: 158,
-    textAlign: "center",
-    color: "#333",
-    fontFamily: "HankenGrotesk",
-    fontSize: 12,
-    fontWeight: "600",
   },
 });

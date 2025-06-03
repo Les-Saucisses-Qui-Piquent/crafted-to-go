@@ -18,25 +18,15 @@ const index = () => {
         <Text style={styles.title}>Bienvenue</Text>
         <Text style={[styles.subtitle, { color: "black" }]}>BIERE COUCOU</Text>
 
-        <MainButton
-          onPress={() => navigate("login")}
-          title="Already have account?"
-          subtitle="Log In"
-          isBlack
-        />
+        <MainButton onPress={() => navigate("login")} title="LOGIN" isBlack />
 
         <MainButton
           onPress={() => navigate("registerBrewery")}
-          title="Vous êtes une brasserie"
-          subtitle="REGISTER"
+          title="BREWERY REGISTER"
           isSecondary
         />
 
-        <MainButton
-          onPress={() => navigate("registerClient")}
-          title="Vous voulez des bières ?"
-          subtitle="REGISTER"
-        />
+        <MainButton onPress={() => navigate("registerClient")} title="CLIENT REGISTER" />
       </View>
       <View style={styles.bottomContainer}>
         <Text style={[styles.bottomTitle]}>By continuing, you accept the Terms Of Use and</Text>
