@@ -1,7 +1,6 @@
 import AppIcon from "@/utils/AppIcon";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
 
 interface TextCTAProps {
   title: string;
@@ -12,7 +11,7 @@ export default function TextCTA({ title, onPress }: TextCTAProps) {
   return (
     <TouchableOpacity style={styles.primaryCTAContainer} onPress={onPress}>
       <Text style={styles.orders}>{title}</Text>
-      <AppIcon name="arrow-forward" size={23} color="#000" style={styles.arrowIcon} />
+      <AppIcon name="arrow-forward" size={23} color="#000" />
     </TouchableOpacity>
   );
 }
@@ -40,10 +39,5 @@ const styles = StyleSheet.create({
     fontFamily: "Hanken Grotesk",
     fontSize: 15,
     fontWeight: 500,
-  },
-  arrowIcon: {
-    position: "absolute",
-    right: 0,
-    top: 3,
   },
 });
