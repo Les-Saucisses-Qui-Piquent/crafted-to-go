@@ -5,8 +5,8 @@ import { View, Text, ImageBackground, StyleSheet } from "react-native";
 export default function FilterButton() {
   return (
     <View style={styles.filterButtonContainer}>
-      <Text style={styles.filtrerpar}>{`Filtrer par`}</Text>
-      <AppIcon name="filter" size={14} style={styles.filter1} />
+      <Text style={styles.filter}>{`Filtrer par`}</Text>
+      <AppIcon name="filter" size={14} />
     </View>
   );
 }
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     rowGap: 0,
   },
-  filtrerpar: {
+  filter: {
     position: "absolute",
     flexShrink: 0,
     top: 0,
@@ -31,16 +31,8 @@ const styles = StyleSheet.create({
     left: 25,
     textAlign: "left",
     color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
+    fontFamily: "HankenGrotesk",
     fontSize: 12,
     fontWeight: 400,
-  },
-  filter1: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 1,
-    right: 66,
-    left: 0,
-    height: 14,
   },
 });
