@@ -11,6 +11,7 @@ import {
   FavoriteBreweryFactory,
   UserDetailFactory,
   OrderFactory,
+  OrderDetailFactory,
 } from "./factories";
 import { PrismaClient } from "@prisma/client";
 
@@ -65,7 +66,11 @@ const main = async (dbclient: PrismaClient) => {
     await userDetailFaker.createMany(userIds, addressIds);
 
     const orderFaker = new OrderFactory(dbclient);
-    await orderFaker.createMany(userIds, breweryIds);
+    const orders = await orderFaker.createMany(userIds, breweryIds);
+    const orderIds = orders.map((order) => order.id);
+
+    const orderDetailFaker = new OrderDetailFactory(dbclient);
+    await orderDetailFaker.createMany(orderIds, beerIds);
 
     console.log("-== Completed fake seeding ==-");
   } catch (error) {
