@@ -41,6 +41,12 @@ export const Login = () => {
   const handleLogin = async () => {
     try {
       const { email, password } = formState;
+
+      if (!email || !password) {
+        console.warn("Email and password are required");
+        return;
+      }
+
       const response = await login(email, password);
 
       if (!response || !response.token || !response.user) {
@@ -62,8 +68,8 @@ export const Login = () => {
         console.log("Admin role detected");
       }
     } catch (error) {
+      console.error("Login failed from front:");
       console.error(error);
-      console.error("Login failed from front");
     }
   };
 
