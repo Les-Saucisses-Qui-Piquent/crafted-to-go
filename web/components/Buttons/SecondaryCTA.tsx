@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 
 interface SecondaryCTAProps {
   title: string;
   isBlack?: boolean;
   tablet?: boolean;
   onPress?: () => void;
+  style?: ViewStyle;
 }
 
 export default function SecondaryCTA({
@@ -13,6 +14,7 @@ export default function SecondaryCTA({
   isBlack = false,
   tablet = false,
   onPress,
+  style,
 }: SecondaryCTAProps) {
   let backgroundColor = "rgba(252, 248, 248, 1)";
   if (isBlack) backgroundColor = "#000";
@@ -20,7 +22,7 @@ export default function SecondaryCTA({
   let width = tablet ? 294 : 128;
 
   return (
-    <TouchableOpacity style={[styles.secondaryCTAContainer, { width }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.secondaryCTAContainer, { width }, style]} onPress={onPress}>
       <View style={[styles.rectangle21, { backgroundColor }]} />
       <Text style={[styles.orderDetails, { color: textColor }]}>{title}</Text>
     </TouchableOpacity>

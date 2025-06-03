@@ -4,8 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { useNavigation, useRouter } from "expo-router";
 import Checkbox from "expo-checkbox";
-import Button from "@/components/Button";
-import Input from "@/components/Input";
+import SecondaryCTA from "../components/Buttons/SecondaryCTA";
+import Input from "../components/form/Input";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Nav = {
@@ -90,49 +90,59 @@ export const Login = () => {
           },
         ]}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Text
-            style={[
-              styles.title,
-              {
-                color: COLORS.black,
-              },
-            ]}
-          >
-            Login to Your Account
-          </Text>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.loginContainer}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: COLORS.black,
+                },
+              ]}
+            >
+              LOGIN TO YOUR ACCOUNT
+            </Text>
 
-          <View>
-            <Input
-              id="email"
-              onInputChanged={inputChangedHandler}
-              placeholder="Email"
-              placeholderTextColor={COLORS.black}
-              keyboardType="email-address"
-            />
-
-            <Input
-              id="password"
-              secureTextEntry
-              onInputChanged={inputChangedHandler}
-              placeholder="Password"
-              placeholderTextColor={COLORS.black}
-            />
-            <View>
-              <Button title="Se connecter" onPress={handleLogin}></Button>
-            </View>
-          </View>
-
-          <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: "row" }}>
-              <Checkbox
-                style={styles.checkbox}
-                value={isChecked}
-                color={isChecked ? COLORS.primary : "gray"}
-                onValueChange={setChecked}
+            <View style={styles.formContainer}>
+              <Input
+                label="Email"
+                id="email"
+                onInputChanged={inputChangedHandler}
+                placeholder="Entrez votre email"
+                placeholderTextColor={COLORS.black}
+                keyboardType="email-address"
               />
 
-              <View style={{ flex: 1 }}>
+              <Input
+                label="Mot de passe"
+                id="password"
+                secureTextEntry
+                onInputChanged={inputChangedHandler}
+                placeholder="Entrez votre mot de passe"
+                placeholderTextColor={COLORS.black}
+              />
+              <View style={styles.buttonContainer}>
+                <SecondaryCTA 
+                  title="Se connecter" 
+                  isBlack={true}
+                  tablet={true}
+                  onPress={handleLogin}
+                />
+              </View>
+            </View>
+
+            <View style={styles.checkBoxContainer}>
+              <View style={styles.checkboxRow}>
+                <Checkbox
+                  style={[
+                    styles.checkbox,
+                    !isChecked && styles.checkboxUnchecked
+                  ]}
+                  value={isChecked}
+                  color={isChecked ? "#000000" : "transparent"}
+                  onValueChange={setChecked}
+                />
+
                 <Text
                   style={[
                     styles.privacy,
@@ -141,15 +151,15 @@ export const Login = () => {
                     },
                   ]}
                 >
-                  Remember me
+                  Rester connecté
                 </Text>
               </View>
+
+              <TouchableOpacity onPress={() => navigate("/forgotmypassword")}>
+                <Text style={styles.forgotPasswordBtnText}>Forgot the password?</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          <TouchableOpacity onPress={() => navigate("/forgotmypassword")}>
-            <Text style={styles.forgotPasswordBtnText}>Forgot the password?</Text>
-          </TouchableOpacity>
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -182,29 +192,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 26,
-    fontFamily: "semiBold",
+    fontSize: 28,
+    fontFamily: "HankenGrotesk",
     color: COLORS.black,
     textAlign: "center",
     marginBottom: 22,
+    fontWeight: "700",
+    paddingTop: 26,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginVertical: 20,
   },
   checkBoxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 18,
+    //marginVertical: 18,
+    width: "100%",
   },
   checkbox: {
     marginRight: 8,
     height: 16,
     width: 16,
     borderRadius: 4,
-    borderColor: COLORS.primary,
+    borderWidth: 0,
+  },
+  checkboxUnchecked: {
+    borderColor: "#C9E3D9",
     borderWidth: 2,
   },
   privacy: {
-    fontSize: 12,
-    fontFamily: "regular",
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
     color: COLORS.black,
   },
   socialTitle: {
@@ -223,7 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 18,
+    //marginVertical: 18,
     position: "absolute",
     bottom: 12,
     right: 0,
@@ -245,11 +265,45 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   forgotPasswordBtnText: {
-    fontSize: 16,
-    fontFamily: "semiBold",
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
     color: COLORS.primary,
     textAlign: "center",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
+  formContainer: {
+    alignItems: "center",
+    //marginBottom: 20,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  forgotPasswordContainer: {
+    alignItems: "center",
     marginTop: 12,
+  },
+  loginContainer: {
+    backgroundColor: "#F4F9F7",
+    borderRadius: 16,
+    padding: 24,
+    paddingHorizontal: 48,
+    margin: 24,
+    marginHorizontal: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
 

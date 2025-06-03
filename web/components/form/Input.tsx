@@ -4,16 +4,44 @@ import { View, Text, StyleSheet, TextInput } from "react-native";
 interface InputProps {
   label: string;
   small?: boolean;
+  id?: string;
+  onInputChanged?: (id: string, text: string) => void;
+  placeholder?: string;
+  placeholderTextColor?: string;
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  secureTextEntry?: boolean;
 }
 
-export default function Input({ label, small = false }: InputProps) {
-  let width = small ? 292 : 91;
+export default function Input({ 
+  label, 
+  small = false, 
+  id = "",
+  onInputChanged,
+  placeholder,
+  placeholderTextColor = "rgba(99, 99, 96, 1)",
+  keyboardType = "default",
+  secureTextEntry = false
+}: InputProps) {
+  let width = small ? 292 : 350;
+
+  const handleTextChange = (text: string) => {
+    if (onInputChanged && id) {
+      onInputChanged(id, text);
+    }
+  };
 
   return (
-    <View style={(styles.inputContainer, { width })}>
+    <View style={[styles.inputContainer, { width }]}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.rectangle94} />
-      <TextInput style={styles.placeholder} />
+      <TextInput 
+        style={styles.placeholder}
+        placeholder={placeholder}
+        placeholderTextColor={placeholderTextColor}
+        keyboardType={keyboardType}
+        secureTextEntry={secureTextEntry}
+        onChangeText={handleTextChange}
+      />
     </View>
   );
 }
@@ -27,19 +55,20 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "flex-start",
     rowGap: 0,
+    marginVertical: 10,
   },
   label: {
     position: "absolute",
     flexShrink: 0,
     top: 0,
-    right: 255,
+    right: 0,
     bottom: 32,
     left: 0,
     textAlign: "left",
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "HankenGrotesk",
     fontSize: 15,
-    fontWeight: 700,
+    fontWeight: "700",
   },
   rectangle94: {
     position: "absolute",
@@ -50,7 +79,7 @@ const styles = StyleSheet.create({
     left: 0,
     borderStyle: "solid",
     backgroundColor: "rgba(255, 255, 255, 1)",
-    borderWidth: 0.20000000298023224,
+    borderWidth: 0.5,
     borderColor: "rgba(0, 0, 0, 1)",
     borderRadius: 4,
   },
@@ -58,13 +87,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     flexShrink: 0,
     top: 31,
-    right: 224,
+    right: 10,
     bottom: 7,
     left: 9,
     textAlign: "left",
     color: "rgba(99, 99, 96, 1)",
     fontFamily: "HankenGrotesk",
     fontSize: 11,
-    fontWeight: 300,
+    fontWeight: "300",
   },
 });
