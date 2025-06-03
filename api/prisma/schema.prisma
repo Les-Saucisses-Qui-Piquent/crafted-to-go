@@ -197,13 +197,13 @@ model user_detail {
   id             String       @id @default(uuid()) @db.Uuid
   user_id        String       @db.Uuid
   image          String
-  beer_level     String       @db.VarChar(255)
   address_id     String       @db.Uuid
   created_at     DateTime     @default(now())
   updated_at     DateTime     @default(now())
   color_ids      String[]     @db.Uuid
   style_ids      String[]     @db.Uuid
   payment_method String?
+  beer_level     Int
   address        address      @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
   user           user         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_user_id_foreign")
   beer_color     beer_color[] @relation("beer_colorTouser_detail")
