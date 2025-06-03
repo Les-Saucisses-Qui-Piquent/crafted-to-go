@@ -1,0 +1,108 @@
+import { FastifyRequest, FastifyReply } from "fastify";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { z } from "zod";
+
+type FavoriteBreweryInsert = Prisma.favorite_breweryCreateInput;
+type FavoriteBreweryUpdate = Prisma.favorite_breweryUpdateInput;
+
+export const FavoriteBreweryController = {
+  getFavoriteBreweries: async (
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) => {
+    const prisma = new PrismaClient();
+    const { id: userId } = request.params;
+    try {
+      const { success } = z.string().uuid().safeParse(userId);
+      if (!success) {
+        reply.status(400).send({ message: "Invalid uuid" });
+        return;
+      }
+
+      const favoriteBreweries = await prisma.favorite_brewery.findMany({
+        where: { user_id: userId },
+      });
+
+      if (!favoriteBreweries) {
+        reply.status(404).send({ message: "FavoriteBrewery not found" });
+        return;
+      }
+
+      reply.send(favoriteBreweries);
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ message: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  },
+
+  createFavoriteBrewery: async (
+    request: FastifyRequest<{ Body: FavoriteBreweryInsert }>,
+    reply: FastifyReply,
+  ) => {
+    const prisma = new PrismaClient();
+    try {
+      const favoriteBrewery = await prisma.favorite_brewery.create({
+        data: request.body,
+      });
+      reply.send(favoriteBrewery);
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ message: "Server Error" });
+    } finally {
+      await prisma.$disconnect();
+    }
+  },
+
+  updateFavoriteBrewery: async (
+    request: FastifyRequest<{ Params: { id: string }; Body: FavoriteBreweryUpdate }>,
+    reply: FastifyReply,
+  ) => {
+    const prisma = new PrismaClient();
+    const { id } = request.params;
+    try {
+      const { success } = z.string().uuid().safeParse(id);
+      if (!success) {
+        reply.status(400).send({ message: "Invalid uuid" });
+        return;
+      }
+      const favoriteBrewery = await prisma.favorite_brewery.update({
+        where: { id },
+        data: request.body,
+      });
+      if (!favoriteBrewery) {
+        reply.status(404).send({ message: "FavoriteBrewery not found" });
+        return;
+      }
+      reply.send(favoriteBrewery);
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ message: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  },
+
+  deleteFavoriteBrewery: async (
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) => {
+    const prisma = new PrismaClient();
+    const { id } = request.params;
+    try {
+      const { success } = z.string().uuid().safeParse(id);
+      if (!success) {
+        reply.status(400).send({ message: "Invalid uuid" });
+        return;
+      }
+      await prisma.favorite_brewery.delete({ where: { id } });
+      reply.send({ message: "FavoriteBrewery deleted" });
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ message: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  },
+};
