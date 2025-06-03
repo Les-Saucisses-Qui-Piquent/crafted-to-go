@@ -24,7 +24,37 @@ export default class UserDetailController {
     reply: FastifyReply,
   ) {
     const prisma = new PrismaClient();
-    const { id: userId } = request.params;
+    const { id } = request.params;
+    try {
+      const { success } = z.string().uuid().safeParse(id);
+      if (!success) {
+        reply.status(400).send({ message: "Invalid uuid" });
+        return;
+      }
+
+      const detail = await prisma.user_detail.findUnique({
+        where: { id },
+      });
+      if (!detail) {
+        reply.status(404).send({ message: "UserDetail not found" });
+        return;
+      }
+
+      reply.send(detail);
+    } catch (error) {
+      console.error(error);
+      reply.status(500).send({ message: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  static async getDetailFromUser(
+    request: FastifyRequest<{ Params: { userId: string } }>,
+    reply: FastifyReply,
+  ) {
+    const prisma = new PrismaClient();
+    const { userId } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(userId);
       if (!success) {
