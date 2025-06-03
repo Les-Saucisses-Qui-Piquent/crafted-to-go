@@ -6,6 +6,7 @@ import { BreweryOwnerFactory } from "./brewery-owner-factory";
 import { BreweryFactory } from "./brewery-factory";
 import { BreweryDetailFactory } from "./brewery-detail-factory";
 import { BeerFactory } from "./beer-factory";
+import { FavoriteBeerFactory } from "./favorite-beer";
 
 export {
   UserFactory,
@@ -16,4 +17,5 @@ export {
   BreweryFactory,
   BreweryDetailFactory,
   BeerFactory,
+  FavoriteBeerFactory,
 };
