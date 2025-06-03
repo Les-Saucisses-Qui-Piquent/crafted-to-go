@@ -5,8 +5,8 @@ import { z } from "zod";
 type BeerColorInsert = Prisma.beer_colorCreateInput;
 type BeerColorUpdate = Prisma.beer_colorUpdateInput;
 
-export const BeerColorController = {
-  getBeerColors: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class BeerColorController {
+  static async getBeerColors(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const beerColors = await prisma.beer_color.findMany();
@@ -17,12 +17,12 @@ export const BeerColorController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getBeerColor: async (
+  static async getBeerColor(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -43,12 +43,12 @@ export const BeerColorController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createBeerColor: async (
+  static async createBeerColor(
     request: FastifyRequest<{ Body: BeerColorInsert }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     try {
       const beerColor = await prisma.beer_color.create({
@@ -61,12 +61,12 @@ export const BeerColorController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateBeerColor: async (
+  static async updateBeerColor(
     request: FastifyRequest<{ Params: { id: string }; Body: BeerColorUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -90,12 +90,12 @@ export const BeerColorController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteBeerColor: async (
+  static async deleteBeerColor(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -112,5 +112,5 @@ export const BeerColorController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}

@@ -5,8 +5,8 @@ import { z } from "zod";
 type BeerInsert = Prisma.beerCreateInput;
 type BeerUpdate = Prisma.beerUpdateInput;
 
-export const BeerController = {
-  getBeers: async (_request: FastifyRequest, reply: FastifyReply) => {
+export default class BeerController {
+  static async getBeers(_request: FastifyRequest, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const beers = await prisma.beer.findMany();
@@ -17,9 +17,9 @@ export const BeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  getBeer: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async getBeer(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -40,9 +40,9 @@ export const BeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  createBeer: async (request: FastifyRequest<{ Body: BeerInsert }>, reply: FastifyReply) => {
+  static async createBeer(request: FastifyRequest<{ Body: BeerInsert }>, reply: FastifyReply) {
     const prisma = new PrismaClient();
     try {
       const beer = await prisma.beer.create({ data: request.body });
@@ -53,12 +53,12 @@ export const BeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  updateBeer: async (
+  static async updateBeer(
     request: FastifyRequest<{ Params: { id: string }; Body: BeerUpdate }>,
     reply: FastifyReply,
-  ) => {
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -82,9 +82,12 @@ export const BeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
+  }
 
-  deleteBeer: async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+  static async deleteBeer(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
     const prisma = new PrismaClient();
     const { id } = request.params;
     try {
@@ -101,5 +104,5 @@ export const BeerController = {
     } finally {
       await prisma.$disconnect();
     }
-  },
-};
+  }
+}
