@@ -9,6 +9,7 @@ import { BeerFactory } from "./beer-factory";
 import { FavoriteBeerFactory } from "./favorite-beer";
 import { FavoriteBreweryFactory } from "./favorite-brewery";
 import { UserDetailFactory } from "./user-detail-factory";
+import { OrderFactory } from "./order-factory";
 
 export {
   UserFactory,
@@ -22,4 +23,5 @@ export {
   FavoriteBeerFactory,
   FavoriteBreweryFactory,
   UserDetailFactory,
+  OrderFactory,
 };
