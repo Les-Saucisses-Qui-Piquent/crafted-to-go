@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Button } from "react-n
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
-import MainButton from "../components/Buttons/MainButton";
+import MainButton from "../components/buttons/MainButton";
 
 type Nav = {
   navigate: (value: string) => void;
