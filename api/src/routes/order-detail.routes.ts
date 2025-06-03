@@ -10,7 +10,7 @@ export default async function (fastify: FastifyInstance) {
     handler: OrderDetailController.getOrderDetail,
   });
 
-  fastify.get("/order-details/:orderId", {
+  fastify.get("/order-details/order/:orderId", {
     handler: OrderDetailController.getDetailFromOrder,
   });
 
