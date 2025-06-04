@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { router, useNavigation } from "expo-router";
@@ -35,10 +35,6 @@ const SignupClient = () => {
     phone_number: "",
     birth_date: "",
   });
-
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const debounceForm = useRef(
     debounce((key: keyof typeof formData, value: string) => {
