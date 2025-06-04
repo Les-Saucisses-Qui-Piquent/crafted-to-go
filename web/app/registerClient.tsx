@@ -1,15 +1,17 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { useNavigation } from "expo-router";
-import Input from "@/components/Input";
+import Input from "../components/form/Input";
+import TextCTA from "../components/Buttons/TextCTA";
 
 type Nav = {
   navigate: (value: string) => void;
 };
 
 const SignupClient = () => {
+  const { navigate } = useNavigation<Nav>();
   const { navigate } = useNavigation<Nav>();
 
   return (
@@ -28,8 +30,9 @@ const SignupClient = () => {
             Create Your Account
           </Text>
 
-          <View>
+          <View style={styles.formContainer}>
             <Input
+              label="Prénom"
               id="first_name"
               onInputChanged={console.log}
               placeholder="First Name"
@@ -37,6 +40,7 @@ const SignupClient = () => {
             />
 
             <Input
+              label="Nom"
               id="last_name"
               onInputChanged={console.log}
               placeholder="Last Name"
@@ -44,6 +48,16 @@ const SignupClient = () => {
             />
 
             <Input
+              label="Numéro de téléphone"
+              id="phone_number"
+              onInputChanged={console.log}
+              placeholder="Phone Number"
+              placeholderTextColor={COLORS.black}
+              keyboardType="phone-pad"
+            />
+
+            <Input
+              label="Email"
               id="email"
               onInputChanged={console.log}
               placeholder="Email"
@@ -52,6 +66,7 @@ const SignupClient = () => {
             />
 
             <Input
+              label="Mot de passe"
               id="password"
               secureTextEntry
               onInputChanged={console.log}
@@ -59,16 +74,12 @@ const SignupClient = () => {
               placeholderTextColor={COLORS.black}
             />
 
-            <Input
-              id="phone_number"
-              onInputChanged={console.log}
-              placeholder="Phone Number"
-              placeholderTextColor={COLORS.black}
-              keyboardType="phone-pad"
-            />
-
-            <View>
-              <Button title="Se connecter" onPress={() => console.log("button pressed")}></Button>
+            <View style={styles.buttonContainer}>
+              <TextCTA 
+                title="Valider et passer à l'étape suivante" 
+                onPress={() => console.log("button pressed")}
+                width={350}
+              />
             </View>
           </View>
 
@@ -196,6 +207,13 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     width: SIZES.width - 32,
     borderRadius: 30,
+  },
+  formContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    alignItems: "center",
   },
 });
 

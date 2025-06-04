@@ -4,11 +4,12 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 interface TextCTAProps {
   title: string;
   onPress?: () => void;
+  width?: number;
 }
 
-export default function TextCTA({ title, onPress }: TextCTAProps) {
+export default function TextCTA({ title, onPress, width = 300 }: TextCTAProps) {
   return (
-    <TouchableOpacity style={styles.primaryCTAContainer} onPress={onPress}>
+    <TouchableOpacity style={[styles.primaryCTAContainer, { width }]} onPress={onPress}>
       <View style={styles.contentContainer}>
         <Text style={styles.title}>{title}</Text>
         <View style={styles.arrowContainer}>
@@ -23,7 +24,6 @@ export default function TextCTA({ title, onPress }: TextCTAProps) {
 const styles = StyleSheet.create({
   primaryCTAContainer: {
     flexShrink: 0,
-    width: 300,
     paddingVertical: 10,
     alignItems: "center",
   },
