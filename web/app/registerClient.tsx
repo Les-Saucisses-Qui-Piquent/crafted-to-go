@@ -47,43 +47,49 @@ const SignupClient = () => {
   const validatePasswords = () => {
     if (formState.password !== formState.confirmPassword) {
       setPasswordError("Les mots de passe ne correspondent pas");
+      Alert.alert("Erreur", passwordError);
       return false;
     }
     if (formState.password.length < 12) {
       setPasswordError("Le mot de passe doit contenir au moins 12 caractères");
+      Alert.alert("Erreur", passwordError);
+      return false;
+    }
+    console.info("Passwords are matching");
+    return true;
+  };
+
+  const validateForm = () => {
+    const { first_name, last_name, phone_number, birth_date, email, password } = formState;
+
+    if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
+      console.warn("All fields are required");
+      const trad = {
+        first_name: "Prénom",
+        last_name: "Nom",
+        phone_number: "Numéro de téléphone",
+        birth_date: "Date de naissance",
+        email: "Email",
+        password: "Mot de passe",
+        confirmPassword: "Confirmation du mot de passe",
+      };
+
+      const missingFields = Object.entries(formState)
+        .filter(([, value]) => !value || value.toString().trim() === "")
+        .map(([key]) => trad[key as keyof typeof trad])
+        .join(", ");
+
+      Alert.alert("Oops", `Les champs ${missingFields} sont requis`);
       return false;
     }
     return true;
   };
 
   const handleSubmit = async () => {
-    if (validatePasswords()) {
-      console.log("Form is valid, proceeding...", formState);
+    if (validatePasswords() && validateForm()) {
       // Proceed with form submission
-
       try {
-        const { first_name, last_name, phone_number, birth_date, email, password } = formState;
-
-        if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
-          console.warn("All fields are required");
-          const trad = {
-            first_name: "Prénom",
-            last_name: "Nom",
-            phone_number: "Numéro de téléphone",
-            birth_date: "Date de naissance",
-            email: "Email",
-            password: "Mot de passe",
-            confirmPassword: "Confirmation du mot de passe",
-          };
-
-          const missingFields = Object.entries(formState)
-            .filter(([, value]) => !value || value.toString().trim() === "")
-            .map(([key]) => trad[key as keyof typeof trad])
-            .join(", ");
-
-          Alert.alert("Oops", `Les champs ${missingFields} sont requis`);
-          return;
-        }
+        const { email, password, first_name, last_name, birth_date, phone_number } = formState;
 
         const body = JSON.stringify({
           email,
@@ -93,7 +99,7 @@ const SignupClient = () => {
           birth_date,
           phone_number,
         });
-        console.log("Registering user...");
+        console.info("Registering user...");
 
         const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
           method: "POST",
@@ -108,6 +114,8 @@ const SignupClient = () => {
           console.log(response);
           return;
         }
+
+        // Retrieve token and basic user info
         const data = await response.json();
 
         setToken(data.token);
@@ -120,16 +128,10 @@ const SignupClient = () => {
         if (data.user.role === "brewer") {
           router.push("/brewery/(tabs)");
         }
-
-        if (data.user.role === "admin") {
-          console.log("Admin role detected");
-        }
       } catch (error) {
         console.error("Registration failed from front:");
         console.error(error);
       }
-    } else {
-      Alert.alert("Erreur", passwordError);
     }
   };
 
@@ -175,7 +177,11 @@ const SignupClient = () => {
               keyboardType="phone-pad"
             />
 
-            <TextCTA title="Date de naissance" onPress={() => setShowDatePicker(true)} />
+            <TextCTA
+              title="Date de naissance"
+              onPress={() => setShowDatePicker(true)}
+              width={350}
+            />
             {showDatePicker && (
               <DateTimePicker
                 value={new Date()}
