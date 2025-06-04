@@ -22,16 +22,16 @@ export const icons: Record<string, IconData> = {
         component: Ionicons, name: "ellipsis-vertical"
     },
 
-    home: {
+    "home": {
         component: Ionicons, name: "home-outline",
     },
-    person: {
+    "person": {
         component: Ionicons, name: "person-outline",
     },
-    receipt: {
+    "receipt": {
         component: Ionicons, name: "receipt-outline",
     },
-    grid: {
+    "grid": {
         component: Ionicons, name: "grid-outline",
     },
 
@@ -46,5 +46,14 @@ export const icons: Record<string, IconData> = {
     },
     "grid-active": {
         component: Ionicons, name: "grid",
+    },
+    "cart-outline": {
+        component: Ionicons, name: "cart-outline",
+    },
+    "notifications-outline": {
+        component: Ionicons, name: "notifications-outline",
+    },
+    "notifications": {
+        component: Ionicons, name: "notifications",
     },
 }
