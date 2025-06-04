@@ -2,9 +2,11 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "rea
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import Input from "../components/form/Input";
 import TextCTA from "../components/Buttons/TextCTA";
+import { useAuth } from "@/contexts/AuthContext";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -12,11 +14,22 @@ type Nav = {
 
 const SignupClient = () => {
   const { navigate } = useNavigation<Nav>();
+  const { setToken, setUser } = useAuth();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<{
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    birth_date: Date | undefined;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({
     first_name: "",
     last_name: "",
     phone_number: "",
+    birth_date: undefined,
     email: "",
     password: "",
     confirmPassword: "",
@@ -41,17 +54,69 @@ const SignupClient = () => {
       setPasswordError("Les mots de passe ne correspondent pas");
       return false;
     }
-    if (formState.password.length < 6) {
+    if (formState.password.length < 12) {
       setPasswordError("Le mot de passe doit contenir au moins 6 caractères");
       return false;
     }
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validatePasswords()) {
       console.log("Form is valid, proceeding...", formState);
       // Proceed with form submission
+
+      try {
+        const { first_name, last_name, phone_number, birth_date, email, password } = formState;
+
+        if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
+          console.warn("All fields are required");
+          return;
+        }
+
+        const body = JSON.stringify({
+          email,
+          password,
+          first_name,
+          last_name,
+          birth_date,
+          phone_number,
+        });
+        console.log("Registering user...");
+
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body,
+        });
+
+        if (!response.ok) {
+          console.warn("Registration failed");
+          console.log(response);
+          return;
+        }
+        const data = await response.json();
+
+        setToken(data.token);
+        setUser(data.user);
+
+        if (data.user.role === "client") {
+          router.push("/customer/(tabs)");
+        }
+
+        if (data.user.role === "brewer") {
+          router.push("/brewery/(tabs)");
+        }
+
+        if (data.user.role === "admin") {
+          console.log("Admin role detected");
+        }
+      } catch (error) {
+        console.error("Registration failed from front:");
+        console.error(error);
+      }
     } else {
       Alert.alert("Erreur", passwordError);
     }
@@ -98,6 +163,23 @@ const SignupClient = () => {
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
             />
+
+            <TextCTA title="Date de naissance" onPress={() => setShowDatePicker(true)} />
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="date"
+                display="inline"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  setFormState((prev) => ({
+                    ...prev,
+                    birth_date: selectedDate,
+                  }));
+                }}
+                maximumDate={new Date()}
+              />
+            )}
 
             <Input
               label="Email"
@@ -276,6 +358,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 12,
     marginBottom: 10,
+  },
+  text: {
+    color: "black",
+    fontSize: 12,
   },
 });
 
