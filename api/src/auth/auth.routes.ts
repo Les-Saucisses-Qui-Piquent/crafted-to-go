@@ -20,7 +20,6 @@ const userRegisterSchema = z.object({
   last_name: z.string().min(3, "Last name is required"),
   birth_date: z.string().min(10, "Birth date is required"),
   phone_number: z.string().length(10, "Phone number is required"),
-  paiement_method: z.string().min(3, "Paiement method is required"),
 });
 
 export default async function (fastify: FastifyInstance) {
