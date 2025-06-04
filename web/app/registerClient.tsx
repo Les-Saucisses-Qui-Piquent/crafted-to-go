@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from "react-native";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { useNavigation } from "expo-router";
 import Input from "@/components/Input";
+import DateTimePicker, { DateType, useDefaultStyles } from "react-native-ui-datepicker";
+import { debounce } from "lodash";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -11,6 +13,34 @@ type Nav = {
 
 const SignupClient = () => {
   const { navigate } = useNavigation<Nav>();
+  const defaultStyles = useDefaultStyles("light");
+  const [selectedDate, setSelectedDate] = useState<DateType>();
+
+  const [formData, setFormData] = useState<{
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    phone_number: string;
+    birth_date: DateType;
+  }>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    phone_number: "",
+    birth_date: "",
+  });
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
+
+  const debounceForm = useRef(
+    debounce((key: keyof typeof formData, value: string) => {
+      setFormData((prev) => ({ ...prev, [key]: value }));
+    }, 200),
+  ).current;
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
@@ -31,21 +61,27 @@ const SignupClient = () => {
           <View>
             <Input
               id="first_name"
-              onInputChanged={console.log}
+              onInputChanged={(_, value) => {
+                debounceForm("first_name", value);
+              }}
               placeholder="First Name"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
               id="last_name"
-              onInputChanged={console.log}
+              onInputChanged={(_, value) => {
+                debounceForm("last_name", value);
+              }}
               placeholder="Last Name"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
               id="email"
-              onInputChanged={console.log}
+              onInputChanged={(_, value) => {
+                debounceForm("email", value);
+              }}
               placeholder="Email"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
@@ -54,17 +90,32 @@ const SignupClient = () => {
             <Input
               id="password"
               secureTextEntry
-              onInputChanged={console.log}
+              onInputChanged={(_, value) => {
+                debounceForm("password", value);
+              }}
               placeholder="Password"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
               id="phone_number"
-              onInputChanged={console.log}
+              onInputChanged={(_, value) => {
+                debounceForm("phone_number", value);
+              }}
               placeholder="Phone Number"
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
+            />
+
+            <DateTimePicker
+              mode="single"
+              date={selectedDate}
+              onChange={({ date }) => {
+                setSelectedDate(date);
+                setFormData((prev) => ({ ...prev, birth_date: date }));
+              }}
+              styles={defaultStyles}
+              initialView="year"
             />
 
             <View>
