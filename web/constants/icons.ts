@@ -18,4 +18,7 @@ export const icons: Record<string, IconData> = {
     "close": {
         component: Ionicons, name: "close"
     },
+    "ellipsis-vertical": {
+        component: Ionicons, name: "ellipsis-vertical"
+    },
 }
