@@ -2,18 +2,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "rea
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import Input from "../components/form/Input";
 import TextCTA from "../components/Buttons/TextCTA";
 import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-type Nav = {
-  navigate: (value: string) => void;
-};
-
 const SignupClient = () => {
-  const { navigate } = useNavigation<Nav>();
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -82,7 +77,7 @@ const SignupClient = () => {
           };
 
           const missingFields = Object.entries(formState)
-            .filter(([_, value]) => !value || value.toString().trim() === "")
+            .filter(([, value]) => !value || value.toString().trim() === "")
             .map(([key]) => trad[key as keyof typeof trad])
             .join(", ");
 
@@ -264,7 +259,7 @@ const SignupClient = () => {
           >
             Already have an account ?
           </Text>
-          <TouchableOpacity onPress={() => navigate("login")}>
+          <TouchableOpacity onPress={() => router.push("/login")}>
             <Text style={styles.bottomRight}> Sign In</Text>
           </TouchableOpacity>
         </View>
