@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     left: 33,
     textAlign: "center",
     color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
+    fontFamily: "HankenGrotesk",
     fontSize: 12,
     fontWeight: 300,
     lineHeight: 10,

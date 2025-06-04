@@ -14,5 +14,8 @@ export const icons: Record<string, IconData> = {
     },
     "cloud-upload-outline": {
         component: Ionicons, name: "cloud-upload-outline",
-    }
+    },
+    "close": {
+        component: Ionicons, name: "close"
+    },
 }
