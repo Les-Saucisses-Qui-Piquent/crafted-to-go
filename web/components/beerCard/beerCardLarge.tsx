@@ -1,7 +1,6 @@
 import React from "react";
-import { View, ImageBackground, Text, StyleSheet, Dimensions } from "react-native";
-import { Svg, Line } from "react-native-svg";
-
+import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { Image } from "expo-image";
 const isTabletDevice = () => {
   const { width } = Dimensions.get("window");
   return width >= 600;
@@ -30,12 +29,11 @@ export default function BeerCardLarge({
   stock,
   isTablet = isTabletDevice(),
 }: BeerCardLargeProps) {
-  // Choose styles based on variant
-  const styles = isTablet ? tabletStyles : desktopStyles;
+  const styles = isTablet ? tabletStyles : mobileStyles;
 
   return (
     <View style={styles.container}>
-      <ImageBackground style={styles.image} source={{ uri: imgPath }} />
+      <Image style={styles.image} source={{ uri: imgPath }} />
       <Text style={styles.title}>{name}</Text>
       <Text style={styles.description}>{description}</Text>
       <View
@@ -71,8 +69,7 @@ export default function BeerCardLarge({
   );
 }
 
-// Desktop/Large styles
-const desktopStyles = StyleSheet.create({
+const mobileStyles = StyleSheet.create({
   container: {
     position: "relative",
     flexShrink: 0,
