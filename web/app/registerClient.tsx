@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { useNavigation } from "expo-router";
@@ -12,7 +12,50 @@ type Nav = {
 
 const SignupClient = () => {
   const { navigate } = useNavigation<Nav>();
-  const { navigate } = useNavigation<Nav>();
+
+  const [formState, setFormState] = useState({
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [passwordError, setPasswordError] = useState("");
+
+  const inputChangedHandler = (id: string, text: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [id]: text,
+    }));
+
+    // Clear password error when user starts typing
+    if (id === "password" || id === "confirmPassword") {
+      setPasswordError("");
+    }
+  };
+
+  const validatePasswords = () => {
+    if (formState.password !== formState.confirmPassword) {
+      setPasswordError("Les mots de passe ne correspondent pas");
+      return false;
+    }
+    if (formState.password.length < 6) {
+      setPasswordError("Le mot de passe doit contenir au moins 6 caractères");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = () => {
+    if (validatePasswords()) {
+      console.log("Form is valid, proceeding...", formState);
+      // Proceed with form submission
+    } else {
+      Alert.alert("Erreur", passwordError);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
@@ -34,7 +77,7 @@ const SignupClient = () => {
             <Input
               label="Prénom"
               id="first_name"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="First Name"
               placeholderTextColor={COLORS.black}
             />
@@ -42,7 +85,7 @@ const SignupClient = () => {
             <Input
               label="Nom"
               id="last_name"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Last Name"
               placeholderTextColor={COLORS.black}
             />
@@ -50,7 +93,7 @@ const SignupClient = () => {
             <Input
               label="Numéro de téléphone"
               id="phone_number"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Phone Number"
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
@@ -59,7 +102,7 @@ const SignupClient = () => {
             <Input
               label="Email"
               id="email"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Email"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
@@ -69,15 +112,26 @@ const SignupClient = () => {
               label="Mot de passe"
               id="password"
               secureTextEntry
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Password"
               placeholderTextColor={COLORS.black}
             />
 
+            <Input
+              label="Confirmer le mot de passe"
+              id="confirmPassword"
+              secureTextEntry
+              onInputChanged={inputChangedHandler}
+              placeholder="Confirm Password"
+              placeholderTextColor={COLORS.black}
+            />
+
+            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
             <View style={styles.buttonContainer}>
-              <TextCTA 
-                title="Valider et passer à l'étape suivante" 
-                onPress={() => console.log("button pressed")}
+              <TextCTA
+                title="Valider et passer à l'étape suivante"
+                onPress={handleSubmit}
                 width={350}
               />
             </View>
@@ -217,6 +271,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
   },
 });
 
