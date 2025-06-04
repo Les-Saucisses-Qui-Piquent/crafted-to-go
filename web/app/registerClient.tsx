@@ -2,10 +2,11 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from "re
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import Input from "@/components/Input";
 import DateTimePicker, { DateType, useDefaultStyles } from "react-native-ui-datepicker";
 import { debounce } from "lodash";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -15,12 +16,14 @@ const SignupClient = () => {
   const { navigate } = useNavigation<Nav>();
   const defaultStyles = useDefaultStyles("light");
   const [selectedDate, setSelectedDate] = useState<DateType>();
+  const { setToken, setUser } = useAuth();
 
   const [formData, setFormData] = useState<{
     first_name: string;
     last_name: string;
     email: string;
     password: string;
+    password_confirmation: string;
     phone_number: string;
     birth_date: DateType;
   }>({
@@ -28,6 +31,7 @@ const SignupClient = () => {
     last_name: "",
     email: "",
     password: "",
+    password_confirmation: "",
     phone_number: "",
     birth_date: "",
   });
@@ -41,6 +45,71 @@ const SignupClient = () => {
       setFormData((prev) => ({ ...prev, [key]: value }));
     }, 200),
   ).current;
+
+  const handleRegister = async () => {
+    try {
+      const {
+        first_name,
+        last_name,
+        email,
+        password,
+        phone_number,
+        birth_date,
+        password_confirmation,
+      } = formData;
+
+      if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
+        console.warn("All fields are required");
+        return;
+      }
+
+      if (password !== password_confirmation) {
+        console.warn("Passwords do not match");
+        return;
+      }
+
+      console.log("Registering user...");
+
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          first_name,
+          last_name,
+          birth_date,
+          phone_number,
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn("Registration failed");
+        return;
+      }
+      const data = await response.json();
+
+      setToken(data.token);
+      setUser(data.user);
+
+      if (data.user.role === "client") {
+        router.push("/customer/(tabs)");
+      }
+
+      if (data.user.role === "brewer") {
+        router.push("/brewery/(tabs)");
+      }
+
+      if (data.user.role === "admin") {
+        console.log("Admin role detected");
+      }
+    } catch (error) {
+      console.error("Registration failed from front:");
+      console.error(error);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
@@ -98,6 +167,16 @@ const SignupClient = () => {
             />
 
             <Input
+              id="password_confirmation"
+              secureTextEntry
+              onInputChanged={(_, value) => {
+                debounceForm("password_confirmation", value);
+              }}
+              placeholder="Confirm Password"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
               id="phone_number"
               onInputChanged={(_, value) => {
                 debounceForm("phone_number", value);
@@ -119,7 +198,7 @@ const SignupClient = () => {
             />
 
             <View>
-              <Button title="Se connecter" onPress={() => console.log("button pressed")}></Button>
+              <Button title="S'enregistrer" onPress={handleRegister}></Button>
             </View>
           </View>
 
