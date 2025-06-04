@@ -15,7 +15,7 @@ const index = () => {
 
   return (
     <SafeAreaView style={[styles.area]}>
-      <View style={[styles.container]}>
+      <View style={[styles.container]} id="welcome">
         <Text style={styles.title}>Bienvenue</Text>
 
         <MainButton
