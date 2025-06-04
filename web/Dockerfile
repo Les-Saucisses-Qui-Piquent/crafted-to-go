@@ -4,13 +4,16 @@ WORKDIR /web
 
 COPY ./package*.json .
 
+RUN npm ci
+
+# For posterities sake in case of issues
 # Clean install with native build
-RUN npm install --force && \
-    npm install -g expo-cli && \
-    npm cache clean --force
+# RUN npm install --force && \
+#     npm install -g expo-cli && \
+#     npm cache clean --force
 
 # Rebuild nativewind dependencies
-RUN cd node_modules/lightningcss && npm rebuild --build-from-source
+# RUN cd ./node_modules/lightningcss && npm rebuild --build-from-source
 
 COPY . .
 

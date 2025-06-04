@@ -21,6 +21,14 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./web/app:/web/app
+      - ./web/assets:/web/assets
+      - ./web/components:/web/components
+      - ./web/constants:/web/constants
+      - ./web/hooks:/web/hooks
+      - ./web/screens:/web/screens
+      - ./web/utils:/web/utils
+      - ./web/package.json:/web/package.json
+      - ./web/package-lock.json:/web/package-lock.json
     depends_on:
       - api
     ports:
