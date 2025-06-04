@@ -55,7 +55,7 @@ const SignupClient = () => {
       return false;
     }
     if (formState.password.length < 12) {
-      setPasswordError("Le mot de passe doit contenir au moins 6 caractères");
+      setPasswordError("Le mot de passe doit contenir au moins 12 caractères");
       return false;
     }
     return true;
@@ -71,6 +71,22 @@ const SignupClient = () => {
 
         if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
           console.warn("All fields are required");
+          const trad = {
+            first_name: "Prénom",
+            last_name: "Nom",
+            phone_number: "Numéro de téléphone",
+            birth_date: "Date de naissance",
+            email: "Email",
+            password: "Mot de passe",
+            confirmPassword: "Confirmation du mot de passe",
+          };
+
+          const missingFields = Object.entries(formState)
+            .filter(([_, value]) => !value || value.toString().trim() === "")
+            .map(([key]) => trad[key as keyof typeof trad])
+            .join(", ");
+
+          Alert.alert("Oops", `Les champs ${missingFields} sont requis`);
           return;
         }
 
