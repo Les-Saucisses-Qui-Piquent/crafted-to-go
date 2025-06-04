@@ -91,44 +91,43 @@ export const Login = () => {
         ]}
       >
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.loginContainer}>
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: COLORS.black,
-                },
-              ]}
-            >
-              LOGIN TO YOUR ACCOUNT
-            </Text>
+          <View style={styles.logoContainer}></View>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            LOGIN TO YOUR ACCOUNT
+          </Text>
 
-            <View style={styles.formContainer}>
-              <Input
-                label="Email"
-                id="email"
-                onInputChanged={inputChangedHandler}
-                placeholder="Entrez votre email"
-                placeholderTextColor={COLORS.black}
-                keyboardType="email-address"
-              />
+          <View style={styles.formContainer}>
+            <Input
+              label="Email"
+              id="email"
+              onInputChanged={inputChangedHandler}
+              placeholder="Entrez votre email"
+              placeholderTextColor={COLORS.black}
+              keyboardType="email-address"
+            />
 
-              <Input
-                label="Mot de passe"
-                id="password"
-                secureTextEntry
-                onInputChanged={inputChangedHandler}
-                placeholder="Entrez votre mot de passe"
-                placeholderTextColor={COLORS.black}
+            <Input
+              label="Mot de passe"
+              id="password"
+              secureTextEntry
+              onInputChanged={inputChangedHandler}
+              placeholder="Entrez votre mot de passe"
+              placeholderTextColor={COLORS.black}
+            />
+            <View style={styles.buttonContainer}>
+              <SecondaryCTA 
+                title="Se connecter" 
+                isBlack={true}
+                tablet={true}
+                onPress={handleLogin}
               />
-              <View style={styles.buttonContainer}>
-                <SecondaryCTA 
-                  title="Se connecter" 
-                  isBlack={true}
-                  tablet={true}
-                  onPress={handleLogin}
-                />
-              </View>
             </View>
 
             <View style={styles.checkBoxContainer}>
@@ -196,9 +195,8 @@ const styles = StyleSheet.create({
     fontFamily: "HankenGrotesk",
     color: COLORS.black,
     textAlign: "center",
-    marginBottom: 22,
+    marginBottom: 10,
     fontWeight: "700",
-    paddingTop: 26,
   },
   buttonContainer: {
     alignItems: "center",
@@ -273,8 +271,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20,
   },
   formContainer: {
     alignItems: "center",
@@ -287,23 +283,6 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     alignItems: "center",
     marginTop: 12,
-  },
-  loginContainer: {
-    backgroundColor: "#F4F9F7",
-    borderRadius: 16,
-    padding: 24,
-    paddingHorizontal: 48,
-    margin: 24,
-    marginHorizontal: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
 });
 

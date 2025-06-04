@@ -27,7 +27,7 @@ const SignupClient = () => {
               },
             ]}
           >
-            Create Your Account
+            CREATE YOUR ACCOUNT
           </Text>
 
           <View style={styles.formContainer}>
@@ -81,21 +81,22 @@ const SignupClient = () => {
                 width={350}
               />
             </View>
-          </View>
 
-          <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={[
-                    styles.privacy,
-                    {
-                      color: COLORS.black,
-                    },
-                  ]}
-                >
-                  By continuing you accept our Privacy Policy
-                </Text>
+            <View style={styles.checkBoxContainer}>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={[
+                      styles.privacy,
+                      {
+                        color: "#666666",
+                        fontWeight: "700",
+                      },
+                    ]}
+                  >
+                    By continuing you accept our Privacy Policy
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -146,17 +147,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 26,
-    fontFamily: "semiBold",
+    fontSize: 28,
+    fontFamily: "HankenGrotesk",
     color: COLORS.black,
     textAlign: "center",
-    marginBottom: 22,
+    marginBottom: 10,
+    fontWeight: "700",
   },
   checkBoxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 18,
+    marginVertical: 0,
   },
   checkbox: {
     marginRight: 8,
@@ -168,8 +170,9 @@ const styles = StyleSheet.create({
   },
   privacy: {
     fontSize: 12,
-    fontFamily: "regular",
-    color: COLORS.black,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
   },
   socialTitle: {
     fontSize: 19.25,
