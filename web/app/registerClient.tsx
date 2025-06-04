@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Button } from "react-native";
-import React from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { useNavigation } from "expo-router";
-import Input from "@/components/Input";
+import Input from "../components/form/Input";
+import TextCTA from "../components/Buttons/TextCTA";
 
 type Nav = {
   navigate: (value: string) => void;
@@ -11,6 +12,50 @@ type Nav = {
 
 const SignupClient = () => {
   const { navigate } = useNavigation<Nav>();
+
+  const [formState, setFormState] = useState({
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [passwordError, setPasswordError] = useState("");
+
+  const inputChangedHandler = (id: string, text: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [id]: text,
+    }));
+
+    // Clear password error when user starts typing
+    if (id === "password" || id === "confirmPassword") {
+      setPasswordError("");
+    }
+  };
+
+  const validatePasswords = () => {
+    if (formState.password !== formState.confirmPassword) {
+      setPasswordError("Les mots de passe ne correspondent pas");
+      return false;
+    }
+    if (formState.password.length < 6) {
+      setPasswordError("Le mot de passe doit contenir au moins 6 caractères");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = () => {
+    if (validatePasswords()) {
+      console.log("Form is valid, proceeding...", formState);
+      // Proceed with form submission
+    } else {
+      Alert.alert("Erreur", passwordError);
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
@@ -25,66 +70,87 @@ const SignupClient = () => {
               },
             ]}
           >
-            Create Your Account
+            CREATE YOUR ACCOUNT
           </Text>
 
-          <View>
+          <View style={styles.formContainer}>
             <Input
+              label="Prénom"
               id="first_name"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="First Name"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
+              label="Nom"
               id="last_name"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Last Name"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
+              label="Numéro de téléphone"
+              id="phone_number"
+              onInputChanged={inputChangedHandler}
+              placeholder="Phone Number"
+              placeholderTextColor={COLORS.black}
+              keyboardType="phone-pad"
+            />
+
+            <Input
+              label="Email"
               id="email"
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Email"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
             />
 
             <Input
+              label="Mot de passe"
               id="password"
               secureTextEntry
-              onInputChanged={console.log}
+              onInputChanged={inputChangedHandler}
               placeholder="Password"
               placeholderTextColor={COLORS.black}
             />
 
             <Input
-              id="phone_number"
-              onInputChanged={console.log}
-              placeholder="Phone Number"
+              label="Confirmer le mot de passe"
+              id="confirmPassword"
+              secureTextEntry
+              onInputChanged={inputChangedHandler}
+              placeholder="Confirm Password"
               placeholderTextColor={COLORS.black}
-              keyboardType="phone-pad"
             />
 
-            <View>
-              <Button title="Se connecter" onPress={() => console.log("button pressed")}></Button>
-            </View>
-          </View>
+            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-          <View style={styles.checkBoxContainer}>
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={[
-                    styles.privacy,
-                    {
-                      color: COLORS.black,
-                    },
-                  ]}
-                >
-                  By continuing you accept our Privacy Policy
-                </Text>
+            <View style={styles.buttonContainer}>
+              <TextCTA
+                title="Valider et passer à l'étape suivante"
+                onPress={handleSubmit}
+                width={350}
+              />
+            </View>
+
+            <View style={styles.checkBoxContainer}>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={[
+                      styles.privacy,
+                      {
+                        color: "#666666",
+                        fontWeight: "700",
+                      },
+                    ]}
+                  >
+                    By continuing you accept our Privacy Policy
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -135,17 +201,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 26,
-    fontFamily: "semiBold",
+    fontSize: 28,
+    fontFamily: "HankenGrotesk",
     color: COLORS.black,
     textAlign: "center",
-    marginBottom: 22,
+    marginBottom: 10,
+    fontWeight: "700",
   },
   checkBoxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 18,
+    marginVertical: 0,
   },
   checkbox: {
     marginRight: 8,
@@ -157,8 +224,9 @@ const styles = StyleSheet.create({
   },
   privacy: {
     fontSize: 12,
-    fontFamily: "regular",
-    color: COLORS.black,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
   },
   socialTitle: {
     fontSize: 19.25,
@@ -196,6 +264,18 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     width: SIZES.width - 32,
     borderRadius: 30,
+  },
+  formContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
   },
 });
 
