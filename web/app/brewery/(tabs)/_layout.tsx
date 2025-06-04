@@ -1,45 +1,42 @@
-import { Tabs } from 'expo-router';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Tabs } from "expo-router";
+import TabBar from "@/components/TabBar";
 
 export default function BreweryTabsLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <Tabs 
+    <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
-        headerShown: false
+        headerShown: false,
       }}
+      tabBar={({ navigation, state }) => (
+        <TabBar
+          isClient={false}
+          activeTab={state.routeNames[state.index]}
+          onTabPress={(tabName) => navigation.navigate(tabName)}
+        />
+      )}
     >
-      <Tabs.Screen 
+      <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol name="house.fill" color={color} />,
+          title: "Home",
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <IconSymbol name="dashboard" color={color} />,
+          title: "Dashboard",
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="inventory"
         options={{
-          title: 'Inventory',
-          tabBarIcon: ({ color }) => <IconSymbol name="inventory" color={color} />,
+          title: "Inventory",
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="orders"
         options={{
-          title: 'Orders',
-          tabBarIcon: ({ color }) => <IconSymbol name="orders" color={color} />,
+          title: "Orders",
         }}
       />
     </Tabs>
