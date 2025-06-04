@@ -12,17 +12,17 @@ interface InputProps {
   secureTextEntry?: boolean;
 }
 
-export default function Input({ 
-  label, 
-  small = false, 
+export default function Input({
+  label,
+  small = false,
   id = "",
   onInputChanged,
   placeholder,
   placeholderTextColor = "rgba(99, 99, 96, 1)",
   keyboardType = "default",
-  secureTextEntry = false
+  secureTextEntry = false,
 }: InputProps) {
-  let width = small ? 292 : 350;
+  const width = small ? 292 : 350;
 
   const handleTextChange = (text: string) => {
     if (onInputChanged && id) {
@@ -33,8 +33,8 @@ export default function Input({
   return (
     <View style={[styles.inputContainer, { width }]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.rectangle94} />
-      <TextInput 
+      {/* <View style={styles.rectangle94} /> */}
+      <TextInput
         style={styles.placeholder}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor}
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   label: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 0,
-    right: 0,
-    bottom: 32,
-    left: 0,
+    // position: "absolute",
+    // flexShrink: 0,
+    // top: 0,
+    // right: 0,
+    // bottom: 32,
+    // left: 0,
     textAlign: "left",
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "HankenGrotesk",
@@ -84,16 +84,24 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   placeholder: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 31,
-    right: 10,
-    bottom: 7,
-    left: 9,
+    // position: "absolute",
+    // flexShrink: 0,
+    // top: 31,
+    // right: 10,
+    // bottom: 7,
+    // left: 9,
     textAlign: "left",
     color: "rgba(99, 99, 96, 1)",
     fontFamily: "HankenGrotesk",
     fontSize: 11,
     fontWeight: "300",
+    width: "100%",
+    height: "66%",
+    borderStyle: "solid",
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderWidth: 0.5,
+    borderColor: "rgba(0, 0, 0, 1)",
+    borderRadius: 4,
+    paddingLeft: 10,
   },
 });
