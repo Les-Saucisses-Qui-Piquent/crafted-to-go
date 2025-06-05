@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type FavoriteBeerInsert = Prisma.favorite_beerCreateInput;
@@ -10,7 +10,7 @@ export default class FavoriteBeerController {
     request: FastifyRequest<{ Params: { userId: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { userId } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(userId);
@@ -38,7 +38,7 @@ export default class FavoriteBeerController {
     request: FastifyRequest<{ Body: FavoriteBeerInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const favoriteBeer = await prisma.favorite_beer.create({
         data: request.body,
@@ -57,7 +57,7 @@ export default class FavoriteBeerController {
     request: FastifyRequest<{ Params: { id: string }; Body: FavoriteBeerUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -84,7 +84,7 @@ export default class FavoriteBeerController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);

@@ -31,7 +31,7 @@ export default async function (fastify: FastifyInstance) {
     { preHandler: validateRegister },
     async (request: FastifyRequest<{ Body: UserRegister }>, reply: FastifyReply) => {
       const { email, password, first_name, last_name, ...rest } = request.body;
-      const prisma = new PrismaClient();
+      const prisma = request.server.prisma;
 
       try {
         const alreadyExistingUser = await prisma.user.findUnique({
@@ -78,7 +78,7 @@ export default async function (fastify: FastifyInstance) {
     { preHandler: validateLogin },
     async (request: FastifyRequest<{ Body: UserLogin }>, reply: FastifyReply) => {
       const { email, password } = request.body;
-      const prisma = new PrismaClient();
+      const prisma = request.server.prisma;
 
       try {
         const user = await prisma.user.findUnique({
