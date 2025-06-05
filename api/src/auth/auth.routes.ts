@@ -20,7 +20,6 @@ const userRegisterSchema = z.object({
   last_name: z.string().min(3, "Last name is required"),
   birth_date: z.string().min(10, "Birth date is required"),
   phone_number: z.string().length(10, "Phone number is required"),
-  paiement_method: z.string().min(3, "Paiement method is required"),
 });
 
 export default async function (fastify: FastifyInstance) {
@@ -64,7 +63,7 @@ export default async function (fastify: FastifyInstance) {
 
         const token = generateToken(tokenizedUser);
 
-        return reply.status(201).send({ token });
+        return reply.status(201).send({ token, user: tokenizedUser });
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ message: "Internal server error" });
@@ -121,6 +120,7 @@ const validateLogin = async (request: FastifyRequest<{ Body: UserLogin }>, reply
     request.body = validatedBody;
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error(error.errors);
       return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
     }
     throw error;
@@ -136,6 +136,7 @@ const validateRegister = async (
     request.body = validatedBody;
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error(error.errors);
       return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
     }
     throw error;

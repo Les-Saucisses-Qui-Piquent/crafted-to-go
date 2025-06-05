@@ -2,21 +2,29 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from "rea
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
-import { useNavigation } from "expo-router";
+import { router } from "expo-router";
 import Input from "../components/form/Input";
 import TextCTA from "../components/Buttons/TextCTA";
-
-type Nav = {
-  navigate: (value: string) => void;
-};
+import { useAuth } from "@/contexts/AuthContext";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const SignupClient = () => {
-  const { navigate } = useNavigation<Nav>();
+  const { setToken, setUser } = useAuth();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<{
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    birth_date: Date | undefined;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }>({
     first_name: "",
     last_name: "",
     phone_number: "",
+    birth_date: undefined,
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,21 +47,100 @@ const SignupClient = () => {
   const validatePasswords = () => {
     if (formState.password !== formState.confirmPassword) {
       setPasswordError("Les mots de passe ne correspondent pas");
+      Alert.alert("Erreur", passwordError);
       return false;
     }
-    if (formState.password.length < 6) {
-      setPasswordError("Le mot de passe doit contenir au moins 6 caractères");
+    if (formState.password.length < 12) {
+      setPasswordError("Le mot de passe doit contenir au moins 12 caractères");
+      Alert.alert("Erreur", passwordError);
       return false;
     }
+    console.info("Passwords are matching");
     return true;
   };
 
-  const handleSubmit = () => {
-    if (validatePasswords()) {
-      console.log("Form is valid, proceeding...", formState);
+  const validateForm = () => {
+    const { first_name, last_name, phone_number, birth_date, email, password } = formState;
+
+    // Validate missing fields
+    if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
+      console.warn("All fields are required");
+      const trad = {
+        first_name: "Prénom",
+        last_name: "Nom",
+        phone_number: "Numéro de téléphone",
+        birth_date: "Date de naissance",
+        email: "Email",
+        password: "Mot de passe",
+        confirmPassword: "Confirmation du mot de passe",
+      };
+
+      const missingFields = Object.entries(formState)
+        .filter(([, value]) => !value || value.toString().trim() === "")
+        .map(([key]) => trad[key as keyof typeof trad])
+        .join(", ");
+
+      Alert.alert("Oops", `Les champs ${missingFields} sont requis`);
+      return false;
+    }
+
+    if (phone_number.length !== 10) {
+      Alert.alert("Oops", "Le numéro de téléphone doit contenir 10 chiffres");
+      return false;
+    }
+
+    if (birth_date) return true;
+  };
+
+  const handleSubmit = async () => {
+    if (validatePasswords() && validateForm()) {
       // Proceed with form submission
-    } else {
-      Alert.alert("Erreur", passwordError);
+      try {
+        const { email, password, first_name, last_name, birth_date, phone_number } = formState;
+
+        const body = JSON.stringify({
+          email,
+          password,
+          first_name,
+          last_name,
+          birth_date,
+          phone_number,
+        });
+        console.info("Registering user...");
+
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.warn("Registration failed");
+          if (data.errors.length) {
+            Alert.alert("Erreur", `${data.errors[0].message}: ${data.errors[0].code}`);
+          }
+          return;
+        }
+
+        // Retrieve token and basic user info
+        setToken(data.token);
+        setUser(data.user);
+
+        if (data.user.role === "client") {
+          router.push("/customer/(tabs)");
+        }
+
+        if (data.user.role === "brewer") {
+          router.push("/brewery/(tabs)");
+        }
+      } catch (error) {
+        console.error("Registration failed from front:");
+        console.error(error);
+      }
     }
   };
 
@@ -98,6 +185,27 @@ const SignupClient = () => {
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
             />
+
+            <TextCTA
+              title="Date de naissance"
+              onPress={() => setShowDatePicker(true)}
+              width={350}
+            />
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="date"
+                display="inline"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  setFormState((prev) => ({
+                    ...prev,
+                    birth_date: selectedDate,
+                  }));
+                }}
+                maximumDate={new Date()}
+              />
+            )}
 
             <Input
               label="Email"
@@ -153,23 +261,24 @@ const SignupClient = () => {
                 </View>
               </View>
             </View>
+
+            <View style={styles.bottomContainer}>
+              <Text
+                style={[
+                  styles.bottomLeft,
+                  {
+                    color: COLORS.black,
+                  },
+                ]}
+              >
+                Already have an account ?
+              </Text>
+              <TouchableOpacity onPress={() => router.push("/login")}>
+                <Text style={styles.bottomRight}> Sign In</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
-        <View style={styles.bottomContainer}>
-          <Text
-            style={[
-              styles.bottomLeft,
-              {
-                color: COLORS.black,
-              },
-            ]}
-          >
-            Already have an account ?
-          </Text>
-          <TouchableOpacity onPress={() => navigate("login")}>
-            <Text style={styles.bottomRight}> Sign In</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -244,11 +353,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 18,
-    position: "absolute",
-    bottom: 12,
-    right: 0,
-    left: 0,
+    marginTop: 18,
   },
   bottomLeft: {
     fontSize: 14,
@@ -276,6 +381,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 12,
     marginBottom: 10,
+  },
+  text: {
+    color: "black",
+    fontSize: 12,
   },
 });
 
