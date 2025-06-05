@@ -1,5 +1,6 @@
 import "fastify";
 import type { JwtPayload } from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
 export type AuthUser = {
   id: string;
@@ -19,5 +20,8 @@ declare module "fastify" {
   interface FastifyRequest {
     token: JwtPayload | string;
     authUser: AuthUser;
+  }
+  interface FastifyInstance {
+    prisma: PrismaClient;
   }
 }
