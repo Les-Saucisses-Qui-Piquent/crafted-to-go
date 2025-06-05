@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type OrderInsert = Prisma.orderCreateInput;
 type OrderUpdate = Prisma.orderUpdateInput;
 
 export default class OrderController {
-  static async getOrders(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getOrders(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
     try {
       const orders = await prisma.order.findMany();
       reply.send(orders);
@@ -20,7 +20,7 @@ export default class OrderController {
   }
 
   static async getOrder(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -43,7 +43,7 @@ export default class OrderController {
   }
 
   static async createOrder(request: FastifyRequest<{ Body: OrderInsert }>, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const order = await prisma.order.create({ data: request.body });
       reply.send(order);
@@ -59,7 +59,7 @@ export default class OrderController {
     request: FastifyRequest<{ Params: { id: string }; Body: OrderUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -88,7 +88,7 @@ export default class OrderController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
