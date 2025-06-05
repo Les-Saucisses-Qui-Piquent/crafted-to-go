@@ -120,7 +120,7 @@ const SignupClient = () => {
 
         if (!response.ok) {
           console.warn("Registration failed");
-          if (data.errors.length) {
+          if (data.errors && data.errors.length) {
             Alert.alert("Erreur", `${data.errors[0].message}: ${data.errors[0].code}`);
           }
           return;
