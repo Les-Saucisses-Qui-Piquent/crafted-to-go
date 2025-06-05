@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type UserDetailInsert = Prisma.user_detailCreateInput;
 type UserDetailUpdate = Prisma.user_detailUpdateInput;
 
 export default class UserDetailController {
-  static async getUserDetails(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getUserDetails(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
     try {
       const userDetails = await prisma.user_detail.findMany();
       reply.send(userDetails);
@@ -23,7 +23,7 @@ export default class UserDetailController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -53,7 +53,7 @@ export default class UserDetailController {
     request: FastifyRequest<{ Params: { userId: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { userId } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(userId);
@@ -83,7 +83,7 @@ export default class UserDetailController {
     request: FastifyRequest<{ Body: UserDetailInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const userDetail = await prisma.user_detail.create({
         data: request.body,
@@ -101,7 +101,7 @@ export default class UserDetailController {
     request: FastifyRequest<{ Params: { id: string }; Body: UserDetailUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -130,7 +130,7 @@ export default class UserDetailController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
