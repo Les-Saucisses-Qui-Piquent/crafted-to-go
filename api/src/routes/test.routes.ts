@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { FastifyInstance, FastifyReply, FastifyRequest, RouteGenericInterface } from "fastify";
 
@@ -7,8 +7,8 @@ interface TestInsert extends RouteGenericInterface {
 }
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get("/test", async (_request: FastifyRequest, reply: FastifyReply) => {
-    const prisma = new PrismaClient();
+  fastify.get("/test", async (request: FastifyRequest, reply: FastifyReply) => {
+    const prisma = request.server.prisma;
     const test = await prisma.test.findMany();
     reply.send(test);
   });
@@ -17,7 +17,7 @@ export default async function (fastify: FastifyInstance) {
     "/test",
     { preHandler: authMiddleware },
     async (request: FastifyRequest<TestInsert>, reply: FastifyReply) => {
-      const prisma = new PrismaClient();
+      const prisma = request.server.prisma;
       try {
         const input = request.body;
 
