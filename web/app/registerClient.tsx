@@ -261,23 +261,24 @@ const SignupClient = () => {
                 </View>
               </View>
             </View>
+
+            <View style={styles.bottomContainer}>
+              <Text
+                style={[
+                  styles.bottomLeft,
+                  {
+                    color: COLORS.black,
+                  },
+                ]}
+              >
+                Already have an account ?
+              </Text>
+              <TouchableOpacity onPress={() => router.push("/login")}>
+                <Text style={styles.bottomRight}> Sign In</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
-        <View style={styles.bottomContainer}>
-          <Text
-            style={[
-              styles.bottomLeft,
-              {
-                color: COLORS.black,
-              },
-            ]}
-          >
-            Already have an account ?
-          </Text>
-          <TouchableOpacity onPress={() => router.push("/login")}>
-            <Text style={styles.bottomRight}> Sign In</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -352,11 +353,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 18,
-    position: "absolute",
-    bottom: 12,
-    right: 0,
-    left: 0,
+    marginTop: 18,
   },
   bottomLeft: {
     fontSize: 14,
