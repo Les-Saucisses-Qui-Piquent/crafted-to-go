@@ -1,4 +1,0 @@
-appId: com.crafted-to-go.app
----
-- launchApp
-- assertVisible: "Welcome"

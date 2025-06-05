@@ -1,0 +1,46 @@
+{
+  "cli": {
+    "version": ">= 16.8.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    },
+    "e2e-test": {
+      "extends": "preview",
+      "distribution": "internal",
+      "cache": {
+        "disabled": false
+      },
+      "env": {
+        "NODE_ENV": "test",
+        "E2E_TESTING": "true"
+      }
+    },
+    "e2e-local": {
+      "extends": "preview",
+      "distribution": "internal",
+      "cache": {
+        "disabled": false
+      },
+      "env": {
+        "NODE_ENV": "test",
+        "E2E_TESTING": "true"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
