@@ -62,6 +62,7 @@ const SignupClient = () => {
   const validateForm = () => {
     const { first_name, last_name, phone_number, birth_date, email, password } = formState;
 
+    // Validate missing fields
     if (!first_name || !last_name || !email || !password || !phone_number || !birth_date) {
       console.warn("All fields are required");
       const trad = {
@@ -82,7 +83,13 @@ const SignupClient = () => {
       Alert.alert("Oops", `Les champs ${missingFields} sont requis`);
       return false;
     }
-    return true;
+
+    if (phone_number.length !== 10) {
+      Alert.alert("Oops", "Le numéro de téléphone doit contenir 10 chiffres");
+      return false;
+    }
+
+    if (birth_date) return true;
   };
 
   const handleSubmit = async () => {
@@ -109,15 +116,17 @@ const SignupClient = () => {
           body,
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
           console.warn("Registration failed");
-          console.log(response);
+          if (data.errors.length) {
+            Alert.alert("Erreur", `${data.errors[0].message}: ${data.errors[0].code}`);
+          }
           return;
         }
 
         // Retrieve token and basic user info
-        const data = await response.json();
-
         setToken(data.token);
         setUser(data.user);
 
