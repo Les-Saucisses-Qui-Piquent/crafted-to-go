@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 import Fastify from "fastify";
+import fp from "fastify-plugin";
 import routes from "../src/routes";
 import authRoutes from "../src/auth/auth.routes";
 import { vi } from "vitest";
@@ -18,7 +19,12 @@ export const createTestServer = async (): Promise<AppWithPrisma> => {
     logger: false,
   });
 
-  app.decorate("prisma", prisma);
+  await app.register(
+    fp((fastify, _opts, done) => {
+      fastify.decorate("prisma", prisma);
+      done();
+    }),
+  );
 
   await app.register(authRoutes);
 
@@ -29,6 +35,7 @@ export const createTestServer = async (): Promise<AppWithPrisma> => {
   );
 
   // Ready the server
+  await app.after();
   await app.ready();
 
   return app;
