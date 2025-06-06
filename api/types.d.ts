@@ -20,6 +20,7 @@ declare module "fastify" {
   interface FastifyRequest {
     token: JwtPayload | string;
     authUser: AuthUser;
+    prisma: PrismaClient;
   }
   interface FastifyInstance {
     prisma: PrismaClient;
