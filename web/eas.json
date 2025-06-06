@@ -16,6 +16,7 @@
     },
     "e2e-test": {
       "extends": "preview",
+      "developmentClient": true,
       "distribution": "internal",
       "cache": {
         "disabled": false
@@ -27,6 +28,7 @@
     },
     "e2e-local": {
       "extends": "preview",
+      "developmentClient": true,
       "distribution": "internal",
       "cache": {
         "disabled": false
