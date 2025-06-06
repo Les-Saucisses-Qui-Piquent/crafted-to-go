@@ -10,9 +10,13 @@ export default class AddressController {
   static async getAddresses(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
 
-    console.log("request.server", request.server);
     try {
       const addresses = await prisma.address.findMany();
+
+      if (addresses.length === 0) {
+        reply.status(404).send({ message: "No addresses found" });
+        return;
+      }
 
       reply.send(addresses);
     } catch (error) {

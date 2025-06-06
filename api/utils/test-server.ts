@@ -26,6 +26,9 @@ export const createTestServer = async (): Promise<AppWithPrisma> => {
     }),
   );
 
+  const _prisma = app.getDecorator("prisma");
+  console.log("Test if prisma exists:", _prisma);
+
   await app.register(authRoutes);
 
   await Promise.all(
