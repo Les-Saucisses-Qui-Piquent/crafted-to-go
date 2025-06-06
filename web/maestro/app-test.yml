@@ -1,4 +1,4 @@
-appId: com.craftedtogo.apk
+appId: host.exp.exponent
 ---
 - launchApp
 - assertVisible: "Welcome to my app!" # Replace with some text that appears on your initial screen
