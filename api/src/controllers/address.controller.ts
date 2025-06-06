@@ -1,5 +1,6 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
+import type { FastifyRequest, FastifyReply } from "fastify";
+import type { Prisma } from "@prisma/client";
+
 import { z } from "zod";
 
 type AddressInsert = Prisma.addressCreateInput;
@@ -8,14 +9,15 @@ type AddressUpdate = Prisma.addressUpdateInput;
 export default class AddressController {
   static async getAddresses(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+
+    console.log("request.server", request.server);
     try {
       const addresses = await prisma.address.findMany();
+
       reply.send(addresses);
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -43,8 +45,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -60,8 +60,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error" });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -90,8 +88,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -115,8 +111,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 }
