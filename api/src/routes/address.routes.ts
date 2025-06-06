@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import AddressController from "../controllers/address.controller";
 
 export default async function (fastify: FastifyInstance) {
