@@ -1,6 +1,6 @@
 import "fastify";
 import type { JwtPayload } from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 export type AuthUser = {
   id: string;
