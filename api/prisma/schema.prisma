@@ -87,12 +87,12 @@ model brewery_detail {
   logo          String
   description   String
   social_link   String
-  taproom_hours String?
-  opening_hours String
   phone_number  String
   email         String
   created_at    DateTime @default(now())
   updated_at    DateTime @default(now())
+  taproom_hours Json?
+  opening_hours Json
   brewery       brewery  @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_detail_brewery_id_foreign")
 }
 
