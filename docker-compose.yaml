@@ -7,6 +7,7 @@ services:
       - ./api/src:/api/src
       - ./api/utils:/api/utils
       - ./api/server.ts:/api/server.ts
+      - ./api/tests:/api/tests
       - ./api/prisma:/api/prisma
       - ./api/package.json:/api/package.json
       - ./api/package-lock.json:/api/package-lock.json

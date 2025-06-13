@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type BreweryDetailInsert = Prisma.brewery_detailCreateInput;
 type BreweryDetailUpdate = Prisma.brewery_detailUpdateInput;
 
 export default class BreweryDetailController {
-  static async getBreweryDetails(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getBreweryDetails(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
     try {
       const breweryDetails = await prisma.brewery_detail.findMany();
       reply.send(breweryDetails);
@@ -23,7 +23,7 @@ export default class BreweryDetailController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -49,7 +49,7 @@ export default class BreweryDetailController {
     request: FastifyRequest<{ Body: BreweryDetailInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const breweryDetail = await prisma.brewery_detail.create({
         data: request.body,
@@ -67,7 +67,7 @@ export default class BreweryDetailController {
     request: FastifyRequest<{ Params: { id: string }; Body: BreweryDetailUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -96,7 +96,7 @@ export default class BreweryDetailController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);

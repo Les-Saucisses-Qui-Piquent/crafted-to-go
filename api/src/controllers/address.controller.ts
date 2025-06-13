@@ -1,21 +1,27 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import type { FastifyRequest, FastifyReply } from "fastify";
+import type { Prisma } from "@prisma/client";
+
 import { z } from "zod";
 
 type AddressInsert = Prisma.addressCreateInput;
 type AddressUpdate = Prisma.addressUpdateInput;
 
 export default class AddressController {
-  static async getAddresses(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getAddresses(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
+
     try {
       const addresses = await prisma.address.findMany();
+
+      if (addresses.length === 0) {
+        reply.status(404).send({ message: "No addresses found" });
+        return;
+      }
+
       reply.send(addresses);
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -23,7 +29,7 @@ export default class AddressController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -43,8 +49,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -52,7 +56,7 @@ export default class AddressController {
     request: FastifyRequest<{ Body: AddressInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const input = request.body;
       const address = await prisma.address.create({ data: input });
@@ -60,8 +64,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error" });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -69,7 +71,7 @@ export default class AddressController {
     request: FastifyRequest<{ Params: { id: string }; Body: AddressUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     const data = request.body;
     try {
@@ -90,8 +92,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 
@@ -99,7 +99,7 @@ export default class AddressController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -115,8 +115,6 @@ export default class AddressController {
     } catch (error) {
       console.error(error);
       reply.status(500).send({ message: "Server Error", error });
-    } finally {
-      await prisma.$disconnect();
     }
   }
 }

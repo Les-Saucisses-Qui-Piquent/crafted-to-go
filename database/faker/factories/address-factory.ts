@@ -11,7 +11,7 @@ export class AddressFactory implements FakerImplementation {
     return {
       line_1: faker.location.streetAddress(),
       line_2: faker.location.secondaryAddress(),
-      postal_code: Number(faker.location.zipCode({ format: "####" })),
+      postal_code: faker.location.zipCode(),
       city: faker.location.city(),
       country: faker.location.country(),
     };
