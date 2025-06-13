@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
 import { router } from "expo-router";
 import Input from "../components/form/Input";
+import SelectInput from "../components/form/SelectInput";
 import TextCTA from "../components/Buttons/TextCTA";
 import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,7 +41,13 @@ const RegisterBrewery = () => {
     website: string;
     main_social: string;
     additional_socials: string[];
-    opening_hours: string;
+    opening_hours: {
+      [key: string]: {
+        isOpen: boolean;
+        openTime: string;
+        closeTime: string;
+      };
+    };
     has_taproom: boolean;
     taproom_hours: string;
   }>({
@@ -70,7 +77,15 @@ const RegisterBrewery = () => {
     website: "",
     main_social: "",
     additional_socials: [],
-    opening_hours: "",
+    opening_hours: {
+      monday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      tuesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      wednesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      thursday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      friday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      saturday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
+      sunday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
+    },
     has_taproom: false,
     taproom_hours: "",
   });
@@ -117,6 +132,54 @@ const RegisterBrewery = () => {
       ...prev,
       additional_socials: prev.additional_socials.map((social, i) => (i === index ? value : social)),
     }));
+  };
+
+  const toggleDayOpen = (day: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      opening_hours: {
+        ...prev.opening_hours,
+        [day]: {
+          ...prev.opening_hours[day],
+          isOpen: !prev.opening_hours[day].isOpen,
+        },
+      },
+    }));
+  };
+
+  const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      opening_hours: {
+        ...prev.opening_hours,
+        [day]: {
+          ...prev.opening_hours[day],
+          [timeType]: time,
+        },
+      },
+    }));
+  };
+
+  const getOpeningHoursSummary = () => {
+    const dayLabels = {
+      monday: "Lundi",
+      tuesday: "Mardi", 
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
+      sunday: "Dimanche"
+    };
+
+    const openDays = Object.entries(formState.opening_hours)
+      .filter(([_, hours]) => hours.isOpen)
+      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+
+    if (openDays.length === 0) {
+      return "Aucun jour d'ouverture sélectionné";
+    }
+
+    return openDays.join(" • ");
   };
 
   const validatePasswords = () => {
@@ -430,13 +493,107 @@ const RegisterBrewery = () => {
               style={{ marginTop: 15, marginBottom: 15 }}
             />
 
-            <Input
-              label="Horaires d'ouverture"
-              id="opening_hours"
-              onInputChanged={inputChangedHandler}
-              placeholder="Lun-Ven: 9h-18h, Sam: 10h-16h"
-              placeholderTextColor={COLORS.black}
-            />
+            {/* Horaires d'ouverture avec checkboxes et dropdowns */}
+            <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
+            
+            {Object.entries({
+              monday: "Lundi",
+              tuesday: "Mardi", 
+              wednesday: "Mercredi",
+              thursday: "Jeudi",
+              friday: "Vendredi",
+              saturday: "Samedi",
+              sunday: "Dimanche"
+            }).map(([dayKey, dayLabel]) => (
+              <View key={dayKey} style={styles.dayRow}>
+                {/* Checkbox pour le jour */}
+                <TouchableOpacity 
+                  style={styles.dayCheckboxContainer} 
+                  onPress={() => toggleDayOpen(dayKey)}
+                >
+                  <View style={[styles.dayCheckbox, formState.opening_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
+                    {formState.opening_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                  </View>
+                  <Text style={styles.dayLabel}>{dayLabel}</Text>
+                </TouchableOpacity>
+
+                {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
+                {formState.opening_hours[dayKey].isOpen && (
+                  <View style={styles.timeSelectors}>
+                    <SelectInput
+                      label="Ouverture"
+                      items={[
+                        { label: "00:00", value: "00:00" },
+                        { label: "01:00", value: "01:00" },
+                        { label: "02:00", value: "02:00" },
+                        { label: "03:00", value: "03:00" },
+                        { label: "04:00", value: "04:00" },
+                        { label: "05:00", value: "05:00" },
+                        { label: "06:00", value: "06:00" },
+                        { label: "07:00", value: "07:00" },
+                        { label: "08:00", value: "08:00" },
+                        { label: "09:00", value: "09:00" },
+                        { label: "10:00", value: "10:00" },
+                        { label: "11:00", value: "11:00" },
+                        { label: "12:00", value: "12:00" },
+                        { label: "13:00", value: "13:00" },
+                        { label: "14:00", value: "14:00" },
+                        { label: "15:00", value: "15:00" },
+                        { label: "16:00", value: "16:00" },
+                        { label: "17:00", value: "17:00" },
+                        { label: "18:00", value: "18:00" },
+                        { label: "19:00", value: "19:00" },
+                        { label: "20:00", value: "20:00" },
+                        { label: "21:00", value: "21:00" },
+                        { label: "22:00", value: "22:00" },
+                        { label: "23:00", value: "23:00" },
+                      ]}
+                      width={165}
+                      onValueChange={(value) => updateDayTime(dayKey, 'openTime', value)}
+                      selectedValue={formState.opening_hours[dayKey].openTime}
+                    />
+                    <SelectInput
+                      label="Fermeture"
+                      items={[
+                        { label: "00:00", value: "00:00" },
+                        { label: "01:00", value: "01:00" },
+                        { label: "02:00", value: "02:00" },
+                        { label: "03:00", value: "03:00" },
+                        { label: "04:00", value: "04:00" },
+                        { label: "05:00", value: "05:00" },
+                        { label: "06:00", value: "06:00" },
+                        { label: "07:00", value: "07:00" },
+                        { label: "08:00", value: "08:00" },
+                        { label: "09:00", value: "09:00" },
+                        { label: "10:00", value: "10:00" },
+                        { label: "11:00", value: "11:00" },
+                        { label: "12:00", value: "12:00" },
+                        { label: "13:00", value: "13:00" },
+                        { label: "14:00", value: "14:00" },
+                        { label: "15:00", value: "15:00" },
+                        { label: "16:00", value: "16:00" },
+                        { label: "17:00", value: "17:00" },
+                        { label: "18:00", value: "18:00" },
+                        { label: "19:00", value: "19:00" },
+                        { label: "20:00", value: "20:00" },
+                        { label: "21:00", value: "21:00" },
+                        { label: "22:00", value: "22:00" },
+                        { label: "23:00", value: "23:00" },
+                      ]}
+                      width={165}
+                      onValueChange={(value) => updateDayTime(dayKey, 'closeTime', value)}
+                      selectedValue={formState.opening_hours[dayKey].closeTime}
+                    />
+                  </View>
+                )}
+              </View>
+                          ))}
+
+            {/* Résumé des horaires */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Résumé des horaires :</Text>
+              <Text style={styles.summaryText}>{getOpeningHoursSummary()}</Text>
+            </View>
 
             {/* Taproom Section */}
             <View style={styles.taproomContainer}>
@@ -655,6 +812,63 @@ const styles = StyleSheet.create({
     borderColor: "rgba(0, 0, 0, 1)",
     borderRadius: 4,
     paddingLeft: 10,
+  },
+  dayRow: {
+    marginVertical: 5,
+    width: 350,
+  },
+  dayCheckboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  dayCheckbox: {
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
+    borderRadius: 4,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dayCheckboxChecked: {
+    backgroundColor: COLORS.black,
+    borderColor: COLORS.black,
+  },
+  dayLabel: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "400",
+  },
+  timeSelectors: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    width: "100%",
+  },
+  summaryContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    width: 350,
+  },
+  summaryTitle: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  summaryText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
+    lineHeight: 18,
   },
 });
 

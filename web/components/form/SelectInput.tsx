@@ -12,6 +12,9 @@ interface SelectInputProps {
   items: SelectItem[];
   small?: boolean;
   multiple?: boolean;
+  width?: number;
+  onValueChange?: (value: string) => void;
+  selectedValue?: string;
 }
 
 export default function SelectInput({
@@ -19,27 +22,35 @@ export default function SelectInput({
   items,
   small = false,
   multiple = false,
+  width,
+  onValueChange,
+  selectedValue: propSelectedValue,
 }: SelectInputProps) {
-  const [selectedValue, setSelectedValue] = useState<string>(items[0]?.value ?? "");
+  const [internalSelectedValue, setInternalSelectedValue] = useState<string>(items[0]?.value ?? "");
+  
+  const selectedValue = propSelectedValue || internalSelectedValue;
+  const containerWidth = width || (small ? 292 : 391);
 
-  let width = small ? 292 : 391;
+  const handleValueChange = (value: string) => {
+    if (onValueChange) {
+      onValueChange(value);
+    } else {
+      setInternalSelectedValue(value);
+    }
+  };
 
   return (
-    <View style={[styles.inputContainer, { width }]}>
+    <View style={[styles.inputContainer, { width: containerWidth }]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.rectangle94} />
       <Picker
         selectedValue={selectedValue}
-        onValueChange={(itemValue) => setSelectedValue(itemValue)}
+        onValueChange={handleValueChange}
         style={styles.picker}
       >
         {items.map((item) => (
           <Picker.Item key={item.value} label={item.label} value={item.value} />
         ))}
       </Picker>
-      <Text style={styles.selectedLabel}>
-        Sélectionné : {items.find((i) => i.value === selectedValue)?.label}
-      </Text>
     </View>
   );
 }
@@ -48,12 +59,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: "relative",
     flexShrink: 0,
-    height: 80,
+    //height: 80,
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     rowGap: 0,
-    marginBottom: 12,
+    //marginBottom: 12,
   },
   label: {
     position: "absolute",
@@ -82,18 +93,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   picker: {
-    position: "absolute",
-    top: 24,
-    left: 0,
-    right: 0,
+    marginTop: 5,
     height: 40,
     width: "100%",
-    zIndex: 3,
   },
-  selectedLabel: {
-    marginTop: 60,
-    color: "#333",
-    fontSize: 13,
-    fontFamily: "HankenGrotesk",
-  },
+
 });
