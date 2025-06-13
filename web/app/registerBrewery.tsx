@@ -49,7 +49,13 @@ const RegisterBrewery = () => {
       };
     };
     has_taproom: boolean;
-    taproom_hours: string;
+    taproom_hours: {
+      [key: string]: {
+        isOpen: boolean;
+        openTime: string;
+        closeTime: string;
+      };
+    };
   }>({
     // Brewery Owner
     first_name: "",
@@ -87,7 +93,15 @@ const RegisterBrewery = () => {
       sunday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
     },
     has_taproom: false,
-    taproom_hours: "",
+    taproom_hours: {
+      monday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      tuesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      wednesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      thursday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      friday: { isOpen: false, openTime: "16:00", closeTime: "23:00" },
+      saturday: { isOpen: false, openTime: "14:00", closeTime: "23:00" },
+      sunday: { isOpen: false, openTime: "14:00", closeTime: "22:00" },
+    },
   });
 
   const [passwordError, setPasswordError] = useState("");
@@ -160,6 +174,32 @@ const RegisterBrewery = () => {
     }));
   };
 
+  const toggleTaproomDayOpen = (day: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      taproom_hours: {
+        ...prev.taproom_hours,
+        [day]: {
+          ...prev.taproom_hours[day],
+          isOpen: !prev.taproom_hours[day].isOpen,
+        },
+      },
+    }));
+  };
+
+  const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      taproom_hours: {
+        ...prev.taproom_hours,
+        [day]: {
+          ...prev.taproom_hours[day],
+          [timeType]: time,
+        },
+      },
+    }));
+  };
+
   const getOpeningHoursSummary = () => {
     const dayLabels = {
       monday: "Lundi",
@@ -177,6 +217,28 @@ const RegisterBrewery = () => {
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné";
+    }
+
+    return openDays.join(" • ");
+  };
+
+  const getTaproomHoursSummary = () => {
+    const dayLabels = {
+      monday: "Lundi",
+      tuesday: "Mardi", 
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
+      sunday: "Dimanche"
+    };
+
+    const openDays = Object.entries(formState.taproom_hours)
+      .filter(([_, hours]) => hours.isOpen)
+      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+
+    if (openDays.length === 0) {
+      return "Aucun jour d'ouverture sélectionné pour la taproom";
     }
 
     return openDays.join(" • ");
@@ -606,13 +668,108 @@ const RegisterBrewery = () => {
             </View>
 
             {formState.has_taproom && (
-              <Input
-                label="Horaires de la taproom"
-                id="taproom_hours"
-                onInputChanged={inputChangedHandler}
-                placeholder="Mar-Dim: 16h-22h"
-                placeholderTextColor={COLORS.black}
-              />
+              <>
+                <Text style={styles.sectionTitle}>Horaires de la taproom</Text>
+                
+                {Object.entries({
+                  monday: "Lundi",
+                  tuesday: "Mardi", 
+                  wednesday: "Mercredi",
+                  thursday: "Jeudi",
+                  friday: "Vendredi",
+                  saturday: "Samedi",
+                  sunday: "Dimanche"
+                }).map(([dayKey, dayLabel]) => (
+                  <View key={dayKey} style={styles.dayRow}>
+                    {/* Checkbox pour le jour */}
+                    <TouchableOpacity 
+                      style={styles.dayCheckboxContainer} 
+                      onPress={() => toggleTaproomDayOpen(dayKey)}
+                    >
+                      <View style={[styles.dayCheckbox, formState.taproom_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
+                        {formState.taproom_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                      </View>
+                      <Text style={styles.dayLabel}>{dayLabel}</Text>
+                    </TouchableOpacity>
+
+                    {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
+                    {formState.taproom_hours[dayKey].isOpen && (
+                      <View style={styles.timeSelectors}>
+                        <SelectInput
+                          label="Ouverture"
+                          items={[
+                            { label: "00:00", value: "00:00" },
+                            { label: "01:00", value: "01:00" },
+                            { label: "02:00", value: "02:00" },
+                            { label: "03:00", value: "03:00" },
+                            { label: "04:00", value: "04:00" },
+                            { label: "05:00", value: "05:00" },
+                            { label: "06:00", value: "06:00" },
+                            { label: "07:00", value: "07:00" },
+                            { label: "08:00", value: "08:00" },
+                            { label: "09:00", value: "09:00" },
+                            { label: "10:00", value: "10:00" },
+                            { label: "11:00", value: "11:00" },
+                            { label: "12:00", value: "12:00" },
+                            { label: "13:00", value: "13:00" },
+                            { label: "14:00", value: "14:00" },
+                            { label: "15:00", value: "15:00" },
+                            { label: "16:00", value: "16:00" },
+                            { label: "17:00", value: "17:00" },
+                            { label: "18:00", value: "18:00" },
+                            { label: "19:00", value: "19:00" },
+                            { label: "20:00", value: "20:00" },
+                            { label: "21:00", value: "21:00" },
+                            { label: "22:00", value: "22:00" },
+                            { label: "23:00", value: "23:00" },
+                          ]}
+                          width={165}
+                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'openTime', value)}
+                          selectedValue={formState.taproom_hours[dayKey].openTime}
+                        />
+                        <SelectInput
+                          label="Fermeture"
+                          items={[
+                            { label: "00:00", value: "00:00" },
+                            { label: "01:00", value: "01:00" },
+                            { label: "02:00", value: "02:00" },
+                            { label: "03:00", value: "03:00" },
+                            { label: "04:00", value: "04:00" },
+                            { label: "05:00", value: "05:00" },
+                            { label: "06:00", value: "06:00" },
+                            { label: "07:00", value: "07:00" },
+                            { label: "08:00", value: "08:00" },
+                            { label: "09:00", value: "09:00" },
+                            { label: "10:00", value: "10:00" },
+                            { label: "11:00", value: "11:00" },
+                            { label: "12:00", value: "12:00" },
+                            { label: "13:00", value: "13:00" },
+                            { label: "14:00", value: "14:00" },
+                            { label: "15:00", value: "15:00" },
+                            { label: "16:00", value: "16:00" },
+                            { label: "17:00", value: "17:00" },
+                            { label: "18:00", value: "18:00" },
+                            { label: "19:00", value: "19:00" },
+                            { label: "20:00", value: "20:00" },
+                            { label: "21:00", value: "21:00" },
+                            { label: "22:00", value: "22:00" },
+                            { label: "23:00", value: "23:00" },
+                          ]}
+                          width={165}
+                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'closeTime', value)}
+                          selectedValue={formState.taproom_hours[dayKey].closeTime}
+                        />
+                      </View>
+                    )}
+                  </View>
+                ))}
+
+                {/* Résumé des horaires taproom */}
+                <View style={styles.summaryContainer}>
+                  <Text style={styles.summaryTitle}>Résumé des horaires taproom :</Text>
+                  <Text style={styles.summaryText}>{getTaproomHoursSummary()}</Text>
+                </View>
+              </>
             )}
 
             <View style={styles.buttonContainer}>
