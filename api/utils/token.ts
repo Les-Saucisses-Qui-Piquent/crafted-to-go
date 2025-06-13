@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 type TokenPayload = Prisma.userGetPayload<{
   select: {
