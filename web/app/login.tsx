@@ -43,7 +43,7 @@ export const Login = () => {
       const { email, password } = formState;
 
       if (!email || !password) {
-        console.warn("Email and password are required");
+        Alert.alert("Email and password are required");
         return;
       }
 
@@ -90,7 +90,10 @@ export const Login = () => {
           },
         ]}
       >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <View style={styles.logoContainer}></View>
           <Text
             style={[
@@ -122,8 +125,8 @@ export const Login = () => {
               placeholderTextColor={COLORS.black}
             />
             <View style={styles.buttonContainer}>
-              <SecondaryCTA 
-                title="Se connecter" 
+              <SecondaryCTA
+                title="Se connecter"
                 isBlack={true}
                 tablet={true}
                 onPress={handleLogin}
@@ -133,10 +136,7 @@ export const Login = () => {
             <View style={styles.checkBoxContainer}>
               <View style={styles.checkboxRow}>
                 <Checkbox
-                  style={[
-                    styles.checkbox,
-                    !isChecked && styles.checkboxUnchecked
-                  ]}
+                  style={[styles.checkbox, !isChecked && styles.checkboxUnchecked]}
                   value={isChecked}
                   color={isChecked ? "#000000" : "transparent"}
                   onValueChange={setChecked}
