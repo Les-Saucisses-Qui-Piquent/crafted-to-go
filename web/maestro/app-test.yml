@@ -1,0 +1,6 @@
+appId: host.exp.exponent
+---
+- launchApp
+- assertVisible: "Welcome to my app!" # Replace with some text that appears on your initial screen
+- tapOn: "Login Button" # Replace with the text or accessibilityLabel of a button
+- assertVisible: "Login Screen" # Assert something visible after tapping the button

@@ -46,3 +46,11 @@ Clean database containers and images:
 
 Reset database containers, images and volumes:  
 `npm run db:reset`
+
+-----
+
+TEST End to End
+
+documentation de maestro : https://docs.maestro.dev/getting-started/installing-maestro
+
+si vous n'y avez pas accès, il suffit dans web de faire ça comme commande : eas build --profile e2e-local --platform android
