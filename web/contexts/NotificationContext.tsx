@@ -28,7 +28,6 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 const NOTIFICATIONS_STORAGE_KEY = "@notifications";
 const PERMISSIONS_STORAGE_KEY = "@notification_permissions";
 
-// Configuration des notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -45,14 +44,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [hasPermission, setHasPermission] = useState(false);
 
-  // Charger les notifications au démarrage
   useEffect(() => {
     loadNotifications();
     checkPermissions();
     setupNotificationListeners();
   }, []);
 
-  // Sauvegarder les notifications quand elles changent
   useEffect(() => {
     saveNotifications();
     updateBadgeCount();
@@ -120,7 +117,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   };
 
   const setupNotificationListeners = () => {
-    // Écouter les notifications reçues quand l'app est ouverte
     const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
       const newNotif: Notification = {
         id: Date.now().toString(),

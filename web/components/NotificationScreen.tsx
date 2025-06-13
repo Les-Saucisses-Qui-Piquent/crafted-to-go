@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
 import { useNotifications } from "@/contexts/NotificationContext";
 import AppIcon from "@/utils/AppIcon";
+import { COLORS } from "@/constants";
 
 export interface Notification {
   id: string;
@@ -62,7 +63,7 @@ const NotificationScreen: React.FC = () => {
           <AppIcon
             name={getNotificationIcon(item.type)}
             size={24}
-            color={item.read ? "#666" : "#007AFF"}
+            color={item.read ? COLORS.dark1 : COLORS.primary}
           />
           <Text style={[styles.title, !item.read && styles.unreadTitle]}>{item.title}</Text>
           <Text style={styles.time}>{formatTime(item.timestamp)}</Text>
@@ -125,7 +126,7 @@ const NotificationScreen: React.FC = () => {
         style={styles.list}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <AppIcon name="notifications-off-outline" size={64} color="#CCC" />
+            <AppIcon name="notifications-off-outline" size={64} color={COLORS.secondaryWhite} />
             <Text style={styles.emptyText}>Aucune notification</Text>
           </View>
         }
@@ -137,13 +138,13 @@ const NotificationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: COLORS.white,
   },
   header: {
-    backgroundColor: "#FFF",
+    backgroundColor: COLORS.white,
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    borderBottomColor: COLORS.dark3,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -151,21 +152,21 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
+    color: COLORS.black,
   },
   unreadCount: {
     fontSize: 16,
-    color: "#007AFF",
+    color: COLORS.primary,
     fontWeight: "500",
   },
   permissionBanner: {
-    backgroundColor: "#FFF3CD",
+    backgroundColor: COLORS.secondary,
     padding: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    borderBottomColor: COLORS.dark3,
   },
   permissionText: {
     flex: 1,
@@ -173,18 +174,18 @@ const styles = StyleSheet.create({
     color: "#856404",
   },
   permissionButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
   },
   permissionButtonText: {
-    color: "#FFF",
+    color: COLORS.black,
     fontSize: 14,
     fontWeight: "500",
   },
   actions: {
-    backgroundColor: "#FFF",
+    backgroundColor: COLORS.black,
     padding: 16,
     flexDirection: "row",
     justifyContent: "space-around",
@@ -196,18 +197,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   actionButtonText: {
-    color: "#007AFF",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "500",
   },
   disabledText: {
-    color: "#CCC",
+    color: COLORS.dark1,
   },
   list: {
     flex: 1,
   },
   notificationItem: {
-    backgroundColor: "#FFF",
+    backgroundColor: COLORS.white,
     marginVertical: 4,
     marginHorizontal: 16,
     borderRadius: 8,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
   },
   unreadNotification: {
     borderLeftWidth: 4,
-    borderLeftColor: "#007AFF",
+    borderLeftColor: COLORS.primary,
   },
   notificationContent: {
     position: "relative",
@@ -233,25 +234,25 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#666",
+    color: COLORS.black,
     flex: 1,
     marginLeft: 12,
   },
   unreadTitle: {
-    color: "#333",
+    color: COLORS.dark1,
     fontWeight: "600",
   },
   time: {
     fontSize: 12,
-    color: "#999",
+    color: COLORS.dark2,
   },
   body: {
     fontSize: 14,
-    color: "#888",
+    color: COLORS.black2,
     lineHeight: 20,
   },
   unreadBody: {
-    color: "#555",
+    color: COLORS.dark1,
   },
   unreadDot: {
     position: "absolute",
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#007AFF",
+    backgroundColor: COLORS.primary,
   },
   emptyState: {
     flex: 1,
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: "#999",
+    color: COLORS.dark1,
     marginTop: 16,
   },
 });

@@ -55,7 +55,6 @@ const CartScreen: React.FC = () => {
         {
           text: "Commander",
           onPress: () => {
-            // Créer la commande
             addOrder({
               customerId: "current-user-id", // À remplacer par l'ID utilisateur réel
               customerName: "Client", // À remplacer par le nom utilisateur réel
@@ -72,7 +71,6 @@ const CartScreen: React.FC = () => {
               type: "order",
             });
 
-            // Vider le panier
             clearCart();
 
             Alert.alert("Succès", "Votre commande a été passée avec succès !");
