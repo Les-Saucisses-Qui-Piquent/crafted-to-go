@@ -5,6 +5,7 @@ import { COLORS, SIZES } from "../constants";
 import { router } from "expo-router";
 import Input from "../components/form/Input";
 import TextCTA from "../components/Buttons/TextCTA";
+import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
@@ -421,9 +422,13 @@ const RegisterBrewery = () => {
               </View>
             ))}
 
-            <TouchableOpacity style={styles.addSocialButton} onPress={addAdditionalSocial}>
-              <Text style={styles.addSocialButtonText}>+ Ajouter un réseau social</Text>
-            </TouchableOpacity>
+            <SecondaryCTA
+              title="+ Ajouter un réseau social"
+              isBlack={true}
+              tablet={true}
+              onPress={addAdditionalSocial}
+              style={{ marginTop: 15, marginBottom: 15 }}
+            />
 
             <Input
               label="Horaires d'ouverture"
@@ -439,13 +444,13 @@ const RegisterBrewery = () => {
                 <View style={[styles.checkbox, formState.has_taproom && styles.checkboxChecked]}>
                   {formState.has_taproom && <Text style={styles.checkmark}>✓</Text>}
                 </View>
-                <Text style={styles.taproomText}>Ma brasserie a un taproom</Text>
+                <Text style={styles.taproomText}>Ma brasserie a une taproom</Text>
               </TouchableOpacity>
             </View>
 
             {formState.has_taproom && (
               <Input
-                label="Horaires du taproom"
+                label="Horaires de la taproom"
                 id="taproom_hours"
                 onInputChanged={inputChangedHandler}
                 placeholder="Mar-Dim: 16h-22h"
@@ -585,10 +590,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: COLORS.primary,
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
     borderRadius: 4,
     marginRight: 10,
     alignItems: "center",
@@ -609,21 +614,7 @@ const styles = StyleSheet.create({
     color: COLORS.black,
   },
 
-  addSocialButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 10,
-    width: 350,
-  },
-  addSocialButtonText: {
-    fontSize: 16,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "600",
-  },
+
   socialInputContainer: {
     width: 350,
     marginVertical: 10,
@@ -641,10 +632,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   removeText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "HankenGrotesk",
-    color: "#ff4444",
-    fontWeight: "400",
+    color: COLORS.black,
+    fontWeight: "800",
+    textDecorationLine: "underline",
   },
   inputWithoutLabel: {
     width: "100%",
