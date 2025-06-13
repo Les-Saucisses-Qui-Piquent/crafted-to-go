@@ -14,7 +14,7 @@ model address {
   id            String                    @id @default(uuid()) @db.Uuid
   line_1        String
   line_2        String?
-  postal_code   String
+  postal_code   Int
   city          String
   country       String
   GPS           Unsupported("geography")?
