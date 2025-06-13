@@ -1,4 +1,3 @@
-import { TopBar } from "@/components/TopBar";
 import { useFonts } from "expo-font";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Stack } from "expo-router";
