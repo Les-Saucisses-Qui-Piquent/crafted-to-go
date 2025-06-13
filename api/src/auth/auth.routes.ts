@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { useHash } from "../../utils/hash";
 import { useToken } from "../../utils/token";
 import { z } from "zod";
