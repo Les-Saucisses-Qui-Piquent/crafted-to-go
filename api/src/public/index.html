@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crafted to Go - API Documentation</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #fdfdfd;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        color: #222;
+        border-bottom: 1px solid #eaecef;
+        padding-bottom: 0.3em;
+        margin-top: 24px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 2em;
+        text-align: center;
+      }
+      h2 {
+        font-size: 1.5em;
+      }
+      h3 {
+        font-size: 1.2em;
+      }
+      h4 {
+        font-size: 1em;
+      }
+      pre {
+        background-color: #f6f8fa;
+        padding: 16px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        font-size: 85%;
+        background-color: rgba(27, 31, 35, 0.05);
+        border-radius: 3px;
+        padding: 0.2em 0.4em;
+      }
+      pre > code {
+        padding: 0;
+        background-color: transparent;
+        border-radius: 0;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin-bottom: 0.5em;
+      }
+      a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      strong {
+        font-weight: 600;
+      }
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Crafted to Go - API Documentation</h1>
+
+      <p>
+        This document provides a detailed overview of the Crafted to Go API, including its
+        endpoints, authentication, and other necessary information for development and integration.
+      </p>
+
+      <nav class="nav">
+        <h2>Table of Contents</h2>
+        <ul>
+          <li>
+            <a href="#getting-started">Getting Started</a>
+            <ul>
+              <li><a href="#prerequisites">Prerequisites</a></li>
+              <li><a href="#installation">Installation</a></li>
+              <li><a href="#running-the-api">Running the API</a></li>
+            </ul>
+          </li>
+          <li><a href="#authentication">Authentication</a></li>
+          <li>
+            <a href="#api-endpoints">API Endpoints</a>
+            <ul>
+              <li><a href="#health-check">Health Check</a></li>
+              <li><a href="#auth">Auth</a></li>
+              <li><a href="#users">Users</a></li>
+              <li><a href="#user-details">User Details</a></li>
+              <li><a href="#addresses">Addresses</a></li>
+              <li><a href="#breweries">Breweries</a></li>
+              <li><a href="#brewery-details">Brewery Details</a></li>
+              <li><a href="#brewery-owners">Brewery Owners</a></li>
+              <li><a href="#beers">Beers</a></li>
+              <li><a href="#beer-colors">Beer Colors</a></li>
+              <li><a href="#beer-styles">Beer Styles</a></li>
+              <li><a href="#orders">Orders</a></li>
+              <li><a href="#order-details">Order Details</a></li>
+              <li><a href="#favorite-beers">Favorite Beers</a></li>
+              <li><a href="#favorite-breweries">Favorite Breweries</a></li>
+              <li><a href="#test">Test</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <h2 id="getting-started">Getting Started</h2>
+
+      <h3 id="prerequisites">Prerequisites</h3>
+      <ul>
+        <li>Node.js (v18 or higher)</li>
+        <li>npm</li>
+        <li>Docker and Docker Compose</li>
+        <li>A running PostgreSQL database</li>
+      </ul>
+
+      <h3 id="installation">Installation</h3>
+      <ol>
+        <li>Clone the repository.</li>
+        <li>Navigate to the <code>api</code> directory: <code>cd api</code></li>
+        <li>Install dependencies: <code>npm install</code></li>
+      </ol>
+
+      <h3 id="running-the-api">Running the API</h3>
+      <ul>
+        <li><strong>Development:</strong> <code>npm run dev</code></li>
+        <li><strong>Production:</strong> <code>npm start</code></li>
+        <li><strong>Tests:</strong> <code>npm run test</code></li>
+      </ul>
+      <p>The API will be available at <code>http://localhost:3000</code>.</p>
+
+      <h2 id="authentication">Authentication</h2>
+      <p>
+        Authentication is handled via JSON Web Tokens (JWT). A token can be obtained by registering
+        or logging in. The token must be included in the <code>Authorization</code> header of
+        subsequent requests as a <strong>Bearer token</strong>.
+      </p>
+      <h4><code>authMiddleware</code></h4>
+      <p>
+        The project includes an <code>authMiddleware</code> that can be used to protect endpoints.
+        It verifies the JWT and attaches the user's information to the request object.
+      </p>
+      <p><strong>Example Usage:</strong></p>
+      <pre><code class="language-typescript">import { authMiddleware } from "../middlewares/auth.middleware";
+
+// ...
+
+fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (request, reply) => {
+  // ... route logic
+});
+</code></pre>
+      <p>
+        <strong>IMPORTANT:</strong> Currently, most endpoints are <strong>unprotected</strong>. In a
+        near futur development step, all endpoints excluding <code>auth/login</code> and
+        <code>auth/register</code> will be <strong>protected</strong>.
+      </p>
+
+      <h2 id="api-endpoints">API Endpoints</h2>
+
+      <h3 id="health-check">Health Check</h3>
+      <ul>
+        <li><code>GET /</code>: Redirects to <code>/health</code>.</li>
+        <li>
+          <code>GET /health</code>: Returns the status of the API.
+          <ul>
+            <li><strong>Access</strong>: Public</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="auth">Auth</h3>
+      <ul>
+        <li>
+          <p><code>POST /auth/register</code>: Register a new user.</p>
+          <ul>
+            <li><strong>Access</strong>: Public</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "email": "user@example.com",
+  "password": "yoursecurepassword",
+  "first_name": "John",
+  "last_name": "Doe",
+  "birth_date": "1990-01-01T00:00:00.000Z",
+  "phone_number": "1234567890"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><code>POST /auth/login</code>: Login an existing user.</p>
+          <ul>
+            <li><strong>Access</strong>: Public</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "email": "user@example.com",
+  "password": "yoursecurepassword"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="users">Users</h3>
+      <ul>
+        <li>
+          <code>GET /users</code>: Get all users.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /users/:id</code>: Get a single user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /users</code>: Create a new user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "first_name": "John",
+  "last_name": "Doe",
+  "birth_date": "1990-01-01T00:00:00.000Z",
+  "email": "john.doe@example.com",
+  "phone_number": "0123456789",
+  "password": "a_very_strong_password"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /users/:id</code>: Update a user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "first_name": "John",
+  "last_name": "Doe",
+  "birth_date": "1990-01-01T00:00:00.000Z",
+  "email": "john.doe@example.com",
+  "phone_number": "0123456789",
+  "password": "a_new_very_strong_password"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /users/:id</code>: Delete a user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="user-details">User Details</h3>
+      <ul>
+        <li>
+          <code>GET /user-details</code>: Get all user details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /user-details/:id</code>: Get a single user detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /user-details/user/:userId</code>: Get details for a specific user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /user-details</code>: Create new user details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "user_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "image": "/path/to/image.jpg",
+  "address_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+  "color_ids": ["..."],
+  "style_ids": ["..."],
+  "payment_method": "credit_card",
+  "beer_level": 5
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /user-details/:id</code>: Update user details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "image": "/path/to/new_image.jpg",
+  "payment_method": "paypal",
+  "beer_level": 6
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /user-details/:id</code>: Delete user details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="addresses">Addresses</h3>
+      <ul>
+        <li>
+          <code>GET /addresses</code>: Get all addresses.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /addresses/:id</code>: Get a single address.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /addresses</code>: Create a new address.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "line_1": "123 Main Street",
+  "line_2": "Apt 4B",
+  "postal_code": 12345,
+  "city": "Anytown",
+  "country": "USA"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /addresses/:id</code>: Update an address.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "line_1": "456 Oak Avenue"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /addresses/:id</code>: Delete an address.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="breweries">Breweries</h3>
+      <ul>
+        <li>
+          <code>GET /breweries</code>: Get all breweries.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /breweries/:id</code>: Get a single brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /breweries</code>: Create a new brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "name": "Crafty Brews",
+  "RIB": "FR7630001007941234567890185",
+  "siren": "123456789",
+  "address_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+  "brewery_owner_id": "f1e2d3c4-b5a6-f7e8-d9c0-b1a2f3e4d5c6"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /breweries/:id</code>: Update a brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "name": "The Crafty Brewer"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /breweries/:id</code>: Delete a brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="brewery-details">Brewery Details</h3>
+      <ul>
+        <li>
+          <code>GET /brewery-details</code>: Get all brewery details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /brewery-details/:id</code>: Get a single brewery detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /brewery-details</code>: Create a new brewery detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "brewery_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "has_taproom": true,
+  "image": "/path/to/image.jpg",
+  "logo": "/path/to/logo.png",
+  "description": "A great place for craft beer.",
+  "social_link": "https://twitter.com/craftybrews",
+  "phone_number": "123-456-7890",
+  "email": "contact@craftybrews.com",
+  "opening_hours": { "monday": "10-22", "tuesday-saturday": "10-23" }
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /brewery-details/:id</code>: Update a brewery detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "description": "The best place for craft beer."
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /brewery-details/:id</code>: Delete a brewery detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="brewery-owners">Brewery Owners</h3>
+      <ul>
+        <li>
+          <code>GET /brewery-owners</code>: Get all brewery owners.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /brewery-owners/:id</code>: Get a single brewery owner.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /brewery-owners</code>: Create a new brewery owner.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "first_name": "Brew",
+  "last_name": "Master",
+  "address_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+  "birth_date": "1980-05-15T00:00:00.000Z",
+  "phone_number": "9876543210",
+  "email": "brew.master@example.com",
+  "password": "a_secure_password"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /brewery-owners/:id</code>: Update a brewery owner.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "email": "brew.master@newdomain.com"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /brewery-owners/:id</code>: Delete a brewery owner.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="beers">Beers</h3>
+      <ul>
+        <li>
+          <code>GET /beers</code>: Get all beers.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /beers/:id</code>: Get a single beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /beers</code>: Create a new beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "name": "Hoppy IPA",
+  "beer_color_id": "d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5",
+  "brewery_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "beer_style_ids": "b5a6f7e8-d9c0-b1a2-f3e4-d5c6b7a8f9e0",
+  "abv_rate": 6.5,
+  "ibu_rate": 60,
+  "quantity": 100,
+  "price": 5.99
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /beers/:id</code>: Update a beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "price": 6.49,
+  "is_public": true
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /beers/:id</code>: Delete a beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="beer-colors">Beer Colors</h3>
+      <ul>
+        <li>
+          <code>GET /beer-colors</code>: Get all beer colors.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="beer-styles">Beer Styles</h3>
+      <ul>
+        <li>
+          <code>GET /beer-styles</code>: Get all beer styles.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="orders">Orders</h3>
+      <ul>
+        <li>
+          <code>GET /orders</code>: Get all orders.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /orders/:id</code>: Get a single order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /orders</code>: Create a new order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "user_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "brewery_id": "f1e2d3c4-b5a6-f7e8-d9c0-b1a2f3e4d5c6",
+  "final_price": 59.99,
+  "status": "pending",
+  "pickup_day": "2024-07-20T00:00:00.000Z",
+  "pickup_time": "18:00",
+  "payment_method": "stripe"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /orders/:id</code>: Update an order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "status": "confirmed"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /orders/:id</code>: Delete an order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="order-details">Order Details</h3>
+      <ul>
+        <li>
+          <code>GET /order-details</code>: Get all order details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /order-details/:id</code>: Get a single order detail.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /order-details/order/:orderId</code>: Get details for a specific order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /order-details</code>: Create new order details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "order_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+  "beer_id": "d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5",
+  "quantity": 6,
+  "price": 35.94
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>PUT /order-details/:id</code>: Update order details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>: (all fields are optional)
+              <pre><code class="language-json">{
+  "is_ready": true
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /order-details/:id</code>: Delete order details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="favorite-beers">Favorite Beers</h3>
+      <ul>
+        <li>
+          <code>GET /favorite-beers/:userId</code>: Get all favorite beers for a user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /favorite-beers</code>: Create a new favorite beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "user_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "beer_id": "d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5",
+  "liked_at": "2024-07-19T10:00:00.000Z"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /favorite-beers/:id</code>: Delete a favorite beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="favorite-breweries">Favorite Breweries</h3>
+      <ul>
+        <li>
+          <code>GET /favorite-breweries/:userId</code>: Get all favorite breweries for a user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /favorite-breweries</code>: Create a new favorite brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "user_id": "c6a9b4d0-1f2e-3d4c-5b6a-7e8f9d0c1b2a",
+  "brewery_id": "f1e2d3c4-b5a6-f7e8-d9c0-b1a2f3e4d5c6",
+  "liked_at": "2024-07-19T10:05:00.000Z"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <code>DELETE /favorite-breweries/:id</code>: Delete a favorite brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3 id="test">Test</h3>
+      <ul>
+        <li>
+          <code>GET /test</code>: Get test data.
+          <ul>
+            <li><strong>Access</strong>: Public</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /test</code>: Create test data.
+          <ul>
+            <li><strong>Access</strong>: Protected (Requires authentication)</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "first_name": "Testy",
+  "last_name": "McTestFace"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
