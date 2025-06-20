@@ -109,8 +109,8 @@ interface Brewery {
 
 interface OpeningHours {
   isOpen: boolean;
-  openTime: string;
-  closeTime: string;
+  openTime?: string;  // Optionnel si isOpen est false
+  closeTime?: string; // Optionnel si isOpen est false
 }
 
 interface BreweryDetail {
@@ -132,8 +132,8 @@ interface BreweryFormState extends BreweryOwner, Address, Brewery, BreweryDetail
 type OpeningHoursType = {
   [key: string]: {
     isOpen: boolean;
-    openTime: string;
-    closeTime: string;
+    openTime?: string;
+    closeTime?: string;
   };
 };
 
@@ -266,23 +266,23 @@ const RegisterBrewery = () => {
     main_social: "",
     additional_socials: [],
     opening_hours: {
-      monday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
-      tuesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
-      wednesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
-      thursday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
-      friday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
-      saturday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
-      sunday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
+      monday: { isOpen: false },
+      tuesday: { isOpen: false },
+      wednesday: { isOpen: false },
+      thursday: { isOpen: false },
+      friday: { isOpen: false },
+      saturday: { isOpen: false },
+      sunday: { isOpen: false },
     },
     has_taproom: false,
     taproom_hours: {
-      monday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
-      tuesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
-      wednesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
-      thursday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
-      friday: { isOpen: false, openTime: "16:00", closeTime: "23:00" },
-      saturday: { isOpen: false, openTime: "14:00", closeTime: "23:00" },
-      sunday: { isOpen: false, openTime: "14:00", closeTime: "22:00" },
+      monday: { isOpen: false },
+      tuesday: { isOpen: false },
+      wednesday: { isOpen: false },
+      thursday: { isOpen: false },
+      friday: { isOpen: false },
+      saturday: { isOpen: false },
+      sunday: { isOpen: false },
     },
   });
 
@@ -350,16 +350,18 @@ const RegisterBrewery = () => {
   };
 
   const toggleDayOpen = (day: string) => {
-    setFormState((prev) => ({
-      ...prev,
-      opening_hours: {
-        ...prev.opening_hours,
-        [day]: {
-          ...prev.opening_hours[day],
-          isOpen: !prev.opening_hours[day].isOpen,
+    setFormState((prev) => {
+      const isCurrentlyOpen = prev.opening_hours[day].isOpen;
+      return {
+        ...prev,
+        opening_hours: {
+          ...prev.opening_hours,
+          [day]: isCurrentlyOpen 
+            ? { isOpen: false }  // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "09:00", closeTime: "18:00" }  // Ajoute des horaires par défaut quand on ouvre
         },
-      },
-    }));
+      };
+    });
   };
 
   const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
@@ -376,16 +378,18 @@ const RegisterBrewery = () => {
   };
 
   const toggleTaproomDayOpen = (day: string) => {
-    setFormState((prev) => ({
-      ...prev,
-      taproom_hours: {
-        ...prev.taproom_hours,
-        [day]: {
-          ...prev.taproom_hours[day],
-          isOpen: !prev.taproom_hours[day].isOpen,
+    setFormState((prev) => {
+      const isCurrentlyOpen = prev.taproom_hours[day].isOpen;
+      return {
+        ...prev,
+        taproom_hours: {
+          ...prev.taproom_hours,
+          [day]: isCurrentlyOpen
+            ? { isOpen: false }  // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "16:00", closeTime: "22:00" }  // Ajoute des horaires par défaut quand on ouvre
         },
-      },
-    }));
+      };
+    });
   };
 
   const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
