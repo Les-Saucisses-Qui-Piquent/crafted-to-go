@@ -1,158 +1,1032 @@
-import { View, Text, StyleSheet, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SIZES } from '../constants';
-import Checkbox from 'expo-checkbox';
-import { useNavigation } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, TextInput } from "react-native";
+import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { COLORS, SIZES } from "../constants";
+import { router } from "expo-router";
+import Input from "../components/form/Input";
+import SelectInput from "../components/form/SelectInput";
+import TextCTA from "../components/Buttons/TextCTA";
+import SecondaryCTA from "../components/Buttons/SecondaryCTA";
+import { useAuth } from "@/contexts/AuthContext";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
-const isTestMode = true;
+const RegisterBrewery = () => {
+  const { setToken, setUser } = useAuth();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-const initialState = {
-    inputValues: {
-        email: isTestMode ? 'example@gmail.com' : '',
-        password: isTestMode ? '**********' : '',
+  const [formState, setFormState] = useState<{
+    // Brewery Owner fields
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    birth_date: Date | undefined;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    
+    // Address fields
+    address_line_1: string;
+    address_line_2: string;
+    postal_code: string;
+    city: string;
+    country: string;
+    
+    // Brewery fields
+    brewery_name: string;
+    rib: string;
+    siren: string;
+    
+    // Brewery Detail fields
+    description: string;
+    website: string;
+    main_social: string;
+    additional_socials: string[];
+    opening_hours: {
+      [key: string]: {
+        isOpen: boolean;
+        openTime: string;
+        closeTime: string;
+      };
+    };
+    has_taproom: boolean;
+    taproom_hours: {
+      [key: string]: {
+        isOpen: boolean;
+        openTime: string;
+        closeTime: string;
+      };
+    };
+  }>({
+    // Brewery Owner
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    birth_date: undefined,
+    email: "",
+    password: "",
+    confirmPassword: "",
+    
+    // Address
+    address_line_1: "",
+    address_line_2: "",
+    postal_code: "",
+    city: "",
+    country: "France",
+    
+    // Brewery
+    brewery_name: "",
+    rib: "",
+    siren: "",
+    
+    // Brewery Detail
+    description: "",
+    website: "",
+    main_social: "",
+    additional_socials: [],
+    opening_hours: {
+      monday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      tuesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      wednesday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      thursday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      friday: { isOpen: false, openTime: "09:00", closeTime: "18:00" },
+      saturday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
+      sunday: { isOpen: false, openTime: "10:00", closeTime: "16:00" },
     },
-    inputValidities: {
-        email: false,
-        password: false
+    has_taproom: false,
+    taproom_hours: {
+      monday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      tuesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      wednesday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      thursday: { isOpen: false, openTime: "16:00", closeTime: "22:00" },
+      friday: { isOpen: false, openTime: "16:00", closeTime: "23:00" },
+      saturday: { isOpen: false, openTime: "14:00", closeTime: "23:00" },
+      sunday: { isOpen: false, openTime: "14:00", closeTime: "22:00" },
     },
-    formIsValid: false,
-}
+  });
 
-type Nav = {
-    navigate: (value: string) => void
-}
+  const [passwordError, setPasswordError] = useState("");
 
-const registerBrewery = () => {
-    const { navigate } = useNavigation<Nav>();
+  const inputChangedHandler = (id: string, text: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [id]: text,
+    }));
+
+    // Clear password error when user starts typing
+    if (id === "password" || id === "confirmPassword") {
+      setPasswordError("");
+    }
+  };
+
+  const toggleTaproom = () => {
+    setFormState((prev) => ({
+      ...prev,
+      has_taproom: !prev.has_taproom,
+    }));
+  };
+
+  const addAdditionalSocial = () => {
+    setFormState((prev) => ({
+      ...prev,
+      additional_socials: [...prev.additional_socials, ""],
+    }));
+  };
 
 
-    return (
-        <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
-            <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={styles.logoContainer}>
-                        
-                    </View>
-                    <Text style={[styles.title, {
-                        color: COLORS.black
-                    }]}>Create Your BREWERY</Text>
-                  
-                    <View style={styles.checkBoxContainer}>
-                        <View style={{ flexDirection: 'row' }}>
 
-                            <View style={{ flex: 1 }}>
-                                <Text style={[styles.privacy, {
-                                    color: COLORS.black
-                                }]}>By continuing you accept our Privacy Policy</Text>
-                            </View>
-                        </View>
-                    </View>
-                    
-                </ScrollView>
-                <View style={styles.bottomContainer}>
-                    <Text style={[styles.bottomLeft, {
-                        color: COLORS.black
-                    }]}>Already have an account ?</Text>
-                    <TouchableOpacity
-                        onPress={() => navigate("login")}
-                    >
-                        <Text style={styles.bottomRight}>{" "}Sign In</Text>
-                    </TouchableOpacity>
+  const removeAdditionalSocial = (index: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      additional_socials: prev.additional_socials.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateAdditionalSocial = (index: number, value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      additional_socials: prev.additional_socials.map((social, i) => (i === index ? value : social)),
+    }));
+  };
+
+  const toggleDayOpen = (day: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      opening_hours: {
+        ...prev.opening_hours,
+        [day]: {
+          ...prev.opening_hours[day],
+          isOpen: !prev.opening_hours[day].isOpen,
+        },
+      },
+    }));
+  };
+
+  const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      opening_hours: {
+        ...prev.opening_hours,
+        [day]: {
+          ...prev.opening_hours[day],
+          [timeType]: time,
+        },
+      },
+    }));
+  };
+
+  const toggleTaproomDayOpen = (day: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      taproom_hours: {
+        ...prev.taproom_hours,
+        [day]: {
+          ...prev.taproom_hours[day],
+          isOpen: !prev.taproom_hours[day].isOpen,
+        },
+      },
+    }));
+  };
+
+  const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      taproom_hours: {
+        ...prev.taproom_hours,
+        [day]: {
+          ...prev.taproom_hours[day],
+          [timeType]: time,
+        },
+      },
+    }));
+  };
+
+  const getOpeningHoursSummary = () => {
+    const dayLabels = {
+      monday: "Lundi",
+      tuesday: "Mardi", 
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
+      sunday: "Dimanche"
+    };
+
+    const openDays = Object.entries(formState.opening_hours)
+      .filter(([_, hours]) => hours.isOpen)
+      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+
+    if (openDays.length === 0) {
+      return "Aucun jour d'ouverture sélectionné";
+    }
+
+    return openDays.join(" • ");
+  };
+
+  const getTaproomHoursSummary = () => {
+    const dayLabels = {
+      monday: "Lundi",
+      tuesday: "Mardi", 
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
+      sunday: "Dimanche"
+    };
+
+    const openDays = Object.entries(formState.taproom_hours)
+      .filter(([_, hours]) => hours.isOpen)
+      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+
+    if (openDays.length === 0) {
+      return "Aucun jour d'ouverture sélectionné pour la taproom";
+    }
+
+    return openDays.join(" • ");
+  };
+
+  const validatePasswords = () => {
+    if (formState.password !== formState.confirmPassword) {
+      setPasswordError("Les mots de passe ne correspondent pas");
+      Alert.alert("Erreur", passwordError);
+      return false;
+    }
+    if (formState.password.length < 12) {
+      setPasswordError("Le mot de passe doit contenir au moins 12 caractères");
+      Alert.alert("Erreur", passwordError);
+      return false;
+    }
+    console.info("Passwords are matching");
+    return true;
+  };
+
+  const validateForm = () => {
+    const requiredFields = {
+      first_name: "Prénom",
+      last_name: "Nom",
+      phone_number: "Numéro de téléphone",
+      // birth_date: "Date de naissance", // Commented out temporarily
+      email: "Email",
+      password: "Mot de passe",
+      address_line_1: "Adresse",
+      postal_code: "Code postal",
+      city: "Ville",
+      country: "Pays",
+      brewery_name: "Nom de la brasserie",
+      rib: "RIB",
+      siren: "SIREN",
+      description: "Description",
+      opening_hours: "Horaires d'ouverture",
+    };
+
+    // Check required fields
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key]) => {
+        const value = formState[key as keyof typeof formState];
+        return !value || (typeof value === 'string' && value.trim() === "");
+      })
+      .map(([, label]) => label);
+
+    if (missingFields.length > 0) {
+      Alert.alert("Oops", `Les champs suivants sont requis: ${missingFields.join(", ")}`);
+      return false;
+    }
+
+    // Validate phone number
+    if (formState.phone_number.length !== 10) {
+      Alert.alert("Oops", "Le numéro de téléphone doit contenir 10 chiffres");
+      return false;
+    }
+
+    // Validate postal code
+    if (formState.postal_code.length !== 5) {
+      Alert.alert("Oops", "Le code postal doit contenir 5 chiffres");
+      return false;
+    }
+
+    // Validate SIREN (should be 9 digits)
+    if (formState.siren.length !== 9) {
+      Alert.alert("Oops", "Le SIREN doit contenir 9 chiffres");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (validatePasswords() && validateForm()) {
+      try {
+        // TODO: Implement brewery registration API call
+        // For now, we'll just log the data
+        console.info("Registering brewery...", formState);
+        
+        Alert.alert(
+          "Inscription en cours", 
+          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !"
+        );
+        
+        // Temporary navigation back to index
+        router.push("/");
+        
+      } catch (error) {
+        console.error("Registration failed from front:");
+        console.error(error);
+        Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
+      }
+    }
+  };
+
+  return (
+    <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
+      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.logoContainer}></View>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: COLORS.black,
+              },
+            ]}
+          >
+            CRÉER VOTRE BRASSERIE
+          </Text>
+
+          <View style={styles.formContainer}>
+            {/* Brewery Owner Information */}
+            <Text style={styles.sectionTitle}>Informations personnelles</Text>
+            
+            <Input
+              label="Prénom"
+              id="first_name"
+              onInputChanged={inputChangedHandler}
+              placeholder="Prénom"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Nom"
+              id="last_name"
+              onInputChanged={inputChangedHandler}
+              placeholder="Nom"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Numéro de téléphone"
+              id="phone_number"
+              onInputChanged={inputChangedHandler}
+              placeholder="0123456789"
+              placeholderTextColor={COLORS.black}
+              keyboardType="phone-pad"
+            />
+
+            {/* TODO: Uncomment when date picker is needed */}
+            {/* <TextCTA
+              title="Date de naissance"
+              onPress={() => setShowDatePicker(true)}
+              width={350}
+            />
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="date"
+                display="inline"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  setFormState((prev) => ({
+                    ...prev,
+                    birth_date: selectedDate,
+                  }));
+                }}
+                maximumDate={new Date()}
+              />
+            )} */}
+
+            <Input
+              label="Email"
+              id="email"
+              onInputChanged={inputChangedHandler}
+              placeholder="email@exemple.com"
+              placeholderTextColor={COLORS.black}
+              keyboardType="email-address"
+            />
+
+            <Input
+              label="Mot de passe"
+              id="password"
+              secureTextEntry
+              onInputChanged={inputChangedHandler}
+              placeholder="Mot de passe"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Confirmer le mot de passe"
+              id="confirmPassword"
+              secureTextEntry
+              onInputChanged={inputChangedHandler}
+              placeholder="Confirmer le mot de passe"
+              placeholderTextColor={COLORS.black}
+            />
+
+            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
+            {/* Address Information */}
+            <Text style={styles.sectionTitle}>Adresse</Text>
+            
+            <Input
+              label="Adresse"
+              id="address_line_1"
+              onInputChanged={inputChangedHandler}
+              placeholder="123 Rue de la Brasserie"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Complément d'adresse (optionnel)"
+              id="address_line_2"
+              onInputChanged={inputChangedHandler}
+              placeholder="Appartement, étage, etc."
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Code postal"
+              id="postal_code"
+              onInputChanged={inputChangedHandler}
+              placeholder="75001"
+              placeholderTextColor={COLORS.black}
+              keyboardType="numeric"
+            />
+
+            <Input
+              label="Ville"
+              id="city"
+              onInputChanged={inputChangedHandler}
+              placeholder="Paris"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Pays"
+              id="country"
+              onInputChanged={inputChangedHandler}
+              placeholder="France"
+              placeholderTextColor={COLORS.black}
+            />
+
+            {/* Brewery Information */}
+            <Text style={styles.sectionTitle}>Informations de la brasserie</Text>
+            
+            <Input
+              label="Nom de la brasserie"
+              id="brewery_name"
+              onInputChanged={inputChangedHandler}
+              placeholder="Ma Super Brasserie"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="RIB"
+              id="rib"
+              onInputChanged={inputChangedHandler}
+              placeholder="FR76 1234 5678 9012 3456 7890 123"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="SIREN"
+              id="siren"
+              onInputChanged={inputChangedHandler}
+              placeholder="123456789"
+              placeholderTextColor={COLORS.black}
+              keyboardType="numeric"
+            />
+
+            <Input
+              label="Description"
+              id="description"
+              onInputChanged={inputChangedHandler}
+              placeholder="Décrivez votre brasserie..."
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Site internet"
+              id="website"
+              onInputChanged={inputChangedHandler}
+              placeholder="https://www.ma-brasserie.com"
+              placeholderTextColor={COLORS.black}
+            />
+
+            <Input
+              label="Réseau social principal"
+              id="main_social"
+              onInputChanged={inputChangedHandler}
+              placeholder="https://instagram.com/ma-brasserie"
+              placeholderTextColor={COLORS.black}
+            />
+
+            {/* Additional Social Networks */}
+            {formState.additional_socials.map((social, index) => (
+              <View key={index} style={styles.socialInputContainer}>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.inputLabel}>Réseau social {index + 2}</Text>
+                  <TouchableOpacity onPress={() => removeAdditionalSocial(index)}>
+                    <Text style={styles.removeText}>(supprimer)</Text>
+                  </TouchableOpacity>
                 </View>
+                <View style={styles.inputWithoutLabel}>
+                  <TextInput
+                    style={styles.customInput}
+                    placeholder="https://facebook.com/ma-brasserie"
+                    placeholderTextColor={COLORS.black}
+                    onChangeText={(text) => updateAdditionalSocial(index, text)}
+                  />
+                </View>
+              </View>
+            ))}
+
+            <SecondaryCTA
+              title="+ Ajouter un réseau social"
+              isBlack={true}
+              tablet={true}
+              onPress={addAdditionalSocial}
+              style={{ marginTop: 15, marginBottom: 15 }}
+            />
+
+            {/* Horaires d'ouverture avec checkboxes et dropdowns */}
+            <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
+            
+            {Object.entries({
+              monday: "Lundi",
+              tuesday: "Mardi", 
+              wednesday: "Mercredi",
+              thursday: "Jeudi",
+              friday: "Vendredi",
+              saturday: "Samedi",
+              sunday: "Dimanche"
+            }).map(([dayKey, dayLabel]) => (
+              <View key={dayKey} style={styles.dayRow}>
+                {/* Checkbox pour le jour */}
+                <TouchableOpacity 
+                  style={styles.dayCheckboxContainer} 
+                  onPress={() => toggleDayOpen(dayKey)}
+                >
+                  <View style={[styles.dayCheckbox, formState.opening_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
+                    {formState.opening_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                  </View>
+                  <Text style={styles.dayLabel}>{dayLabel}</Text>
+                </TouchableOpacity>
+
+                {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
+                {formState.opening_hours[dayKey].isOpen && (
+                  <View style={styles.timeSelectors}>
+                    <SelectInput
+                      label="Ouverture"
+                      items={[
+                        { label: "00:00", value: "00:00" },
+                        { label: "01:00", value: "01:00" },
+                        { label: "02:00", value: "02:00" },
+                        { label: "03:00", value: "03:00" },
+                        { label: "04:00", value: "04:00" },
+                        { label: "05:00", value: "05:00" },
+                        { label: "06:00", value: "06:00" },
+                        { label: "07:00", value: "07:00" },
+                        { label: "08:00", value: "08:00" },
+                        { label: "09:00", value: "09:00" },
+                        { label: "10:00", value: "10:00" },
+                        { label: "11:00", value: "11:00" },
+                        { label: "12:00", value: "12:00" },
+                        { label: "13:00", value: "13:00" },
+                        { label: "14:00", value: "14:00" },
+                        { label: "15:00", value: "15:00" },
+                        { label: "16:00", value: "16:00" },
+                        { label: "17:00", value: "17:00" },
+                        { label: "18:00", value: "18:00" },
+                        { label: "19:00", value: "19:00" },
+                        { label: "20:00", value: "20:00" },
+                        { label: "21:00", value: "21:00" },
+                        { label: "22:00", value: "22:00" },
+                        { label: "23:00", value: "23:00" },
+                      ]}
+                      width={165}
+                      onValueChange={(value) => updateDayTime(dayKey, 'openTime', value)}
+                      selectedValue={formState.opening_hours[dayKey].openTime}
+                    />
+                    <SelectInput
+                      label="Fermeture"
+                      items={[
+                        { label: "00:00", value: "00:00" },
+                        { label: "01:00", value: "01:00" },
+                        { label: "02:00", value: "02:00" },
+                        { label: "03:00", value: "03:00" },
+                        { label: "04:00", value: "04:00" },
+                        { label: "05:00", value: "05:00" },
+                        { label: "06:00", value: "06:00" },
+                        { label: "07:00", value: "07:00" },
+                        { label: "08:00", value: "08:00" },
+                        { label: "09:00", value: "09:00" },
+                        { label: "10:00", value: "10:00" },
+                        { label: "11:00", value: "11:00" },
+                        { label: "12:00", value: "12:00" },
+                        { label: "13:00", value: "13:00" },
+                        { label: "14:00", value: "14:00" },
+                        { label: "15:00", value: "15:00" },
+                        { label: "16:00", value: "16:00" },
+                        { label: "17:00", value: "17:00" },
+                        { label: "18:00", value: "18:00" },
+                        { label: "19:00", value: "19:00" },
+                        { label: "20:00", value: "20:00" },
+                        { label: "21:00", value: "21:00" },
+                        { label: "22:00", value: "22:00" },
+                        { label: "23:00", value: "23:00" },
+                      ]}
+                      width={165}
+                      onValueChange={(value) => updateDayTime(dayKey, 'closeTime', value)}
+                      selectedValue={formState.opening_hours[dayKey].closeTime}
+                    />
+                  </View>
+                )}
+              </View>
+                          ))}
+
+            {/* Résumé des horaires */}
+            <View style={styles.summaryContainer}>
+              <Text style={styles.summaryTitle}>Résumé des horaires :</Text>
+              <Text style={styles.summaryText}>{getOpeningHoursSummary()}</Text>
             </View>
-        </SafeAreaView>
-    )
+
+            {/* Taproom Section */}
+            <View style={styles.taproomContainer}>
+              <TouchableOpacity style={styles.taproomToggle} onPress={toggleTaproom}>
+                <View style={[styles.checkbox, formState.has_taproom && styles.checkboxChecked]}>
+                  {formState.has_taproom && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.taproomText}>Ma brasserie a une taproom</Text>
+              </TouchableOpacity>
+            </View>
+
+            {formState.has_taproom && (
+              <>
+                <Text style={styles.sectionTitle}>Horaires de la taproom</Text>
+                
+                {Object.entries({
+                  monday: "Lundi",
+                  tuesday: "Mardi", 
+                  wednesday: "Mercredi",
+                  thursday: "Jeudi",
+                  friday: "Vendredi",
+                  saturday: "Samedi",
+                  sunday: "Dimanche"
+                }).map(([dayKey, dayLabel]) => (
+                  <View key={dayKey} style={styles.dayRow}>
+                    {/* Checkbox pour le jour */}
+                    <TouchableOpacity 
+                      style={styles.dayCheckboxContainer} 
+                      onPress={() => toggleTaproomDayOpen(dayKey)}
+                    >
+                      <View style={[styles.dayCheckbox, formState.taproom_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
+                        {formState.taproom_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                      </View>
+                      <Text style={styles.dayLabel}>{dayLabel}</Text>
+                    </TouchableOpacity>
+
+                    {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
+                    {formState.taproom_hours[dayKey].isOpen && (
+                      <View style={styles.timeSelectors}>
+                        <SelectInput
+                          label="Ouverture"
+                          items={[
+                            { label: "00:00", value: "00:00" },
+                            { label: "01:00", value: "01:00" },
+                            { label: "02:00", value: "02:00" },
+                            { label: "03:00", value: "03:00" },
+                            { label: "04:00", value: "04:00" },
+                            { label: "05:00", value: "05:00" },
+                            { label: "06:00", value: "06:00" },
+                            { label: "07:00", value: "07:00" },
+                            { label: "08:00", value: "08:00" },
+                            { label: "09:00", value: "09:00" },
+                            { label: "10:00", value: "10:00" },
+                            { label: "11:00", value: "11:00" },
+                            { label: "12:00", value: "12:00" },
+                            { label: "13:00", value: "13:00" },
+                            { label: "14:00", value: "14:00" },
+                            { label: "15:00", value: "15:00" },
+                            { label: "16:00", value: "16:00" },
+                            { label: "17:00", value: "17:00" },
+                            { label: "18:00", value: "18:00" },
+                            { label: "19:00", value: "19:00" },
+                            { label: "20:00", value: "20:00" },
+                            { label: "21:00", value: "21:00" },
+                            { label: "22:00", value: "22:00" },
+                            { label: "23:00", value: "23:00" },
+                          ]}
+                          width={165}
+                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'openTime', value)}
+                          selectedValue={formState.taproom_hours[dayKey].openTime}
+                        />
+                        <SelectInput
+                          label="Fermeture"
+                          items={[
+                            { label: "00:00", value: "00:00" },
+                            { label: "01:00", value: "01:00" },
+                            { label: "02:00", value: "02:00" },
+                            { label: "03:00", value: "03:00" },
+                            { label: "04:00", value: "04:00" },
+                            { label: "05:00", value: "05:00" },
+                            { label: "06:00", value: "06:00" },
+                            { label: "07:00", value: "07:00" },
+                            { label: "08:00", value: "08:00" },
+                            { label: "09:00", value: "09:00" },
+                            { label: "10:00", value: "10:00" },
+                            { label: "11:00", value: "11:00" },
+                            { label: "12:00", value: "12:00" },
+                            { label: "13:00", value: "13:00" },
+                            { label: "14:00", value: "14:00" },
+                            { label: "15:00", value: "15:00" },
+                            { label: "16:00", value: "16:00" },
+                            { label: "17:00", value: "17:00" },
+                            { label: "18:00", value: "18:00" },
+                            { label: "19:00", value: "19:00" },
+                            { label: "20:00", value: "20:00" },
+                            { label: "21:00", value: "21:00" },
+                            { label: "22:00", value: "22:00" },
+                            { label: "23:00", value: "23:00" },
+                          ]}
+                          width={165}
+                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'closeTime', value)}
+                          selectedValue={formState.taproom_hours[dayKey].closeTime}
+                        />
+                      </View>
+                    )}
+                  </View>
+                ))}
+
+                {/* Résumé des horaires taproom */}
+                <View style={styles.summaryContainer}>
+                  <Text style={styles.summaryTitle}>Résumé des horaires taproom :</Text>
+                  <Text style={styles.summaryText}>{getTaproomHoursSummary()}</Text>
+                </View>
+              </>
+            )}
+
+            <View style={styles.buttonContainer}>
+              <TextCTA
+                title="Créer ma brasserie"
+                onPress={handleSubmit}
+                width={350}
+              />
+            </View>
+
+            <View style={styles.checkBoxContainer}>
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={[
+                      styles.privacy,
+                      {
+                        color: "#666666",
+                        fontWeight: "700",
+                      },
+                    ]}
+                  >
+                    En continuant, vous acceptez notre Politique de Confidentialité
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.bottomContainer}>
+              <Text
+                style={[
+                  styles.bottomLeft,
+                  {
+                    color: COLORS.black,
+                  },
+                ]}
+              >
+                Vous avez déjà un compte ?
+              </Text>
+              <TouchableOpacity onPress={() => router.push("/login")}>
+                <Text style={styles.bottomRight}> Se connecter</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
-    area: {
-        flex: 1,
-        backgroundColor: COLORS.white
-    },
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: COLORS.white
-    },
-    logo: {
-        width: 100,
-        height: 100,
-        tintColor: COLORS.primary
-    },
-    logoContainer: {
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 32
-    },
-    center: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 26,
-        fontFamily: "semiBold",
-        color: COLORS.black,
-        textAlign: "center",
-        marginBottom: 22
-    },
-    checkBoxContainer: {
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginVertical: 18,
-    },
-    checkbox: {
-        marginRight: 8,
-        height: 16,
-        width: 16,
-        borderRadius: 4,
-        borderColor: COLORS.primary,
-        borderWidth: 2,
-    },
-    privacy: {
-        fontSize: 12,
-        fontFamily: "regular",
-        color: COLORS.black,
-    },
-    socialTitle: {
-        fontSize: 19.25,
-        fontFamily: "medium",
-        color: COLORS.black,
-        textAlign: "center",
-        marginVertical: 26
-    },
-    socialBtnContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    bottomContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        marginVertical: 18,
-        position: "absolute",
-        bottom: 12,
-        right: 0,
-        left: 0,
-    },
-    bottomLeft: {
-        fontSize: 14,
-        fontFamily: "regular",
-        color: "black"
-    },
-    bottomRight: {
-        fontSize: 16,
-        fontFamily: "medium",
-        color: COLORS.primary
-    },
-    button: {
-        marginVertical: 6,
-        width: SIZES.width - 32,
-        borderRadius: 30
-    }
-})
+  area: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: COLORS.white,
+  },
+  logoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    textAlign: "center",
+    marginBottom: 10,
+    fontWeight: "700",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  formContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  checkBoxContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  privacy: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
+    textAlign: "center",
+  },
+  bottomContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 18,
+  },
+  bottomLeft: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    color: "black",
+  },
+  bottomRight: {
+    fontSize: 16,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+  taproomContainer: {
+    marginVertical: 15,
+  },
+  taproomToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
+    borderRadius: 4,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.black,
+    borderColor: COLORS.black,
+  },
+  checkmark: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  taproomText: {
+    fontSize: 16,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+  },
 
-export default registerBrewery
+
+  socialInputContainer: {
+    width: 350,
+    marginVertical: 10,
+  },
+  labelContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  inputLabel: {
+    fontSize: 15,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "700",
+  },
+  removeText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "800",
+    textDecorationLine: "underline",
+  },
+  inputWithoutLabel: {
+    width: "100%",
+  },
+  customInput: {
+    textAlign: "left",
+    color: "rgba(99, 99, 96, 1)",
+    fontFamily: "HankenGrotesk",
+    fontSize: 11,
+    fontWeight: "300",
+    width: "100%",
+    height: 34,
+    borderStyle: "solid",
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderWidth: 0.5,
+    borderColor: "rgba(0, 0, 0, 1)",
+    borderRadius: 4,
+    paddingLeft: 10,
+  },
+  dayRow: {
+    marginVertical: 5,
+    width: 350,
+  },
+  dayCheckboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  dayCheckbox: {
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
+    borderRadius: 4,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dayCheckboxChecked: {
+    backgroundColor: COLORS.black,
+    borderColor: COLORS.black,
+  },
+  dayLabel: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "400",
+  },
+  timeSelectors: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    width: "100%",
+  },
+  summaryContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    width: 350,
+  },
+  summaryTitle: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  summaryText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
+    lineHeight: 18,
+  },
+});
+
+export default RegisterBrewery;
