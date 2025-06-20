@@ -76,7 +76,7 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
 
 ### Health Check
 
-- `GET /`: Redirects to `/health`.
+- `GET /`: Returns the API documentation.
 - `GET /health`: Returns the status of the API.
   - **Access**: Public
 

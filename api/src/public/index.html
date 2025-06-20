@@ -189,7 +189,7 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
 
       <h3 id="health-check">Health Check</h3>
       <ul>
-        <li><code>GET /</code>: Redirects to <code>/health</code>.</li>
+        <li><code>GET /</code>: Returns the API documentation.</li>
         <li>
           <code>GET /health</code>: Returns the status of the API.
           <ul>
