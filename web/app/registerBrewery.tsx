@@ -1,4 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SIZES } from "../constants";
@@ -8,55 +16,55 @@ import SelectInput from "../components/form/SelectInput";
 import TextCTA from "../components/Buttons/TextCTA";
 import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
+type BreweryOwnerFields = {
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  birth_date: Date | undefined;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
+type BreweryFields = {
+  brewery_name: string;
+  rib: string;
+  siren: string;
+};
+
+type Days = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+type DayDetails = {
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+};
+
+type BreweryDetailFields = {
+  description: string;
+  website: string;
+  main_social: string;
+  additional_socials: string[];
+  opening_hours: Record<Days, DayDetails>;
+  has_taproom: boolean;
+  taproom_hours: Record<Days, DayDetails>;
+};
+
+type AddressFields = {
+  address_line_1: string;
+  address_line_2?: string;
+  postal_code: string;
+  city: string;
+  country: string;
+};
 
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [formState, setFormState] = useState<{
-    // Brewery Owner fields
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    birth_date: Date | undefined;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    
-    // Address fields
-    address_line_1: string;
-    address_line_2: string;
-    postal_code: string;
-    city: string;
-    country: string;
-    
-    // Brewery fields
-    brewery_name: string;
-    rib: string;
-    siren: string;
-    
-    // Brewery Detail fields
-    description: string;
-    website: string;
-    main_social: string;
-    additional_socials: string[];
-    opening_hours: {
-      [key: string]: {
-        isOpen: boolean;
-        openTime: string;
-        closeTime: string;
-      };
-    };
-    has_taproom: boolean;
-    taproom_hours: {
-      [key: string]: {
-        isOpen: boolean;
-        openTime: string;
-        closeTime: string;
-      };
-    };
-  }>({
+  const [formState, setFormState] = useState<
+    BreweryOwnerFields & BreweryFields & AddressFields & BreweryDetailFields
+  >({
     // Brewery Owner
     first_name: "",
     last_name: "",
@@ -65,19 +73,19 @@ const RegisterBrewery = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    
+
     // Address
     address_line_1: "",
     address_line_2: "",
     postal_code: "",
     city: "",
     country: "France",
-    
+
     // Brewery
     brewery_name: "",
     rib: "",
     siren: "",
-    
+
     // Brewery Detail
     description: "",
     website: "",
@@ -106,6 +114,16 @@ const RegisterBrewery = () => {
 
   const [passwordError, setPasswordError] = useState("");
 
+  const dayLabels: Record<Days, string> = {
+    monday: "Lundi",
+    tuesday: "Mardi",
+    wednesday: "Mercredi",
+    thursday: "Jeudi",
+    friday: "Vendredi",
+    saturday: "Samedi",
+    sunday: "Dimanche",
+  };
+
   const inputChangedHandler = (id: string, text: string) => {
     setFormState((prev) => ({
       ...prev,
@@ -132,8 +150,6 @@ const RegisterBrewery = () => {
     }));
   };
 
-
-
   const removeAdditionalSocial = (index: number) => {
     setFormState((prev) => ({
       ...prev,
@@ -144,11 +160,13 @@ const RegisterBrewery = () => {
   const updateAdditionalSocial = (index: number, value: string) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.map((social, i) => (i === index ? value : social)),
+      additional_socials: prev.additional_socials.map((social, i) =>
+        i === index ? value : social,
+      ),
     }));
   };
 
-  const toggleDayOpen = (day: string) => {
+  const toggleDayOpen = (day: Days) => {
     setFormState((prev) => ({
       ...prev,
       opening_hours: {
@@ -161,7 +179,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateDayTime = (day: Days, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       opening_hours: {
@@ -174,7 +192,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const toggleTaproomDayOpen = (day: string) => {
+  const toggleTaproomDayOpen = (day: Days) => {
     setFormState((prev) => ({
       ...prev,
       taproom_hours: {
@@ -187,7 +205,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateTaproomDayTime = (day: Days, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       taproom_hours: {
@@ -201,19 +219,9 @@ const RegisterBrewery = () => {
   };
 
   const getOpeningHoursSummary = () => {
-    const dayLabels = {
-      monday: "Lundi",
-      tuesday: "Mardi", 
-      wednesday: "Mercredi",
-      thursday: "Jeudi",
-      friday: "Vendredi",
-      saturday: "Samedi",
-      sunday: "Dimanche"
-    };
-
     const openDays = Object.entries(formState.opening_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(([day, hours]) => `${dayLabels[day as Days]}: ${hours.openTime} - ${hours.closeTime}`);
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné";
@@ -223,19 +231,9 @@ const RegisterBrewery = () => {
   };
 
   const getTaproomHoursSummary = () => {
-    const dayLabels = {
-      monday: "Lundi",
-      tuesday: "Mardi", 
-      wednesday: "Mercredi",
-      thursday: "Jeudi",
-      friday: "Vendredi",
-      saturday: "Samedi",
-      sunday: "Dimanche"
-    };
-
     const openDays = Object.entries(formState.taproom_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(([day, hours]) => `${dayLabels[day as Days]}: ${hours.openTime} - ${hours.closeTime}`);
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné pour la taproom";
@@ -282,7 +280,7 @@ const RegisterBrewery = () => {
     const missingFields = Object.entries(requiredFields)
       .filter(([key]) => {
         const value = formState[key as keyof typeof formState];
-        return !value || (typeof value === 'string' && value.trim() === "");
+        return !value || (typeof value === "string" && value.trim() === "");
       })
       .map(([, label]) => label);
 
@@ -318,15 +316,14 @@ const RegisterBrewery = () => {
         // TODO: Implement brewery registration API call
         // For now, we'll just log the data
         console.info("Registering brewery...", formState);
-        
+
         Alert.alert(
-          "Inscription en cours", 
-          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !"
+          "Inscription en cours",
+          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !",
         );
-        
+
         // Temporary navigation back to index
         router.push("/");
-        
       } catch (error) {
         console.error("Registration failed from front:");
         console.error(error);
@@ -354,7 +351,7 @@ const RegisterBrewery = () => {
           <View style={styles.formContainer}>
             {/* Brewery Owner Information */}
             <Text style={styles.sectionTitle}>Informations personnelles</Text>
-            
+
             <Input
               label="Prénom"
               id="first_name"
@@ -433,7 +430,7 @@ const RegisterBrewery = () => {
 
             {/* Address Information */}
             <Text style={styles.sectionTitle}>Adresse</Text>
-            
+
             <Input
               label="Adresse"
               id="address_line_1"
@@ -477,7 +474,7 @@ const RegisterBrewery = () => {
 
             {/* Brewery Information */}
             <Text style={styles.sectionTitle}>Informations de la brasserie</Text>
-            
+
             <Input
               label="Nom de la brasserie"
               id="brewery_name"
@@ -557,24 +554,31 @@ const RegisterBrewery = () => {
 
             {/* Horaires d'ouverture avec checkboxes et dropdowns */}
             <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
-            
+
             {Object.entries({
               monday: "Lundi",
-              tuesday: "Mardi", 
+              tuesday: "Mardi",
               wednesday: "Mercredi",
               thursday: "Jeudi",
               friday: "Vendredi",
               saturday: "Samedi",
-              sunday: "Dimanche"
+              sunday: "Dimanche",
             }).map(([dayKey, dayLabel]) => (
               <View key={dayKey} style={styles.dayRow}>
                 {/* Checkbox pour le jour */}
-                <TouchableOpacity 
-                  style={styles.dayCheckboxContainer} 
+                <TouchableOpacity
+                  style={styles.dayCheckboxContainer}
                   onPress={() => toggleDayOpen(dayKey)}
                 >
-                  <View style={[styles.dayCheckbox, formState.opening_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
-                    {formState.opening_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                  <View
+                    style={[
+                      styles.dayCheckbox,
+                      formState.opening_hours[dayKey].isOpen && styles.dayCheckboxChecked,
+                    ]}
+                  >
+                    {formState.opening_hours[dayKey].isOpen && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
                   </View>
                   <Text style={styles.dayLabel}>{dayLabel}</Text>
                 </TouchableOpacity>
@@ -611,7 +615,7 @@ const RegisterBrewery = () => {
                         { label: "23:00", value: "23:00" },
                       ]}
                       width={165}
-                      onValueChange={(value) => updateDayTime(dayKey, 'openTime', value)}
+                      onValueChange={(value) => updateDayTime(dayKey, "openTime", value)}
                       selectedValue={formState.opening_hours[dayKey].openTime}
                     />
                     <SelectInput
@@ -643,13 +647,13 @@ const RegisterBrewery = () => {
                         { label: "23:00", value: "23:00" },
                       ]}
                       width={165}
-                      onValueChange={(value) => updateDayTime(dayKey, 'closeTime', value)}
+                      onValueChange={(value) => updateDayTime(dayKey, "closeTime", value)}
                       selectedValue={formState.opening_hours[dayKey].closeTime}
                     />
                   </View>
                 )}
               </View>
-                          ))}
+            ))}
 
             {/* Résumé des horaires */}
             <View style={styles.summaryContainer}>
@@ -670,24 +674,31 @@ const RegisterBrewery = () => {
             {formState.has_taproom && (
               <>
                 <Text style={styles.sectionTitle}>Horaires de la taproom</Text>
-                
+
                 {Object.entries({
                   monday: "Lundi",
-                  tuesday: "Mardi", 
+                  tuesday: "Mardi",
                   wednesday: "Mercredi",
                   thursday: "Jeudi",
                   friday: "Vendredi",
                   saturday: "Samedi",
-                  sunday: "Dimanche"
+                  sunday: "Dimanche",
                 }).map(([dayKey, dayLabel]) => (
                   <View key={dayKey} style={styles.dayRow}>
                     {/* Checkbox pour le jour */}
-                    <TouchableOpacity 
-                      style={styles.dayCheckboxContainer} 
+                    <TouchableOpacity
+                      style={styles.dayCheckboxContainer}
                       onPress={() => toggleTaproomDayOpen(dayKey)}
                     >
-                      <View style={[styles.dayCheckbox, formState.taproom_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
-                        {formState.taproom_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+                      <View
+                        style={[
+                          styles.dayCheckbox,
+                          formState.taproom_hours[dayKey].isOpen && styles.dayCheckboxChecked,
+                        ]}
+                      >
+                        {formState.taproom_hours[dayKey].isOpen && (
+                          <Text style={styles.checkmark}>✓</Text>
+                        )}
                       </View>
                       <Text style={styles.dayLabel}>{dayLabel}</Text>
                     </TouchableOpacity>
@@ -724,7 +735,7 @@ const RegisterBrewery = () => {
                             { label: "23:00", value: "23:00" },
                           ]}
                           width={165}
-                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'openTime', value)}
+                          onValueChange={(value) => updateTaproomDayTime(dayKey, "openTime", value)}
                           selectedValue={formState.taproom_hours[dayKey].openTime}
                         />
                         <SelectInput
@@ -756,7 +767,9 @@ const RegisterBrewery = () => {
                             { label: "23:00", value: "23:00" },
                           ]}
                           width={165}
-                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'closeTime', value)}
+                          onValueChange={(value) =>
+                            updateTaproomDayTime(dayKey, "closeTime", value)
+                          }
                           selectedValue={formState.taproom_hours[dayKey].closeTime}
                         />
                       </View>
@@ -773,11 +786,7 @@ const RegisterBrewery = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TextCTA
-                title="Créer ma brasserie"
-                onPress={handleSubmit}
-                width={350}
-              />
+              <TextCTA title="Créer ma brasserie" onPress={handleSubmit} width={350} />
             </View>
 
             <View style={styles.checkBoxContainer}>
@@ -819,214 +828,5 @@ const RegisterBrewery = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: COLORS.white,
-  },
-  logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 32,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    textAlign: "center",
-    marginBottom: 10,
-    fontWeight: "700",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  formContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    marginBottom: 10,
-  },
-  checkBoxContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 20,
-    paddingHorizontal: 20,
-  },
-  privacy: {
-    fontSize: 12,
-    fontFamily: "HankenGrotesk",
-    color: "#666666",
-    fontWeight: "400",
-    textAlign: "center",
-  },
-  bottomContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 18,
-  },
-  bottomLeft: {
-    fontSize: 14,
-    fontFamily: "HankenGrotesk",
-    color: "black",
-  },
-  bottomRight: {
-    fontSize: 16,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.primary,
-    fontWeight: "600",
-  },
-  taproomContainer: {
-    marginVertical: 15,
-  },
-  taproomToggle: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkbox: {
-    width: 15,
-    height: 15,
-    borderWidth: 1.5,
-    borderColor: COLORS.black,
-    borderRadius: 4,
-    marginRight: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: COLORS.black,
-    borderColor: COLORS.black,
-  },
-  checkmark: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  taproomText: {
-    fontSize: 16,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-  },
-
-
-  socialInputContainer: {
-    width: 350,
-    marginVertical: 10,
-  },
-  labelContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  inputLabel: {
-    fontSize: 15,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "700",
-  },
-  removeText: {
-    fontSize: 12,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "800",
-    textDecorationLine: "underline",
-  },
-  inputWithoutLabel: {
-    width: "100%",
-  },
-  customInput: {
-    textAlign: "left",
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "HankenGrotesk",
-    fontSize: 11,
-    fontWeight: "300",
-    width: "100%",
-    height: 34,
-    borderStyle: "solid",
-    backgroundColor: "rgba(255, 255, 255, 1)",
-    borderWidth: 0.5,
-    borderColor: "rgba(0, 0, 0, 1)",
-    borderRadius: 4,
-    paddingLeft: 10,
-  },
-  dayRow: {
-    marginVertical: 5,
-    width: 350,
-  },
-  dayCheckboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  dayCheckbox: {
-    width: 15,
-    height: 15,
-    borderWidth: 1.5,
-    borderColor: COLORS.black,
-    borderRadius: 4,
-    marginRight: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dayCheckboxChecked: {
-    backgroundColor: COLORS.black,
-    borderColor: COLORS.black,
-  },
-  dayLabel: {
-    fontSize: 12,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "400",
-  },
-  timeSelectors: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-    width: "100%",
-  },
-  summaryContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    width: 350,
-  },
-  summaryTitle: {
-    fontSize: 14,
-    fontFamily: "HankenGrotesk",
-    color: COLORS.black,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  summaryText: {
-    fontSize: 12,
-    fontFamily: "HankenGrotesk",
-    color: "#666666",
-    fontWeight: "400",
-    lineHeight: 18,
-  },
-});
 
 export default RegisterBrewery;
