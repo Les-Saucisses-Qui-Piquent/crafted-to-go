@@ -10,54 +10,171 @@ import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+const DAY_LABELS = {
+  monday: "Lundi",
+  tuesday: "Mardi", 
+  wednesday: "Mercredi",
+  thursday: "Jeudi",
+  friday: "Vendredi",
+  saturday: "Samedi",
+  sunday: "Dimanche"
+} as const;
+
+const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
+  const hour = i.toString().padStart(2, '0');
+  return { label: `${hour}:00`, value: `${hour}:00` };
+});
+
+interface BreweryOwner {
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  birth_date: Date | undefined;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+interface Address {
+  address_line_1: string;
+  address_line_2: string;
+  postal_code: string;
+  city: string;
+  country: string;
+}
+
+interface Brewery {
+  brewery_name: string;
+  rib: string;
+  siren: string;
+}
+
+interface OpeningHours {
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
+interface BreweryDetail {
+  description: string;
+  website: string;
+  main_social: string;
+  additional_socials: string[];
+  opening_hours: {
+    [key: string]: OpeningHours;
+  };
+  has_taproom: boolean;
+  taproom_hours: {
+    [key: string]: OpeningHours;
+  };
+}
+
+interface BreweryFormState extends BreweryOwner, Address, Brewery, BreweryDetail {}
+
+type OpeningHoursType = {
+  [key: string]: {
+    isOpen: boolean;
+    openTime: string;
+    closeTime: string;
+  };
+};
+
+interface OpeningHoursSectionProps {
+  title: string;
+  hours: OpeningHoursType;
+  onToggleDay: (day: string) => void;
+  onUpdateTime: (day: string, timeType: 'openTime' | 'closeTime', time: string) => void;
+  summary: string;
+}
+
+const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
+  title,
+  hours,
+  onToggleDay,
+  onUpdateTime,
+  summary
+}) => {
+  return (
+    <>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {Object.entries(DAY_LABELS).map(([dayKey, dayLabel]) => (
+        <View key={dayKey} style={styles.dayRow}>
+          <TouchableOpacity 
+            style={styles.dayCheckboxContainer} 
+            onPress={() => onToggleDay(dayKey)}
+          >
+            <View style={[styles.dayCheckbox, hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
+              {hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
+            </View>
+            <Text style={styles.dayLabel}>{dayLabel}</Text>
+          </TouchableOpacity>
+
+          {hours[dayKey].isOpen && (
+            <View style={styles.timeSelectors}>
+              <SelectInput
+                label="Ouverture"
+                items={TIME_OPTIONS}
+                width={165}
+                onValueChange={(value) => onUpdateTime(dayKey, 'openTime', value)}
+                selectedValue={hours[dayKey].openTime}
+              />
+              <SelectInput
+                label="Fermeture"
+                items={TIME_OPTIONS}
+                width={165}
+                onValueChange={(value) => onUpdateTime(dayKey, 'closeTime', value)}
+                selectedValue={hours[dayKey].closeTime}
+              />
+            </View>
+          )}
+        </View>
+      ))}
+
+      <View style={styles.summaryContainer}>
+        <Text style={styles.summaryTitle}>Résumé des horaires :</Text>
+        <Text style={styles.summaryText}>{summary}</Text>
+      </View>
+    </>
+  );
+};
+
+interface AdditionalSocialInputProps {
+  index: number;
+  onRemove: (index: number) => void;
+  onChange: (index: number, value: string) => void;
+}
+
+const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
+  index,
+  onRemove,
+  onChange,
+}) => {
+  return (
+    <View style={styles.socialInputContainer}>
+      <View style={styles.labelContainer}>
+        <Text style={styles.inputLabel}>Réseau social {index + 2}</Text>
+        <TouchableOpacity onPress={() => onRemove(index)}>
+          <Text style={styles.removeText}>(supprimer)</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.inputWithoutLabel}>
+        <TextInput
+          style={styles.customInput}
+          placeholder="https://facebook.com/ma-brasserie"
+          placeholderTextColor={COLORS.black}
+          onChangeText={(text) => onChange(index, text)}
+        />
+      </View>
+    </View>
+  );
+};
+
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [formState, setFormState] = useState<{
+  const [formState, setFormState] = useState<BreweryFormState>({
     // Brewery Owner fields
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    birth_date: Date | undefined;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    
-    // Address fields
-    address_line_1: string;
-    address_line_2: string;
-    postal_code: string;
-    city: string;
-    country: string;
-    
-    // Brewery fields
-    brewery_name: string;
-    rib: string;
-    siren: string;
-    
-    // Brewery Detail fields
-    description: string;
-    website: string;
-    main_social: string;
-    additional_socials: string[];
-    opening_hours: {
-      [key: string]: {
-        isOpen: boolean;
-        openTime: string;
-        closeTime: string;
-      };
-    };
-    has_taproom: boolean;
-    taproom_hours: {
-      [key: string]: {
-        isOpen: boolean;
-        openTime: string;
-        closeTime: string;
-      };
-    };
-  }>({
-    // Brewery Owner
     first_name: "",
     last_name: "",
     phone_number: "",
@@ -66,19 +183,19 @@ const RegisterBrewery = () => {
     password: "",
     confirmPassword: "",
     
-    // Address
+    // Address fields
     address_line_1: "",
     address_line_2: "",
     postal_code: "",
     city: "",
     country: "France",
     
-    // Brewery
+    // Brewery fields
     brewery_name: "",
     rib: "",
     siren: "",
     
-    // Brewery Detail
+    // Brewery Detail fields
     description: "",
     website: "",
     main_social: "",
@@ -131,8 +248,6 @@ const RegisterBrewery = () => {
       additional_socials: [...prev.additional_socials, ""],
     }));
   };
-
-
 
   const removeAdditionalSocial = (index: number) => {
     setFormState((prev) => ({
@@ -201,19 +316,9 @@ const RegisterBrewery = () => {
   };
 
   const getOpeningHoursSummary = () => {
-    const dayLabels = {
-      monday: "Lundi",
-      tuesday: "Mardi", 
-      wednesday: "Mercredi",
-      thursday: "Jeudi",
-      friday: "Vendredi",
-      saturday: "Samedi",
-      sunday: "Dimanche"
-    };
-
     const openDays = Object.entries(formState.opening_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné";
@@ -223,19 +328,9 @@ const RegisterBrewery = () => {
   };
 
   const getTaproomHoursSummary = () => {
-    const dayLabels = {
-      monday: "Lundi",
-      tuesday: "Mardi", 
-      wednesday: "Mercredi",
-      thursday: "Jeudi",
-      friday: "Vendredi",
-      saturday: "Samedi",
-      sunday: "Dimanche"
-    };
-
     const openDays = Object.entries(formState.taproom_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${dayLabels[day as keyof typeof dayLabels]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné pour la taproom";
@@ -528,23 +623,13 @@ const RegisterBrewery = () => {
             />
 
             {/* Additional Social Networks */}
-            {formState.additional_socials.map((social, index) => (
-              <View key={index} style={styles.socialInputContainer}>
-                <View style={styles.labelContainer}>
-                  <Text style={styles.inputLabel}>Réseau social {index + 2}</Text>
-                  <TouchableOpacity onPress={() => removeAdditionalSocial(index)}>
-                    <Text style={styles.removeText}>(supprimer)</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.inputWithoutLabel}>
-                  <TextInput
-                    style={styles.customInput}
-                    placeholder="https://facebook.com/ma-brasserie"
-                    placeholderTextColor={COLORS.black}
-                    onChangeText={(text) => updateAdditionalSocial(index, text)}
-                  />
-                </View>
-              </View>
+            {formState.additional_socials.map((_, index) => (
+              <AdditionalSocialInput
+                key={index}
+                index={index}
+                onRemove={removeAdditionalSocial}
+                onChange={updateAdditionalSocial}
+              />
             ))}
 
             <SecondaryCTA
@@ -556,106 +641,13 @@ const RegisterBrewery = () => {
             />
 
             {/* Horaires d'ouverture avec checkboxes et dropdowns */}
-            <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
-            
-            {Object.entries({
-              monday: "Lundi",
-              tuesday: "Mardi", 
-              wednesday: "Mercredi",
-              thursday: "Jeudi",
-              friday: "Vendredi",
-              saturday: "Samedi",
-              sunday: "Dimanche"
-            }).map(([dayKey, dayLabel]) => (
-              <View key={dayKey} style={styles.dayRow}>
-                {/* Checkbox pour le jour */}
-                <TouchableOpacity 
-                  style={styles.dayCheckboxContainer} 
-                  onPress={() => toggleDayOpen(dayKey)}
-                >
-                  <View style={[styles.dayCheckbox, formState.opening_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
-                    {formState.opening_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
-                  </View>
-                  <Text style={styles.dayLabel}>{dayLabel}</Text>
-                </TouchableOpacity>
-
-                {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
-                {formState.opening_hours[dayKey].isOpen && (
-                  <View style={styles.timeSelectors}>
-                    <SelectInput
-                      label="Ouverture"
-                      items={[
-                        { label: "00:00", value: "00:00" },
-                        { label: "01:00", value: "01:00" },
-                        { label: "02:00", value: "02:00" },
-                        { label: "03:00", value: "03:00" },
-                        { label: "04:00", value: "04:00" },
-                        { label: "05:00", value: "05:00" },
-                        { label: "06:00", value: "06:00" },
-                        { label: "07:00", value: "07:00" },
-                        { label: "08:00", value: "08:00" },
-                        { label: "09:00", value: "09:00" },
-                        { label: "10:00", value: "10:00" },
-                        { label: "11:00", value: "11:00" },
-                        { label: "12:00", value: "12:00" },
-                        { label: "13:00", value: "13:00" },
-                        { label: "14:00", value: "14:00" },
-                        { label: "15:00", value: "15:00" },
-                        { label: "16:00", value: "16:00" },
-                        { label: "17:00", value: "17:00" },
-                        { label: "18:00", value: "18:00" },
-                        { label: "19:00", value: "19:00" },
-                        { label: "20:00", value: "20:00" },
-                        { label: "21:00", value: "21:00" },
-                        { label: "22:00", value: "22:00" },
-                        { label: "23:00", value: "23:00" },
-                      ]}
-                      width={165}
-                      onValueChange={(value) => updateDayTime(dayKey, 'openTime', value)}
-                      selectedValue={formState.opening_hours[dayKey].openTime}
-                    />
-                    <SelectInput
-                      label="Fermeture"
-                      items={[
-                        { label: "00:00", value: "00:00" },
-                        { label: "01:00", value: "01:00" },
-                        { label: "02:00", value: "02:00" },
-                        { label: "03:00", value: "03:00" },
-                        { label: "04:00", value: "04:00" },
-                        { label: "05:00", value: "05:00" },
-                        { label: "06:00", value: "06:00" },
-                        { label: "07:00", value: "07:00" },
-                        { label: "08:00", value: "08:00" },
-                        { label: "09:00", value: "09:00" },
-                        { label: "10:00", value: "10:00" },
-                        { label: "11:00", value: "11:00" },
-                        { label: "12:00", value: "12:00" },
-                        { label: "13:00", value: "13:00" },
-                        { label: "14:00", value: "14:00" },
-                        { label: "15:00", value: "15:00" },
-                        { label: "16:00", value: "16:00" },
-                        { label: "17:00", value: "17:00" },
-                        { label: "18:00", value: "18:00" },
-                        { label: "19:00", value: "19:00" },
-                        { label: "20:00", value: "20:00" },
-                        { label: "21:00", value: "21:00" },
-                        { label: "22:00", value: "22:00" },
-                        { label: "23:00", value: "23:00" },
-                      ]}
-                      width={165}
-                      onValueChange={(value) => updateDayTime(dayKey, 'closeTime', value)}
-                      selectedValue={formState.opening_hours[dayKey].closeTime}
-                    />
-                  </View>
-                )}
-              </View>
-                          ))}
-
-            {/* Résumé des horaires */}
-            <View style={styles.summaryContainer}>
-              <Text style={styles.summaryTitle}>Résumé des horaires :</Text>
-              <Text style={styles.summaryText}>{getOpeningHoursSummary()}</Text>
-            </View>
+            <OpeningHoursSection
+              title="Horaires d'ouverture"
+              hours={formState.opening_hours}
+              onToggleDay={toggleDayOpen}
+              onUpdateTime={updateDayTime}
+              summary={getOpeningHoursSummary()}
+            />
 
             {/* Taproom Section */}
             <View style={styles.taproomContainer}>
@@ -668,108 +660,13 @@ const RegisterBrewery = () => {
             </View>
 
             {formState.has_taproom && (
-              <>
-                <Text style={styles.sectionTitle}>Horaires de la taproom</Text>
-                
-                {Object.entries({
-                  monday: "Lundi",
-                  tuesday: "Mardi", 
-                  wednesday: "Mercredi",
-                  thursday: "Jeudi",
-                  friday: "Vendredi",
-                  saturday: "Samedi",
-                  sunday: "Dimanche"
-                }).map(([dayKey, dayLabel]) => (
-                  <View key={dayKey} style={styles.dayRow}>
-                    {/* Checkbox pour le jour */}
-                    <TouchableOpacity 
-                      style={styles.dayCheckboxContainer} 
-                      onPress={() => toggleTaproomDayOpen(dayKey)}
-                    >
-                      <View style={[styles.dayCheckbox, formState.taproom_hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
-                        {formState.taproom_hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
-                      </View>
-                      <Text style={styles.dayLabel}>{dayLabel}</Text>
-                    </TouchableOpacity>
-
-                    {/* Dropdowns pour les horaires (visibles seulement si le jour est sélectionné) */}
-                    {formState.taproom_hours[dayKey].isOpen && (
-                      <View style={styles.timeSelectors}>
-                        <SelectInput
-                          label="Ouverture"
-                          items={[
-                            { label: "00:00", value: "00:00" },
-                            { label: "01:00", value: "01:00" },
-                            { label: "02:00", value: "02:00" },
-                            { label: "03:00", value: "03:00" },
-                            { label: "04:00", value: "04:00" },
-                            { label: "05:00", value: "05:00" },
-                            { label: "06:00", value: "06:00" },
-                            { label: "07:00", value: "07:00" },
-                            { label: "08:00", value: "08:00" },
-                            { label: "09:00", value: "09:00" },
-                            { label: "10:00", value: "10:00" },
-                            { label: "11:00", value: "11:00" },
-                            { label: "12:00", value: "12:00" },
-                            { label: "13:00", value: "13:00" },
-                            { label: "14:00", value: "14:00" },
-                            { label: "15:00", value: "15:00" },
-                            { label: "16:00", value: "16:00" },
-                            { label: "17:00", value: "17:00" },
-                            { label: "18:00", value: "18:00" },
-                            { label: "19:00", value: "19:00" },
-                            { label: "20:00", value: "20:00" },
-                            { label: "21:00", value: "21:00" },
-                            { label: "22:00", value: "22:00" },
-                            { label: "23:00", value: "23:00" },
-                          ]}
-                          width={165}
-                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'openTime', value)}
-                          selectedValue={formState.taproom_hours[dayKey].openTime}
-                        />
-                        <SelectInput
-                          label="Fermeture"
-                          items={[
-                            { label: "00:00", value: "00:00" },
-                            { label: "01:00", value: "01:00" },
-                            { label: "02:00", value: "02:00" },
-                            { label: "03:00", value: "03:00" },
-                            { label: "04:00", value: "04:00" },
-                            { label: "05:00", value: "05:00" },
-                            { label: "06:00", value: "06:00" },
-                            { label: "07:00", value: "07:00" },
-                            { label: "08:00", value: "08:00" },
-                            { label: "09:00", value: "09:00" },
-                            { label: "10:00", value: "10:00" },
-                            { label: "11:00", value: "11:00" },
-                            { label: "12:00", value: "12:00" },
-                            { label: "13:00", value: "13:00" },
-                            { label: "14:00", value: "14:00" },
-                            { label: "15:00", value: "15:00" },
-                            { label: "16:00", value: "16:00" },
-                            { label: "17:00", value: "17:00" },
-                            { label: "18:00", value: "18:00" },
-                            { label: "19:00", value: "19:00" },
-                            { label: "20:00", value: "20:00" },
-                            { label: "21:00", value: "21:00" },
-                            { label: "22:00", value: "22:00" },
-                            { label: "23:00", value: "23:00" },
-                          ]}
-                          width={165}
-                          onValueChange={(value) => updateTaproomDayTime(dayKey, 'closeTime', value)}
-                          selectedValue={formState.taproom_hours[dayKey].closeTime}
-                        />
-                      </View>
-                    )}
-                  </View>
-                ))}
-
-                {/* Résumé des horaires taproom */}
-                <View style={styles.summaryContainer}>
-                  <Text style={styles.summaryTitle}>Résumé des horaires taproom :</Text>
-                  <Text style={styles.summaryText}>{getTaproomHoursSummary()}</Text>
-                </View>
-              </>
+              <OpeningHoursSection
+                title="Horaires de la taproom"
+                hours={formState.taproom_hours}
+                onToggleDay={toggleTaproomDayOpen}
+                onUpdateTime={updateTaproomDayTime}
+                summary={getTaproomHoursSummary()}
+              />
             )}
 
             <View style={styles.buttonContainer}>
@@ -927,7 +824,6 @@ const styles = StyleSheet.create({
     fontFamily: "HankenGrotesk",
     color: COLORS.black,
   },
-
 
   socialInputContainer: {
     width: 350,
