@@ -10,6 +10,7 @@ interface InputProps {
   placeholderTextColor?: string;
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
   secureTextEntry?: boolean;
+  error?: string;
 }
 
 export default function Input({
@@ -21,6 +22,7 @@ export default function Input({
   placeholderTextColor = "rgba(99, 99, 96, 1)",
   keyboardType = "default",
   secureTextEntry = false,
+  error,
 }: InputProps) {
   const width = small ? 292 : 350;
 
@@ -42,6 +44,7 @@ export default function Input({
         secureTextEntry={secureTextEntry}
         onChangeText={handleTextChange}
       />
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
@@ -103,5 +106,10 @@ const styles = StyleSheet.create({
     borderColor: "rgba(0, 0, 0, 1)",
     borderRadius: 4,
     paddingLeft: 10,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginTop: 2,
   },
 });

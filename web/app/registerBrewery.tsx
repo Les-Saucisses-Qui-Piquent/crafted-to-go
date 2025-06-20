@@ -25,6 +25,36 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
+interface FormErrors {
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  address_line_1?: string;
+  address_line_2?: string;
+  postal_code?: string;
+  city?: string;
+  country?: string;
+  brewery_name?: string;
+  rib?: string;
+  siren?: string;
+  description?: string;
+  website?: string;
+  main_social?: string;
+}
+
+const ERROR_MESSAGES = {
+  REQUIRED_FIELD: "Ce champ est requis",
+  INVALID_PHONE: "Le numéro de téléphone doit contenir 10 chiffres",
+  INVALID_POSTAL: "Le code postal doit contenir 5 chiffres",
+  INVALID_SIREN: "Le numéro SIREN doit contenir 9 chiffres",
+  INVALID_EMAIL: "L'adresse email n'est pas valide",
+  PASSWORD_TOO_SHORT: "Le mot de passe doit contenir au moins 12 caractères",
+  PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas"
+};
+
 interface BreweryOwner {
   first_name: string;
   last_name: string;
@@ -172,6 +202,7 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   const [formState, setFormState] = useState<BreweryFormState>({
     // Brewery Owner fields
@@ -221,17 +252,38 @@ const RegisterBrewery = () => {
     },
   });
 
-  const [passwordError, setPasswordError] = useState("");
-
   const inputChangedHandler = (id: string, text: string) => {
     setFormState((prev) => ({
       ...prev,
       [id]: text,
     }));
 
-    // Clear password error when user starts typing
+    // Valider le champ en temps réel
+    const error = validateField(id as keyof BreweryFormState, text);
+    setFormErrors(prev => ({
+      ...prev,
+      [id]: error
+    }));
+
+    // Vérifier les mots de passe si nécessaire
     if (id === "password" || id === "confirmPassword") {
-      setPasswordError("");
+      if (id === "password" && text.length < 12) {
+        setFormErrors(prev => ({
+          ...prev,
+          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT
+        }));
+      }
+      if (formState.confirmPassword && text !== formState.confirmPassword) {
+        setFormErrors(prev => ({
+          ...prev,
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+        }));
+      } else if (formState.password && text !== formState.password) {
+        setFormErrors(prev => ({
+          ...prev,
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+        }));
+      }
     }
   };
 
@@ -339,19 +391,23 @@ const RegisterBrewery = () => {
     return openDays.join(" • ");
   };
 
-  const validatePasswords = () => {
-    if (formState.password !== formState.confirmPassword) {
-      setPasswordError("Les mots de passe ne correspondent pas");
-      Alert.alert("Erreur", passwordError);
-      return false;
+  const validateField = (id: keyof BreweryFormState, value: string): string | undefined => {
+    if (!value.trim()) {
+      return ERROR_MESSAGES.REQUIRED_FIELD;
     }
-    if (formState.password.length < 12) {
-      setPasswordError("Le mot de passe doit contenir au moins 12 caractères");
-      Alert.alert("Erreur", passwordError);
-      return false;
+
+    switch (id) {
+      case 'phone_number':
+        return value.length !== 10 ? ERROR_MESSAGES.INVALID_PHONE : undefined;
+      case 'postal_code':
+        return value.length !== 5 ? ERROR_MESSAGES.INVALID_POSTAL : undefined;
+      case 'siren':
+        return value.length !== 9 ? ERROR_MESSAGES.INVALID_SIREN : undefined;
+      case 'email':
+        return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? ERROR_MESSAGES.INVALID_EMAIL : undefined;
+      default:
+        return undefined;
     }
-    console.info("Passwords are matching");
-    return true;
   };
 
   const validateForm = () => {
@@ -408,7 +464,7 @@ const RegisterBrewery = () => {
   };
 
   const handleSubmit = async () => {
-    if (validatePasswords() && validateForm()) {
+    if (validateForm()) {
       try {
         // TODO: Implement brewery registration API call
         // For now, we'll just log the data
@@ -456,6 +512,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Prénom"
               placeholderTextColor={COLORS.black}
+              error={formErrors.first_name}
             />
 
             <Input
@@ -464,6 +521,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Nom"
               placeholderTextColor={COLORS.black}
+              error={formErrors.last_name}
             />
 
             <Input
@@ -473,6 +531,7 @@ const RegisterBrewery = () => {
               placeholder="0123456789"
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
+              error={formErrors.phone_number}
             />
 
             {/* TODO: Uncomment when date picker is needed */}
@@ -504,6 +563,7 @@ const RegisterBrewery = () => {
               placeholder="email@exemple.com"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
+              error={formErrors.email}
             />
 
             <Input
@@ -513,6 +573,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Mot de passe"
               placeholderTextColor={COLORS.black}
+              error={formErrors.password}
             />
 
             <Input
@@ -522,9 +583,8 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Confirmer le mot de passe"
               placeholderTextColor={COLORS.black}
+              error={formErrors.confirmPassword}
             />
-
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
             {/* Address Information */}
             <Text style={styles.sectionTitle}>Adresse</Text>
@@ -535,6 +595,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="123 Rue de la Brasserie"
               placeholderTextColor={COLORS.black}
+              error={formErrors.address_line_1}
             />
 
             <Input
@@ -543,6 +604,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Appartement, étage, etc."
               placeholderTextColor={COLORS.black}
+              error={formErrors.address_line_2}
             />
 
             <Input
@@ -552,6 +614,7 @@ const RegisterBrewery = () => {
               placeholder="75001"
               placeholderTextColor={COLORS.black}
               keyboardType="numeric"
+              error={formErrors.postal_code}
             />
 
             <Input
@@ -560,6 +623,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Paris"
               placeholderTextColor={COLORS.black}
+              error={formErrors.city}
             />
 
             <Input
@@ -568,6 +632,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="France"
               placeholderTextColor={COLORS.black}
+              error={formErrors.country}
             />
 
             {/* Brewery Information */}
@@ -579,6 +644,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Ma Super Brasserie"
               placeholderTextColor={COLORS.black}
+              error={formErrors.brewery_name}
             />
 
             <Input
@@ -587,6 +653,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="FR76 1234 5678 9012 3456 7890 123"
               placeholderTextColor={COLORS.black}
+              error={formErrors.rib}
             />
 
             <Input
@@ -596,6 +663,7 @@ const RegisterBrewery = () => {
               placeholder="123456789"
               placeholderTextColor={COLORS.black}
               keyboardType="numeric"
+              error={formErrors.siren}
             />
 
             <Input
@@ -604,6 +672,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="Décrivez votre brasserie..."
               placeholderTextColor={COLORS.black}
+              error={formErrors.description}
             />
 
             <Input
@@ -612,6 +681,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="https://www.ma-brasserie.com"
               placeholderTextColor={COLORS.black}
+              error={formErrors.website}
             />
 
             <Input
@@ -620,6 +690,7 @@ const RegisterBrewery = () => {
               onInputChanged={inputChangedHandler}
               placeholder="https://instagram.com/ma-brasserie"
               placeholderTextColor={COLORS.black}
+              error={formErrors.main_social}
             />
 
             {/* Additional Social Networks */}
