@@ -10,6 +10,7 @@ import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+//CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
 const DAY_LABELS = {
   monday: "Lundi",
   tuesday: "Mardi", 
@@ -25,6 +26,7 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
+//INTERFACES ET MESSAGES D'ERREUR POUR LA VALIDATION DU FORMULAIRE
 interface FormErrors {
   first_name?: string;
   last_name?: string;
@@ -55,6 +57,32 @@ const ERROR_MESSAGES = {
   PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas"
 };
 
+//LISTE DES FIELDS REQUIRED POUR VALIDER LE FORMULAIRE : a modifier en fonction de l'évolution du schéma
+const REQUIRED_FIELDS = {
+  first_name: "Prénom",
+  last_name: "Nom",
+  phone_number: "Numéro de téléphone",
+  email: "Email",
+  password: "Mot de passe",
+  confirmPassword: "Confirmation du mot de passe",
+  // birth_date: "Date de naissance",
+
+  address_line_1: "Adresse",
+  postal_code: "Code postal",
+  city: "Ville",
+  country: "Pays",
+
+  brewery_name: "Nom de la brasserie",
+  //rib: "RIB",
+  siren: "SIREN",
+  //description: "Description",
+  //website: "Site internet",
+  //main_social: "Réseau social principal",
+  opening_hours: "Horaires d'ouverture",
+} as const;
+
+
+//INTERFACES POUR LA STRUCTURE DU FORMULAIRE D'INSCRIPTION D'UNE BRASSERIE
 interface BreweryOwner {
   first_name: string;
   last_name: string;
@@ -202,7 +230,13 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  
+  // Affiche les champs requis en rouge dès le chargement de la page : convenient for testing but can be removed
+  const initialErrors: FormErrors = {};
+  Object.keys(REQUIRED_FIELDS).forEach((field) => {
+    initialErrors[field as keyof FormErrors] = ERROR_MESSAGES.REQUIRED_FIELD;
+  });
+  const [formErrors, setFormErrors] = useState<FormErrors>(initialErrors);
 
   const [formState, setFormState] = useState<BreweryFormState>({
     // Brewery Owner fields
@@ -392,7 +426,7 @@ const RegisterBrewery = () => {
   };
 
   const validateField = (id: keyof BreweryFormState, value: string): string | undefined => {
-    if (!value.trim()) {
+    if (id in REQUIRED_FIELDS && !value.trim()) {
       return ERROR_MESSAGES.REQUIRED_FIELD;
     }
 
@@ -411,26 +445,8 @@ const RegisterBrewery = () => {
   };
 
   const validateForm = () => {
-    const requiredFields = {
-      first_name: "Prénom",
-      last_name: "Nom",
-      phone_number: "Numéro de téléphone",
-      // birth_date: "Date de naissance", // Commented out temporarily
-      email: "Email",
-      password: "Mot de passe",
-      address_line_1: "Adresse",
-      postal_code: "Code postal",
-      city: "Ville",
-      country: "Pays",
-      brewery_name: "Nom de la brasserie",
-      rib: "RIB",
-      siren: "SIREN",
-      description: "Description",
-      opening_hours: "Horaires d'ouverture",
-    };
-
     // Check required fields
-    const missingFields = Object.entries(requiredFields)
+    const missingFields = Object.entries(REQUIRED_FIELDS)
       .filter(([key]) => {
         const value = formState[key as keyof typeof formState];
         return !value || (typeof value === 'string' && value.trim() === "");
