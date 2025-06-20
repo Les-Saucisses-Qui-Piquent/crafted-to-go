@@ -1,14 +1,29 @@
 import AppIcon from "@/utils/AppIcon";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { useCart } from "@/contexts/CartContext";
 import React from "react";
-import { View, ImageBackground, StyleSheet } from "react-native";
+import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface TopBarProps {
   variant: "client" | "brewery";
+  onNotificationPress?: () => void;
+  onCartPress?: () => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ variant }) => {
-  // You can further customize these based on the variant if needed
+const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPress }) => {
+  const { unreadCount } = useNotifications();
+  const { totalItems } = useCart();
   const isClient = variant === "client";
+
+  const renderBadge = (count: number) => {
+    if (count === 0) return null;
+
+    return (
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{count > 99 ? "99+" : count.toString()}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.topBarContainer}>
@@ -18,16 +33,23 @@ const TopBar: React.FC<TopBarProps> = ({ variant }) => {
           uri: "https://dummyimage.com/41.700565338134766x37.59886932373047/000/fff.png",
         }}
       />
-      {/* Notification/Bell Icon */}
-      <View style={[styles.bell, isClient ? styles.bellClient : styles.bellBrewery]}>
-        <AppIcon name="notifications-outline" size={27} color="#1E1E1E" />
-      </View>
 
-      {/* Brewery can have a different right icon or none */}
-      {!isClient && (
-        <View style={styles.rightIcon}>
+      {/* Notification Bell */}
+      <TouchableOpacity
+        style={[styles.bell, isClient ? styles.bellClient : styles.bellBrewery]}
+        onPress={onNotificationPress}
+        activeOpacity={0.7}
+      >
+        <AppIcon name="notifications-outline" size={27} color="#1E1E1E" />
+        {renderBadge(unreadCount)}
+      </TouchableOpacity>
+
+      {/* Cart Icon (only for client) */}
+      {isClient && (
+        <TouchableOpacity style={styles.rightIcon} onPress={onCartPress} activeOpacity={0.7}>
           <AppIcon name="cart-outline" size={28} color="#040404" />
-        </View>
+          {renderBadge(totalItems)}
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -59,6 +81,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
+    justifyContent: "center",
   },
   bellClient: {
     left: 252,
@@ -76,6 +99,24 @@ const styles = StyleSheet.create({
     left: 303,
     justifyContent: "center",
     alignItems: "center",
+  },
+  badge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: "#FF4444",
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
