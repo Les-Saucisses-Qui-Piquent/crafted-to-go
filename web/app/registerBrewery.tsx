@@ -829,4 +829,212 @@ const RegisterBrewery = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  area: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: COLORS.white,
+  },
+  logoContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    textAlign: "center",
+    marginBottom: 10,
+    fontWeight: "700",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  formContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  checkBoxContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  privacy: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
+    textAlign: "center",
+  },
+  bottomContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 18,
+  },
+  bottomLeft: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    color: "black",
+  },
+  bottomRight: {
+    fontSize: 16,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+  taproomContainer: {
+    marginVertical: 15,
+  },
+  taproomToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkbox: {
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
+    borderRadius: 4,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.black,
+    borderColor: COLORS.black,
+  },
+  checkmark: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  taproomText: {
+    fontSize: 16,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+  },
+
+  socialInputContainer: {
+    width: 350,
+    marginVertical: 10,
+  },
+  labelContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  inputLabel: {
+    fontSize: 15,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "700",
+  },
+  removeText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "800",
+    textDecorationLine: "underline",
+  },
+  inputWithoutLabel: {
+    width: "100%",
+  },
+  customInput: {
+    textAlign: "left",
+    color: "rgba(99, 99, 96, 1)",
+    fontFamily: "HankenGrotesk",
+    fontSize: 11,
+    fontWeight: "300",
+    width: "100%",
+    height: 34,
+    borderStyle: "solid",
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderWidth: 0.5,
+    borderColor: "rgba(0, 0, 0, 1)",
+    borderRadius: 4,
+    paddingLeft: 10,
+  },
+  dayRow: {
+    marginVertical: 5,
+    width: 350,
+  },
+  dayCheckboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  dayCheckbox: {
+    width: 15,
+    height: 15,
+    borderWidth: 1.5,
+    borderColor: COLORS.black,
+    borderRadius: 4,
+    marginRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dayCheckboxChecked: {
+    backgroundColor: COLORS.black,
+    borderColor: COLORS.black,
+  },
+  dayLabel: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "400",
+  },
+  timeSelectors: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    width: "100%",
+  },
+  summaryContainer: {
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    width: 350,
+  },
+  summaryTitle: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    color: COLORS.black,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  summaryText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    color: "#666666",
+    fontWeight: "400",
+    lineHeight: 18,
+  },
+});
+
 export default RegisterBrewery;
