@@ -105,8 +105,8 @@ model brewery_detail {
   logo          String
   description   String
   social_link   String
-  taproom_hours String?
-  opening_hours String
+  taproom_hours Json?
+  opening_hours Json
   phone_number  String
   email         String
   created_at    DateTime @default(now()) @db.Timestamp(3)
