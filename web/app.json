@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "crafted to go",
+    "slug": "crafted-to-go",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -44,7 +44,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "ef78c894-812c-45b6-903a-8b0329340842"
+        "projectId": "e51ad7d4-46f3-4471-a239-b3a1838ebaf1"
       }
     }
   }
