@@ -506,29 +506,29 @@ const RegisterBrewery = () => {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        // TODO: Implement brewery registration API call
-        // For now, we'll just log the data
-        console.info("Registering brewery...", formState);
+        console.info("Registering brewery...");
+
         const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/brewery/register`, {
           method: "POST",
           body: JSON.stringify(formState),
         });
-        if (!response.ok) {
-          throw new Error("Failed to register brewery");
-        }
 
         const data = await response.json();
-        console.info("Brewery registered successfully:", data);
+        if (!response.ok) {
+          console.warn("Registration failed");
+          if (data.errors && data.errors.length) {
+            Alert.alert("Erreur", `${data.errors[0].message}: ${data.errors[0].code}`);
+          }
+          return;
+        }
 
-        // Alert.alert(
-        //   "Inscription en cours",
-        //   "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !",
-        // );
+        // Retrieve token and basic user info
+        setToken(data.token);
+        setUser(data.user);
 
-        // Temporary navigation back to index
-        router.push("/");
+        router.push("/brewery/(tabs)");
       } catch (error) {
-        console.error("Registration failed from front:");
+        console.error("Registration failed from brewery front:");
         console.error(error);
         Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
       }
@@ -575,7 +575,7 @@ const RegisterBrewery = () => {
 
             <Input
               label="Numéro de téléphone"
-              id="phone_number"
+              id="owner_phone_number"
               onInputChanged={inputChangedHandler}
               placeholder="0123456789"
               placeholderTextColor={COLORS.black}

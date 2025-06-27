@@ -26,9 +26,9 @@ const userRegisterSchema = z.object({
 const breweryOwnerSchema = z.object({
   first_name: z.string().min(3, "First name is required"),
   last_name: z.string().min(3, "Last name is required"),
-  phone_number: z.string().length(10, "Phone number is required"),
+  owner_phone_number: z.string().length(10, "Phone number is required"),
   birth_date: z.string().min(10, "Birth date is required"),
-  email: z.string().email("Invalid email"),
+  owner_email: z.string().email("Invalid email"),
   password: z.string().min(12, "Password must be at least 12 characters long"),
 });
 
@@ -154,12 +154,12 @@ export default async function (fastify: FastifyInstance) {
 
           // 2) Create brewery owner
           const {
-            email,
+            owner_email,
             password,
             first_name,
             last_name,
             birth_date,
-            phone_number,
+            owner_phone_number,
             ...breweryAndRest
           } = breweryOwnerAndRest;
 
@@ -167,12 +167,12 @@ export default async function (fastify: FastifyInstance) {
 
           const breweryOwner = await tx.brewery_owner.create({
             data: {
-              email,
+              email: owner_email,
               password: hashedPassword,
               first_name: capitalize(first_name.trim()),
               last_name: allCaps(last_name.trim()),
               birth_date,
-              phone_number,
+              phone_number: owner_phone_number,
               address_id: address.id,
             },
           });
@@ -200,7 +200,7 @@ export default async function (fastify: FastifyInstance) {
             brewery_phone_number,
           } = breweryDetail;
 
-          const breweryDetailInsert = await tx.brewery_detail.create({
+          await tx.brewery_detail.create({
             data: {
               brewery_id: brewery.id,
               description,
@@ -213,7 +213,15 @@ export default async function (fastify: FastifyInstance) {
             },
           });
 
-          return { address, breweryOwner, brewery, breweryDetailInsert };
+          const tokenizedBreweryOwnerUser = {
+            id: breweryOwner.id,
+            email: breweryOwner.email,
+            role: breweryOwner.role,
+          };
+
+          const token = generateToken(tokenizedBreweryOwnerUser);
+
+          return reply.status(201).send({ token, user: tokenizedBreweryOwnerUser });
         });
       } catch (error) {
         fastify.log.error(error);
