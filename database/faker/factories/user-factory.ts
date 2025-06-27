@@ -30,4 +30,21 @@ export class UserFactory implements FakerImplementation {
 
     return users;
   };
+
+  createAdmin = async () => {
+    const adminData: User = {
+      email: "admin@rncp.com",
+      password:
+        "$argon2id$v=19$m=65536,t=3,p=1$eFPrnaFcPLt8ff54TFNiFw$jKwQduhgtNTB+5Sf5VMWr4JLjRcs7buHDdN/QjgMJFA",
+      first_name: "Admin",
+      last_name: "Admin",
+      birth_date: new Date("1990-01-01"),
+      phone_number: "0000000000",
+      role: "admin",
+    };
+
+    const adminUser = await this.dbClient.user.create({ data: adminData });
+
+    return adminUser;
+  };
 }
