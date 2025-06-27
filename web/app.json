@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.craftedtogo.apk",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -45,7 +49,9 @@
       },
       "eas": {
         "projectId": "e51ad7d4-46f3-4471-a239-b3a1838ebaf1"
+        "projectId": "e51ad7d4-46f3-4471-a239-b3a1838ebaf1"
       }
-    }
+    },
+    "owner": "saucisses-qui-piquent"
   }
 }

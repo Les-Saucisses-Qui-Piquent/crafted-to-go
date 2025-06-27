@@ -15,7 +15,8 @@
     "lint": "eslint \"./**/*.ts\"",
     "lint:fix": "eslint \"./**/*.ts\" --fix",
     "test": "vitest",
-    "test:api-start": "tsx server.ts > /dev/null 2>&1 &"
+    "test:api-start": "tsx server.ts > /dev/null 2>&1 &",
+    "check:ts": "npx tsc --noEmit"
   },
   "keywords": [],
   "author": "",
