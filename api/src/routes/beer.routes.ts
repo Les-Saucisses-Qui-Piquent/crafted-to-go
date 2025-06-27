@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import BeerController from "../controllers/beer.controller";
 
 export default async function (fastify: FastifyInstance) {
