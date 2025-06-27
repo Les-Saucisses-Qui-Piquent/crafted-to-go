@@ -11,8 +11,5 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
   // Register all route modules
   await fastify.register(authRoutes);
-
-  for (const route of Object.values(routes)) {
-    await fastify.register(route);
-  }
+  await fastify.register(routes);
 };
