@@ -27,7 +27,7 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
 });
 
 //INTERFACES ET MESSAGES D'ERREUR POUR LA VALIDATION DU FORMULAIRE
-interface FormErrors {
+type FormErrors = {
   first_name?: string;
   last_name?: string;
   phone_number?: string;
@@ -45,7 +45,7 @@ interface FormErrors {
   description?: string;
   website?: string;
   main_social?: string;
-}
+};
 
 const ERROR_MESSAGES = {
   REQUIRED_FIELD: "Ce champ est requis",
@@ -81,9 +81,8 @@ const REQUIRED_FIELDS = {
   opening_hours: "Horaires d'ouverture",
 } as const;
 
-
-//INTERFACES POUR LA STRUCTURE DU FORMULAIRE D'INSCRIPTION D'UNE BRASSERIE
-interface BreweryOwner {
+//TYPES POUR LA STRUCTURE DU FORMULAIRE D'INSCRIPTION D'UNE BRASSERIE
+type BreweryOwner = {
   first_name: string;
   last_name: string;
   phone_number: string;
@@ -91,29 +90,29 @@ interface BreweryOwner {
   email: string;
   password: string;
   confirmPassword: string;
-}
+};
 
-interface Address {
+type Address = {
   address_line_1: string;
   address_line_2: string;
   postal_code: string;
   city: string;
   country: string;
-}
+};
 
-interface Brewery {
+type Brewery = {
   brewery_name: string;
   rib: string;
   siren: string;
-}
+};
 
-interface OpeningHours {
+type OpeningHours = {
   isOpen: boolean;
-  openTime?: string;  // Optionnel si isOpen est false
+  openTime?: string; // Optionnel si isOpen est false
   closeTime?: string; // Optionnel si isOpen est false
-}
+};
 
-interface BreweryDetail {
+type BreweryDetail = {
   description: string;
   website: string;
   main_social: string;
@@ -125,9 +124,9 @@ interface BreweryDetail {
   taproom_hours: {
     [key: string]: OpeningHours;
   };
-}
+};
 
-interface BreweryFormState extends BreweryOwner, Address, Brewery, BreweryDetail {}
+type BreweryFormState = BreweryOwner & Address & Brewery & BreweryDetail;
 
 type OpeningHoursType = {
   [key: string]: {
