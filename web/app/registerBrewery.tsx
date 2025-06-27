@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 //CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
-const DAY_LABELS = {
+const DAY_LABELS: Record<Day, string> = {
   monday: "Lundi",
   tuesday: "Mardi",
   wednesday: "Mercredi",
@@ -114,41 +114,31 @@ type Brewery = {
   siren: string;
 };
 
-type OpeningHours = {
+type OpeningHoursDetail = {
   isOpen: boolean;
   openTime?: string; // Optionnel si isOpen est false
   closeTime?: string; // Optionnel si isOpen est false
 };
+
+type OpeningHours = Record<Day, OpeningHoursDetail>;
 
 type BreweryDetail = {
   description: string;
   website: string;
   main_social: string;
   additional_socials: string[];
-  opening_hours: {
-    [key: string]: OpeningHours;
-  };
+  opening_hours: OpeningHours;
   has_taproom: boolean;
-  taproom_hours: {
-    [key: string]: OpeningHours;
-  };
+  taproom_hours: OpeningHours;
 };
 
 type BreweryFormState = BreweryOwner & Address & Brewery & BreweryDetail;
 
-type OpeningHoursType = {
-  [key: string]: {
-    isOpen: boolean;
-    openTime?: string;
-    closeTime?: string;
-  };
-};
-
 interface OpeningHoursSectionProps {
   title: string;
-  hours: OpeningHoursType;
-  onToggleDay: (day: string) => void;
-  onUpdateTime: (day: string, timeType: "openTime" | "closeTime", time: string) => void;
+  hours: OpeningHours;
+  onToggleDay: (day: Day) => void;
+  onUpdateTime: (day: Day, timeType: "openTime" | "closeTime", time: string) => void;
   summary: string;
 }
 
@@ -162,13 +152,13 @@ const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
   return (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {Object.entries(DAY_LABELS).map(([dayKey, dayLabel]) => (
+      {DAYS.map((dayKey) => (
         <View key={dayKey} style={styles.dayRow}>
           <TouchableOpacity style={styles.dayCheckboxContainer} onPress={() => onToggleDay(dayKey)}>
             <View style={[styles.dayCheckbox, hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
               {hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
             </View>
-            <Text style={styles.dayLabel}>{dayLabel}</Text>
+            <Text style={styles.dayLabel}>{DAY_LABELS[dayKey]}</Text>
           </TouchableOpacity>
 
           {hours[dayKey].isOpen && (
@@ -355,7 +345,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const toggleDayOpen = (day: string) => {
+  const toggleDayOpen = (day: Day) => {
     setFormState((prev) => {
       const isCurrentlyOpen = prev.opening_hours[day].isOpen;
       return {
@@ -370,7 +360,7 @@ const RegisterBrewery = () => {
     });
   };
 
-  const updateDayTime = (day: string, timeType: "openTime" | "closeTime", time: string) => {
+  const updateDayTime = (day: Day, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       opening_hours: {
@@ -383,7 +373,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const toggleTaproomDayOpen = (day: string) => {
+  const toggleTaproomDayOpen = (day: Day) => {
     setFormState((prev) => {
       const isCurrentlyOpen = prev.taproom_hours[day].isOpen;
       return {
@@ -398,7 +388,7 @@ const RegisterBrewery = () => {
     });
   };
 
-  const updateTaproomDayTime = (day: string, timeType: "openTime" | "closeTime", time: string) => {
+  const updateTaproomDayTime = (day: Day, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       taproom_hours: {
