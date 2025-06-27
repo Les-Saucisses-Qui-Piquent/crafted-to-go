@@ -104,7 +104,7 @@ model brewery_detail {
   image         String
   logo          String
   description   String
-  social_link   String
+  social_links  String[]
   taproom_hours Json?
   opening_hours Json
   phone_number  String
