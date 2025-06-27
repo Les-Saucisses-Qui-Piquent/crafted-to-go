@@ -22,12 +22,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch(`${process.env.API_URL}/auth/login`, {
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
