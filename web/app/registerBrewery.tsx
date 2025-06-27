@@ -34,6 +34,18 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
+const DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
+type Day = (typeof DAYS)[number];
+
 //INTERFACES ET MESSAGES D'ERREUR POUR LA VALIDATION DU FORMULAIRE
 type FormErrors = {
   first_name?: string;
@@ -124,9 +136,7 @@ type OpeningHours = Record<Day, OpeningHoursDetail>;
 
 type BreweryDetail = {
   description: string;
-  website: string;
-  main_social: string;
-  additional_socials: string[];
+  social_links: string[];
   opening_hours: OpeningHours;
   has_taproom: boolean;
   taproom_hours: OpeningHours;
@@ -256,9 +266,7 @@ const RegisterBrewery = () => {
 
     // Brewery Detail fields
     description: "",
-    website: "",
-    main_social: "",
-    additional_socials: [],
+    social_links: [],
     opening_hours: {
       monday: { isOpen: false },
       tuesday: { isOpen: false },
@@ -325,23 +333,21 @@ const RegisterBrewery = () => {
   const addAdditionalSocial = () => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: [...prev.additional_socials, ""],
+      social_links: [...prev.social_links, ""],
     }));
   };
 
   const removeAdditionalSocial = (index: number) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.filter((_, i) => i !== index),
+      social_links: prev.social_links.filter((_, i) => i !== index),
     }));
   };
 
   const updateAdditionalSocial = (index: number, value: string) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.map((social, i) =>
-        i === index ? value : social,
-      ),
+      social_links: prev.social_links.map((social, i) => (i === index ? value : social)),
     }));
   };
 
@@ -491,11 +497,21 @@ const RegisterBrewery = () => {
         // TODO: Implement brewery registration API call
         // For now, we'll just log the data
         console.info("Registering brewery...", formState);
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/brewery/register`, {
+          method: "POST",
+          body: JSON.stringify(formState),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to register brewery");
+        }
 
-        Alert.alert(
-          "Inscription en cours",
-          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !",
-        );
+        const data = await response.json();
+        console.info("Brewery registered successfully:", data);
+
+        // Alert.alert(
+        //   "Inscription en cours",
+        //   "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !",
+        // );
 
         // Temporary navigation back to index
         router.push("/");
