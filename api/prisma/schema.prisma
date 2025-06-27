@@ -103,7 +103,7 @@ model brewery_owner {
   address_id   String    @db.Uuid
   birth_date   DateTime  @db.Date
   phone_number String
-  email        String
+  email        String    @unique
   password     String
   created_at   DateTime  @default(now())
   updated_at   DateTime  @default(now())
