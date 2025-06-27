@@ -101,8 +101,8 @@ model brewery_detail {
   id            String   @id @default(uuid()) @db.Uuid
   brewery_id    String   @db.Uuid
   has_taproom   Boolean  @default(false)
-  image         String
-  logo          String
+  image         String?
+  logo          String?
   description   String
   social_links  String[]
   taproom_hours Json?
