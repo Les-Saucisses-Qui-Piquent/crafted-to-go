@@ -1,7 +1,15 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, SIZES } from "../constants";
+import { COLORS } from "../constants";
 import { router } from "expo-router";
 import Input from "../components/form/Input";
 import SelectInput from "../components/form/SelectInput";
@@ -11,27 +19,39 @@ import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 //CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
-const DAY_LABELS = {
+const DAY_LABELS: Record<Day, string> = {
   monday: "Lundi",
-  tuesday: "Mardi", 
+  tuesday: "Mardi",
   wednesday: "Mercredi",
   thursday: "Jeudi",
   friday: "Vendredi",
   saturday: "Samedi",
-  sunday: "Dimanche"
+  sunday: "Dimanche",
 } as const;
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
-  const hour = i.toString().padStart(2, '0');
+  const hour = i.toString().padStart(2, "0");
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
+const DAYS = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
+type Day = (typeof DAYS)[number];
+
 //INTERFACES ET MESSAGES D'ERREUR POUR LA VALIDATION DU FORMULAIRE
-interface FormErrors {
+type FormErrors = {
   first_name?: string;
   last_name?: string;
-  phone_number?: string;
-  email?: string;
+  owner_phone_number?: string;
+  owner_email?: string;
   password?: string;
   confirmPassword?: string;
   address_line_1?: string;
@@ -42,10 +62,12 @@ interface FormErrors {
   brewery_name?: string;
   rib?: string;
   siren?: string;
+  brewery_phone_number?: string;
+  brewery_email?: string;
   description?: string;
   website?: string;
   main_social?: string;
-}
+};
 
 const ERROR_MESSAGES = {
   REQUIRED_FIELD: "Ce champ est requis",
@@ -54,18 +76,18 @@ const ERROR_MESSAGES = {
   INVALID_SIREN: "Le numéro SIREN doit contenir 9 chiffres",
   INVALID_EMAIL: "L'adresse email n'est pas valide",
   PASSWORD_TOO_SHORT: "Le mot de passe doit contenir au moins 12 caractères",
-  PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas"
+  PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas",
 };
 
 //LISTE DES FIELDS REQUIRED POUR VALIDER LE FORMULAIRE : a modifier en fonction de l'évolution du schéma
 const REQUIRED_FIELDS = {
   first_name: "Prénom",
   last_name: "Nom",
-  phone_number: "Numéro de téléphone",
-  email: "Email",
+  owner_phone_number: "Numéro de téléphone",
+  owner_email: "Email",
   password: "Mot de passe",
   confirmPassword: "Confirmation du mot de passe",
-  // birth_date: "Date de naissance",
+  birth_date: "Date de naissance",
 
   address_line_1: "Adresse",
   postal_code: "Code postal",
@@ -73,75 +95,68 @@ const REQUIRED_FIELDS = {
   country: "Pays",
 
   brewery_name: "Nom de la brasserie",
-  //rib: "RIB",
+  rib: "RIB",
   siren: "SIREN",
-  //description: "Description",
-  //website: "Site internet",
-  //main_social: "Réseau social principal",
+  brewery_phone_number: "Téléphone de la brasserie",
+  brewery_email: "Email de la brasserie",
+  description: "Description",
+  website: "Site internet",
+  main_social: "Réseau social principal",
   opening_hours: "Horaires d'ouverture",
 } as const;
 
-
-//INTERFACES POUR LA STRUCTURE DU FORMULAIRE D'INSCRIPTION D'UNE BRASSERIE
-interface BreweryOwner {
+//TYPES POUR LA STRUCTURE DU FORMULAIRE D'INSCRIPTION D'UNE BRASSERIE
+type BreweryOwner = {
   first_name: string;
   last_name: string;
-  phone_number: string;
+  owner_phone_number: string;
   birth_date: Date | undefined;
-  email: string;
+  owner_email: string;
   password: string;
   confirmPassword: string;
-}
+};
 
-interface Address {
+type Address = {
   address_line_1: string;
-  address_line_2: string;
+  address_line_2?: string;
   postal_code: string;
   city: string;
   country: string;
-}
+};
 
-interface Brewery {
+type Brewery = {
   brewery_name: string;
   rib: string;
   siren: string;
-}
-
-interface OpeningHours {
-  isOpen: boolean;
-  openTime?: string;  // Optionnel si isOpen est false
-  closeTime?: string; // Optionnel si isOpen est false
-}
-
-interface BreweryDetail {
-  description: string;
-  website: string;
-  main_social: string;
-  additional_socials: string[];
-  opening_hours: {
-    [key: string]: OpeningHours;
-  };
-  has_taproom: boolean;
-  taproom_hours: {
-    [key: string]: OpeningHours;
-  };
-}
-
-interface BreweryFormState extends BreweryOwner, Address, Brewery, BreweryDetail {}
-
-type OpeningHoursType = {
-  [key: string]: {
-    isOpen: boolean;
-    openTime?: string;
-    closeTime?: string;
-  };
 };
+
+type OpeningHoursDetail = {
+  isOpen: boolean;
+  openTime?: string; // Optionnel si isOpen est false
+  closeTime?: string; // Optionnel si isOpen est false
+};
+
+type OpeningHours = Record<Day, OpeningHoursDetail>;
+
+type BreweryDetail = {
+  description: string;
+  social_links: string[];
+  opening_hours: OpeningHours;
+  has_taproom: boolean;
+  taproom_hours: OpeningHours;
+  image: string;
+  logo: string;
+  brewery_phone_number: string;
+  brewery_email: string;
+};
+
+type BreweryFormState = BreweryOwner & Address & Brewery & BreweryDetail;
 
 interface OpeningHoursSectionProps {
   title: string;
-  hours: OpeningHoursType;
-  onToggleDay: (day: string) => void;
-  onUpdateTime: (day: string, timeType: 'openTime' | 'closeTime', time: string) => void;
+  hours: OpeningHours;
+  onToggleDay: (day: Day) => void;
+  onUpdateTime: (day: Day, timeType: "openTime" | "closeTime", time: string) => void;
   summary: string;
 }
 
@@ -150,21 +165,18 @@ const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
   hours,
   onToggleDay,
   onUpdateTime,
-  summary
+  summary,
 }) => {
   return (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {Object.entries(DAY_LABELS).map(([dayKey, dayLabel]) => (
+      {DAYS.map((dayKey) => (
         <View key={dayKey} style={styles.dayRow}>
-          <TouchableOpacity 
-            style={styles.dayCheckboxContainer} 
-            onPress={() => onToggleDay(dayKey)}
-          >
+          <TouchableOpacity style={styles.dayCheckboxContainer} onPress={() => onToggleDay(dayKey)}>
             <View style={[styles.dayCheckbox, hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
               {hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
             </View>
-            <Text style={styles.dayLabel}>{dayLabel}</Text>
+            <Text style={styles.dayLabel}>{DAY_LABELS[dayKey]}</Text>
           </TouchableOpacity>
 
           {hours[dayKey].isOpen && (
@@ -173,14 +185,14 @@ const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
                 label="Ouverture"
                 items={TIME_OPTIONS}
                 width={165}
-                onValueChange={(value) => onUpdateTime(dayKey, 'openTime', value)}
+                onValueChange={(value) => onUpdateTime(dayKey, "openTime", value)}
                 selectedValue={hours[dayKey].openTime}
               />
               <SelectInput
                 label="Fermeture"
                 items={TIME_OPTIONS}
                 width={165}
-                onValueChange={(value) => onUpdateTime(dayKey, 'closeTime', value)}
+                onValueChange={(value) => onUpdateTime(dayKey, "closeTime", value)}
                 selectedValue={hours[dayKey].closeTime}
               />
             </View>
@@ -230,7 +242,7 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
-  
+
   // Affiche les champs requis en rouge dès le chargement de la page : convenient for testing but can be removed
   const initialErrors: FormErrors = {};
   Object.keys(REQUIRED_FIELDS).forEach((field) => {
@@ -242,29 +254,27 @@ const RegisterBrewery = () => {
     // Brewery Owner fields
     first_name: "",
     last_name: "",
-    phone_number: "",
+    owner_phone_number: "",
     birth_date: undefined,
-    email: "",
+    owner_email: "",
     password: "",
     confirmPassword: "",
-    
+
     // Address fields
     address_line_1: "",
-    address_line_2: "",
+    address_line_2: undefined,
     postal_code: "",
     city: "",
     country: "France",
-    
+
     // Brewery fields
     brewery_name: "",
     rib: "",
     siren: "",
-    
+
     // Brewery Detail fields
     description: "",
-    website: "",
-    main_social: "",
-    additional_socials: [],
+    social_links: [],
     opening_hours: {
       monday: { isOpen: false },
       tuesday: { isOpen: false },
@@ -284,6 +294,10 @@ const RegisterBrewery = () => {
       saturday: { isOpen: false },
       sunday: { isOpen: false },
     },
+    image: "",
+    logo: "",
+    brewery_phone_number: "",
+    brewery_email: "",
   });
 
   const inputChangedHandler = (id: string, text: string) => {
@@ -294,28 +308,28 @@ const RegisterBrewery = () => {
 
     // Valider le champ en temps réel
     const error = validateField(id as keyof BreweryFormState, text);
-    setFormErrors(prev => ({
+    setFormErrors((prev) => ({
       ...prev,
-      [id]: error
+      [id]: error,
     }));
 
     // Vérifier les mots de passe si nécessaire
     if (id === "password" || id === "confirmPassword") {
       if (id === "password" && text.length < 12) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT
+          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
         }));
       }
       if (formState.confirmPassword && text !== formState.confirmPassword) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
         }));
       } else if (formState.password && text !== formState.password) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
         }));
       }
     }
@@ -331,40 +345,40 @@ const RegisterBrewery = () => {
   const addAdditionalSocial = () => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: [...prev.additional_socials, ""],
+      social_links: [...prev.social_links, ""],
     }));
   };
 
   const removeAdditionalSocial = (index: number) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.filter((_, i) => i !== index),
+      social_links: prev.social_links.filter((_, i) => i !== index),
     }));
   };
 
   const updateAdditionalSocial = (index: number, value: string) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.map((social, i) => (i === index ? value : social)),
+      social_links: prev.social_links.map((social, i) => (i === index ? value : social)),
     }));
   };
 
-  const toggleDayOpen = (day: string) => {
+  const toggleDayOpen = (day: Day) => {
     setFormState((prev) => {
       const isCurrentlyOpen = prev.opening_hours[day].isOpen;
       return {
         ...prev,
         opening_hours: {
           ...prev.opening_hours,
-          [day]: isCurrentlyOpen 
-            ? { isOpen: false }  // Supprime les horaires quand on ferme
-            : { isOpen: true, openTime: "09:00", closeTime: "18:00" }  // Ajoute des horaires par défaut quand on ouvre
+          [day]: isCurrentlyOpen
+            ? { isOpen: false } // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "09:00", closeTime: "18:00" }, // Ajoute des horaires par défaut quand on ouvre
         },
       };
     });
   };
 
-  const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateDayTime = (day: Day, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       opening_hours: {
@@ -377,7 +391,7 @@ const RegisterBrewery = () => {
     }));
   };
 
-  const toggleTaproomDayOpen = (day: string) => {
+  const toggleTaproomDayOpen = (day: Day) => {
     setFormState((prev) => {
       const isCurrentlyOpen = prev.taproom_hours[day].isOpen;
       return {
@@ -385,14 +399,14 @@ const RegisterBrewery = () => {
         taproom_hours: {
           ...prev.taproom_hours,
           [day]: isCurrentlyOpen
-            ? { isOpen: false }  // Supprime les horaires quand on ferme
-            : { isOpen: true, openTime: "16:00", closeTime: "22:00" }  // Ajoute des horaires par défaut quand on ouvre
+            ? { isOpen: false } // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "16:00", closeTime: "22:00" }, // Ajoute des horaires par défaut quand on ouvre
         },
       };
     });
   };
 
-  const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateTaproomDayTime = (day: Day, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       taproom_hours: {
@@ -408,7 +422,10 @@ const RegisterBrewery = () => {
   const getOpeningHoursSummary = () => {
     const openDays = Object.entries(formState.opening_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(
+        ([day, hours]) =>
+          `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`,
+      );
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné";
@@ -420,7 +437,10 @@ const RegisterBrewery = () => {
   const getTaproomHoursSummary = () => {
     const openDays = Object.entries(formState.taproom_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(
+        ([day, hours]) =>
+          `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`,
+      );
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné pour la taproom";
@@ -435,13 +455,13 @@ const RegisterBrewery = () => {
     }
 
     switch (id) {
-      case 'phone_number':
+      case "owner_phone_number":
         return value.length !== 10 ? ERROR_MESSAGES.INVALID_PHONE : undefined;
-      case 'postal_code':
+      case "postal_code":
         return value.length !== 5 ? ERROR_MESSAGES.INVALID_POSTAL : undefined;
-      case 'siren':
+      case "siren":
         return value.length !== 9 ? ERROR_MESSAGES.INVALID_SIREN : undefined;
-      case 'email':
+      case "owner_email":
         return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? ERROR_MESSAGES.INVALID_EMAIL : undefined;
       default:
         return undefined;
@@ -453,7 +473,7 @@ const RegisterBrewery = () => {
     const missingFields = Object.entries(REQUIRED_FIELDS)
       .filter(([key]) => {
         const value = formState[key as keyof typeof formState];
-        return !value || (typeof value === 'string' && value.trim() === "");
+        return !value || (typeof value === "string" && value.trim() === "");
       })
       .map(([, label]) => label);
 
@@ -463,7 +483,7 @@ const RegisterBrewery = () => {
     }
 
     // Validate phone number
-    if (formState.phone_number.length !== 10) {
+    if (formState.owner_phone_number.length !== 10) {
       Alert.alert("Oops", "Le numéro de téléphone doit contenir 10 chiffres");
       return false;
     }
@@ -486,20 +506,29 @@ const RegisterBrewery = () => {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        // TODO: Implement brewery registration API call
-        // For now, we'll just log the data
-        console.info("Registering brewery...", formState);
-        
-        Alert.alert(
-          "Inscription en cours", 
-          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !"
-        );
-        
-        // Temporary navigation back to index
-        router.push("/");
-        
+        console.info("Registering brewery...");
+
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/brewery/register`, {
+          method: "POST",
+          body: JSON.stringify(formState),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          console.warn("Registration failed");
+          if (data.errors && data.errors.length) {
+            Alert.alert("Erreur", `${data.errors[0].message}: ${data.errors[0].code}`);
+          }
+          return;
+        }
+
+        // Retrieve token and basic user info
+        setToken(data.token);
+        setUser(data.user);
+
+        router.push("/brewery/(tabs)");
       } catch (error) {
-        console.error("Registration failed from front:");
+        console.error("Registration failed from brewery front:");
         console.error(error);
         Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
       }
@@ -525,7 +554,7 @@ const RegisterBrewery = () => {
           <View style={styles.formContainer}>
             {/* Brewery Owner Information */}
             <Text style={styles.sectionTitle}>Informations personnelles</Text>
-            
+
             <Input
               label="Prénom"
               id="first_name"
@@ -546,12 +575,12 @@ const RegisterBrewery = () => {
 
             <Input
               label="Numéro de téléphone"
-              id="phone_number"
+              id="owner_phone_number"
               onInputChanged={inputChangedHandler}
               placeholder="0123456789"
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
-              error={formErrors.phone_number}
+              error={formErrors.owner_phone_number}
             />
 
             {/* TODO: Uncomment when date picker is needed */}
@@ -583,7 +612,7 @@ const RegisterBrewery = () => {
               placeholder="email@exemple.com"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
-              error={formErrors.email}
+              error={formErrors.owner_email}
             />
 
             <Input
@@ -608,7 +637,7 @@ const RegisterBrewery = () => {
 
             {/* Address Information */}
             <Text style={styles.sectionTitle}>Adresse</Text>
-            
+
             <Input
               label="Adresse"
               id="address_line_1"
@@ -657,7 +686,7 @@ const RegisterBrewery = () => {
 
             {/* Brewery Information */}
             <Text style={styles.sectionTitle}>Informations de la brasserie</Text>
-            
+
             <Input
               label="Nom de la brasserie"
               id="brewery_name"
@@ -684,6 +713,26 @@ const RegisterBrewery = () => {
               placeholderTextColor={COLORS.black}
               keyboardType="numeric"
               error={formErrors.siren}
+            />
+
+            <Input
+              label="Téléphone de la brasserie"
+              id="brewery_phone_number"
+              onInputChanged={inputChangedHandler}
+              placeholder="0123456789"
+              placeholderTextColor={COLORS.black}
+              keyboardType="numeric"
+              error={formErrors.brewery_phone_number}
+            />
+
+            <Input
+              label="Email de la brasserie"
+              id="brewery_email"
+              onInputChanged={inputChangedHandler}
+              placeholder="awesome@brew.com"
+              placeholderTextColor={COLORS.black}
+              keyboardType="email-address"
+              error={formErrors.brewery_email}
             />
 
             <Input
@@ -714,7 +763,7 @@ const RegisterBrewery = () => {
             />
 
             {/* Additional Social Networks */}
-            {formState.additional_socials.map((_, index) => (
+            {formState.social_links.map((_, index) => (
               <AdditionalSocialInput
                 key={index}
                 index={index}
@@ -761,11 +810,7 @@ const RegisterBrewery = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TextCTA
-                title="Créer ma brasserie"
-                onPress={handleSubmit}
-                width={350}
-              />
+              <TextCTA title="Créer ma brasserie" onPress={handleSubmit} width={350} />
             </View>
 
             <View style={styles.checkBoxContainer}>

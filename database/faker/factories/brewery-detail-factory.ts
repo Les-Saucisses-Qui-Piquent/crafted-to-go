@@ -64,7 +64,7 @@ export class BreweryDetailFactory implements FakerImplementation {
       image: faker.image.url(),
       logo: faker.image.url(),
       description: faker.lorem.paragraph(),
-      social_link: faker.internet.url(),
+      social_links: [faker.internet.url(), faker.internet.url()],
       opening_hours: openingHours,
       has_taproom: faker.datatype.boolean(),
       taproom_hours: openingHours,

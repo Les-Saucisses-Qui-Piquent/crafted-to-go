@@ -14,7 +14,7 @@ model address {
   id            String                    @id @default(uuid()) @db.Uuid
   line_1        String
   line_2        String?
-  postal_code   Int
+  postal_code   String
   city          String
   country       String
   GPS           Unsupported("geography")?
@@ -83,16 +83,16 @@ model brewery_detail {
   id            String   @id @default(uuid()) @db.Uuid
   brewery_id    String   @db.Uuid
   has_taproom   Boolean  @default(false)
-  image         String
-  logo          String
+  image         String?
+  logo          String?
   description   String
-  social_link   String
   phone_number  String
   email         String
   created_at    DateTime @default(now())
   updated_at    DateTime @default(now())
   taproom_hours Json?
   opening_hours Json
+  social_links  String[]
   brewery       brewery  @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_detail_brewery_id_foreign")
 }
 
@@ -103,7 +103,7 @@ model brewery_owner {
   address_id   String    @db.Uuid
   birth_date   DateTime  @db.Date
   phone_number String
-  email        String
+  email        String    @unique
   password     String
   created_at   DateTime  @default(now())
   updated_at   DateTime  @default(now())

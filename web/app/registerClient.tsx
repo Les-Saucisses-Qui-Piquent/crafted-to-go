@@ -138,8 +138,9 @@ const SignupClient = () => {
           router.push("/brewery/(tabs)");
         }
       } catch (error) {
-        console.error("Registration failed from front:");
+        console.error("Registration failed from client front:");
         console.error(error);
+        Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
       }
     }
   };
