@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
-interface BeerCardProps {
+export interface BeerCardProps {
   title?: string;
   style?: string;
   color?: string;
@@ -33,7 +33,7 @@ export default function BeerCard({
 
       {/* Beer Info */}
       <Text style={styles.stockLabel}>Stock en ligne</Text>
-      <Text style={styles.productName}>[title]</Text>
+      <Text style={styles.productName}>{title}</Text>
 
       {/* Beer Attributes */}
       <Text style={styles.attributeLabel}>Style</Text>
