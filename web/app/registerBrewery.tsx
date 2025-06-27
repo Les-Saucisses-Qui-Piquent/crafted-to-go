@@ -1,7 +1,15 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, SIZES } from "../constants";
+import { COLORS } from "../constants";
 import { router } from "expo-router";
 import Input from "../components/form/Input";
 import SelectInput from "../components/form/SelectInput";
@@ -13,16 +21,16 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 //CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
 const DAY_LABELS = {
   monday: "Lundi",
-  tuesday: "Mardi", 
+  tuesday: "Mardi",
   wednesday: "Mercredi",
   thursday: "Jeudi",
   friday: "Vendredi",
   saturday: "Samedi",
-  sunday: "Dimanche"
+  sunday: "Dimanche",
 } as const;
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
-  const hour = i.toString().padStart(2, '0');
+  const hour = i.toString().padStart(2, "0");
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
@@ -54,7 +62,7 @@ const ERROR_MESSAGES = {
   INVALID_SIREN: "Le numéro SIREN doit contenir 9 chiffres",
   INVALID_EMAIL: "L'adresse email n'est pas valide",
   PASSWORD_TOO_SHORT: "Le mot de passe doit contenir au moins 12 caractères",
-  PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas"
+  PASSWORDS_DONT_MATCH: "Les mots de passe ne correspondent pas",
 };
 
 //LISTE DES FIELDS REQUIRED POUR VALIDER LE FORMULAIRE : a modifier en fonction de l'évolution du schéma
@@ -94,7 +102,7 @@ type BreweryOwner = {
 
 type Address = {
   address_line_1: string;
-  address_line_2: string;
+  address_line_2?: string;
   postal_code: string;
   city: string;
   country: string;
@@ -140,7 +148,7 @@ interface OpeningHoursSectionProps {
   title: string;
   hours: OpeningHoursType;
   onToggleDay: (day: string) => void;
-  onUpdateTime: (day: string, timeType: 'openTime' | 'closeTime', time: string) => void;
+  onUpdateTime: (day: string, timeType: "openTime" | "closeTime", time: string) => void;
   summary: string;
 }
 
@@ -149,17 +157,14 @@ const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
   hours,
   onToggleDay,
   onUpdateTime,
-  summary
+  summary,
 }) => {
   return (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
       {Object.entries(DAY_LABELS).map(([dayKey, dayLabel]) => (
         <View key={dayKey} style={styles.dayRow}>
-          <TouchableOpacity 
-            style={styles.dayCheckboxContainer} 
-            onPress={() => onToggleDay(dayKey)}
-          >
+          <TouchableOpacity style={styles.dayCheckboxContainer} onPress={() => onToggleDay(dayKey)}>
             <View style={[styles.dayCheckbox, hours[dayKey].isOpen && styles.dayCheckboxChecked]}>
               {hours[dayKey].isOpen && <Text style={styles.checkmark}>✓</Text>}
             </View>
@@ -172,14 +177,14 @@ const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
                 label="Ouverture"
                 items={TIME_OPTIONS}
                 width={165}
-                onValueChange={(value) => onUpdateTime(dayKey, 'openTime', value)}
+                onValueChange={(value) => onUpdateTime(dayKey, "openTime", value)}
                 selectedValue={hours[dayKey].openTime}
               />
               <SelectInput
                 label="Fermeture"
                 items={TIME_OPTIONS}
                 width={165}
-                onValueChange={(value) => onUpdateTime(dayKey, 'closeTime', value)}
+                onValueChange={(value) => onUpdateTime(dayKey, "closeTime", value)}
                 selectedValue={hours[dayKey].closeTime}
               />
             </View>
@@ -229,7 +234,7 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
 const RegisterBrewery = () => {
   const { setToken, setUser } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
-  
+
   // Affiche les champs requis en rouge dès le chargement de la page : convenient for testing but can be removed
   const initialErrors: FormErrors = {};
   Object.keys(REQUIRED_FIELDS).forEach((field) => {
@@ -246,19 +251,19 @@ const RegisterBrewery = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    
+
     // Address fields
     address_line_1: "",
-    address_line_2: "",
+    address_line_2: undefined,
     postal_code: "",
     city: "",
     country: "France",
-    
+
     // Brewery fields
     brewery_name: "",
     rib: "",
     siren: "",
-    
+
     // Brewery Detail fields
     description: "",
     website: "",
@@ -293,28 +298,28 @@ const RegisterBrewery = () => {
 
     // Valider le champ en temps réel
     const error = validateField(id as keyof BreweryFormState, text);
-    setFormErrors(prev => ({
+    setFormErrors((prev) => ({
       ...prev,
-      [id]: error
+      [id]: error,
     }));
 
     // Vérifier les mots de passe si nécessaire
     if (id === "password" || id === "confirmPassword") {
       if (id === "password" && text.length < 12) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT
+          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
         }));
       }
       if (formState.confirmPassword && text !== formState.confirmPassword) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
         }));
       } else if (formState.password && text !== formState.password) {
-        setFormErrors(prev => ({
+        setFormErrors((prev) => ({
           ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH
+          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
         }));
       }
     }
@@ -344,7 +349,9 @@ const RegisterBrewery = () => {
   const updateAdditionalSocial = (index: number, value: string) => {
     setFormState((prev) => ({
       ...prev,
-      additional_socials: prev.additional_socials.map((social, i) => (i === index ? value : social)),
+      additional_socials: prev.additional_socials.map((social, i) =>
+        i === index ? value : social,
+      ),
     }));
   };
 
@@ -355,15 +362,15 @@ const RegisterBrewery = () => {
         ...prev,
         opening_hours: {
           ...prev.opening_hours,
-          [day]: isCurrentlyOpen 
-            ? { isOpen: false }  // Supprime les horaires quand on ferme
-            : { isOpen: true, openTime: "09:00", closeTime: "18:00" }  // Ajoute des horaires par défaut quand on ouvre
+          [day]: isCurrentlyOpen
+            ? { isOpen: false } // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "09:00", closeTime: "18:00" }, // Ajoute des horaires par défaut quand on ouvre
         },
       };
     });
   };
 
-  const updateDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateDayTime = (day: string, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       opening_hours: {
@@ -384,14 +391,14 @@ const RegisterBrewery = () => {
         taproom_hours: {
           ...prev.taproom_hours,
           [day]: isCurrentlyOpen
-            ? { isOpen: false }  // Supprime les horaires quand on ferme
-            : { isOpen: true, openTime: "16:00", closeTime: "22:00" }  // Ajoute des horaires par défaut quand on ouvre
+            ? { isOpen: false } // Supprime les horaires quand on ferme
+            : { isOpen: true, openTime: "16:00", closeTime: "22:00" }, // Ajoute des horaires par défaut quand on ouvre
         },
       };
     });
   };
 
-  const updateTaproomDayTime = (day: string, timeType: 'openTime' | 'closeTime', time: string) => {
+  const updateTaproomDayTime = (day: string, timeType: "openTime" | "closeTime", time: string) => {
     setFormState((prev) => ({
       ...prev,
       taproom_hours: {
@@ -407,7 +414,10 @@ const RegisterBrewery = () => {
   const getOpeningHoursSummary = () => {
     const openDays = Object.entries(formState.opening_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(
+        ([day, hours]) =>
+          `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`,
+      );
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné";
@@ -419,7 +429,10 @@ const RegisterBrewery = () => {
   const getTaproomHoursSummary = () => {
     const openDays = Object.entries(formState.taproom_hours)
       .filter(([_, hours]) => hours.isOpen)
-      .map(([day, hours]) => `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`);
+      .map(
+        ([day, hours]) =>
+          `${DAY_LABELS[day as keyof typeof DAY_LABELS]}: ${hours.openTime} - ${hours.closeTime}`,
+      );
 
     if (openDays.length === 0) {
       return "Aucun jour d'ouverture sélectionné pour la taproom";
@@ -434,13 +447,13 @@ const RegisterBrewery = () => {
     }
 
     switch (id) {
-      case 'phone_number':
+      case "phone_number":
         return value.length !== 10 ? ERROR_MESSAGES.INVALID_PHONE : undefined;
-      case 'postal_code':
+      case "postal_code":
         return value.length !== 5 ? ERROR_MESSAGES.INVALID_POSTAL : undefined;
-      case 'siren':
+      case "siren":
         return value.length !== 9 ? ERROR_MESSAGES.INVALID_SIREN : undefined;
-      case 'email':
+      case "email":
         return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? ERROR_MESSAGES.INVALID_EMAIL : undefined;
       default:
         return undefined;
@@ -452,7 +465,7 @@ const RegisterBrewery = () => {
     const missingFields = Object.entries(REQUIRED_FIELDS)
       .filter(([key]) => {
         const value = formState[key as keyof typeof formState];
-        return !value || (typeof value === 'string' && value.trim() === "");
+        return !value || (typeof value === "string" && value.trim() === "");
       })
       .map(([, label]) => label);
 
@@ -488,15 +501,14 @@ const RegisterBrewery = () => {
         // TODO: Implement brewery registration API call
         // For now, we'll just log the data
         console.info("Registering brewery...", formState);
-        
+
         Alert.alert(
-          "Inscription en cours", 
-          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !"
+          "Inscription en cours",
+          "La fonctionnalité d'inscription brasserie sera bientôt disponible. Vos données ont été validées avec succès !",
         );
-        
+
         // Temporary navigation back to index
         router.push("/");
-        
       } catch (error) {
         console.error("Registration failed from front:");
         console.error(error);
@@ -524,7 +536,7 @@ const RegisterBrewery = () => {
           <View style={styles.formContainer}>
             {/* Brewery Owner Information */}
             <Text style={styles.sectionTitle}>Informations personnelles</Text>
-            
+
             <Input
               label="Prénom"
               id="first_name"
@@ -607,7 +619,7 @@ const RegisterBrewery = () => {
 
             {/* Address Information */}
             <Text style={styles.sectionTitle}>Adresse</Text>
-            
+
             <Input
               label="Adresse"
               id="address_line_1"
@@ -656,7 +668,7 @@ const RegisterBrewery = () => {
 
             {/* Brewery Information */}
             <Text style={styles.sectionTitle}>Informations de la brasserie</Text>
-            
+
             <Input
               label="Nom de la brasserie"
               id="brewery_name"
@@ -760,11 +772,7 @@ const RegisterBrewery = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TextCTA
-                title="Créer ma brasserie"
-                onPress={handleSubmit}
-                width={350}
-              />
+              <TextCTA title="Créer ma brasserie" onPress={handleSubmit} width={350} />
             </View>
 
             <View style={styles.checkBoxContainer}>
