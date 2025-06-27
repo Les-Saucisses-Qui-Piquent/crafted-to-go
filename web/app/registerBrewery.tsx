@@ -50,8 +50,8 @@ type Day = (typeof DAYS)[number];
 type FormErrors = {
   first_name?: string;
   last_name?: string;
-  phone_number?: string;
-  email?: string;
+  owner_phone_number?: string;
+  owner_email?: string;
   password?: string;
   confirmPassword?: string;
   address_line_1?: string;
@@ -62,6 +62,8 @@ type FormErrors = {
   brewery_name?: string;
   rib?: string;
   siren?: string;
+  brewery_phone_number?: string;
+  brewery_email?: string;
   description?: string;
   website?: string;
   main_social?: string;
@@ -81,11 +83,11 @@ const ERROR_MESSAGES = {
 const REQUIRED_FIELDS = {
   first_name: "Prénom",
   last_name: "Nom",
-  phone_number: "Numéro de téléphone",
-  email: "Email",
+  owner_phone_number: "Numéro de téléphone",
+  owner_email: "Email",
   password: "Mot de passe",
   confirmPassword: "Confirmation du mot de passe",
-  // birth_date: "Date de naissance",
+  birth_date: "Date de naissance",
 
   address_line_1: "Adresse",
   postal_code: "Code postal",
@@ -93,11 +95,13 @@ const REQUIRED_FIELDS = {
   country: "Pays",
 
   brewery_name: "Nom de la brasserie",
-  //rib: "RIB",
+  rib: "RIB",
   siren: "SIREN",
-  //description: "Description",
-  //website: "Site internet",
-  //main_social: "Réseau social principal",
+  brewery_phone_number: "Téléphone de la brasserie",
+  brewery_email: "Email de la brasserie",
+  description: "Description",
+  website: "Site internet",
+  main_social: "Réseau social principal",
   opening_hours: "Horaires d'ouverture",
 } as const;
 
@@ -105,9 +109,9 @@ const REQUIRED_FIELDS = {
 type BreweryOwner = {
   first_name: string;
   last_name: string;
-  phone_number: string;
+  owner_phone_number: string;
   birth_date: Date | undefined;
-  email: string;
+  owner_email: string;
   password: string;
   confirmPassword: string;
 };
@@ -140,6 +144,10 @@ type BreweryDetail = {
   opening_hours: OpeningHours;
   has_taproom: boolean;
   taproom_hours: OpeningHours;
+  image: string;
+  logo: string;
+  brewery_phone_number: string;
+  brewery_email: string;
 };
 
 type BreweryFormState = BreweryOwner & Address & Brewery & BreweryDetail;
@@ -246,9 +254,9 @@ const RegisterBrewery = () => {
     // Brewery Owner fields
     first_name: "",
     last_name: "",
-    phone_number: "",
+    owner_phone_number: "",
     birth_date: undefined,
-    email: "",
+    owner_email: "",
     password: "",
     confirmPassword: "",
 
@@ -286,6 +294,10 @@ const RegisterBrewery = () => {
       saturday: { isOpen: false },
       sunday: { isOpen: false },
     },
+    image: "",
+    logo: "",
+    brewery_phone_number: "",
+    brewery_email: "",
   });
 
   const inputChangedHandler = (id: string, text: string) => {
@@ -443,13 +455,13 @@ const RegisterBrewery = () => {
     }
 
     switch (id) {
-      case "phone_number":
+      case "owner_phone_number":
         return value.length !== 10 ? ERROR_MESSAGES.INVALID_PHONE : undefined;
       case "postal_code":
         return value.length !== 5 ? ERROR_MESSAGES.INVALID_POSTAL : undefined;
       case "siren":
         return value.length !== 9 ? ERROR_MESSAGES.INVALID_SIREN : undefined;
-      case "email":
+      case "owner_email":
         return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? ERROR_MESSAGES.INVALID_EMAIL : undefined;
       default:
         return undefined;
@@ -471,7 +483,7 @@ const RegisterBrewery = () => {
     }
 
     // Validate phone number
-    if (formState.phone_number.length !== 10) {
+    if (formState.owner_phone_number.length !== 10) {
       Alert.alert("Oops", "Le numéro de téléphone doit contenir 10 chiffres");
       return false;
     }
@@ -568,7 +580,7 @@ const RegisterBrewery = () => {
               placeholder="0123456789"
               placeholderTextColor={COLORS.black}
               keyboardType="phone-pad"
-              error={formErrors.phone_number}
+              error={formErrors.owner_phone_number}
             />
 
             {/* TODO: Uncomment when date picker is needed */}
@@ -600,7 +612,7 @@ const RegisterBrewery = () => {
               placeholder="email@exemple.com"
               placeholderTextColor={COLORS.black}
               keyboardType="email-address"
-              error={formErrors.email}
+              error={formErrors.owner_email}
             />
 
             <Input
@@ -701,6 +713,26 @@ const RegisterBrewery = () => {
               placeholderTextColor={COLORS.black}
               keyboardType="numeric"
               error={formErrors.siren}
+            />
+
+            <Input
+              label="Téléphone de la brasserie"
+              id="brewery_phone_number"
+              onInputChanged={inputChangedHandler}
+              placeholder="0123456789"
+              placeholderTextColor={COLORS.black}
+              keyboardType="numeric"
+              error={formErrors.brewery_phone_number}
+            />
+
+            <Input
+              label="Email de la brasserie"
+              id="brewery_email"
+              onInputChanged={inputChangedHandler}
+              placeholder="awesome@brew.com"
+              placeholderTextColor={COLORS.black}
+              keyboardType="email-address"
+              error={formErrors.brewery_email}
             />
 
             <Input
