@@ -731,7 +731,7 @@ const RegisterBrewery = () => {
             />
 
             {/* Additional Social Networks */}
-            {formState.additional_socials.map((_, index) => (
+            {formState.social_links.map((_, index) => (
               <AdditionalSocialInput
                 key={index}
                 index={index}
