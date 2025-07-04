@@ -70,4 +70,21 @@ export class UserFactory implements FakerImplementation {
 
     return brewerAdminUser;
   };
+
+  createClientAdmin = async () => {
+    const clientData: User = {
+      email: "client@rncp.com",
+      password:
+        "$argon2id$v=19$m=65536,t=3,p=1$eFPrnaFcPLt8ff54TFNiFw$jKwQduhgtNTB+5Sf5VMWr4JLjRcs7buHDdN/QjgMJFA",
+      first_name: "Client",
+      last_name: "Client",
+      birth_date: new Date("1990-01-01"),
+      phone_number: "0000000000",
+      role: "client",
+    };
+
+    const clientUser = await this.dbClient.user.create({ data: clientData });
+
+    return clientUser;
+  };
 }

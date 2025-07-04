@@ -35,6 +35,7 @@ const main = async (dbclient: PrismaClient) => {
 
     await userFaker.createAdmin();
     await userFaker.createBrewerAdmin(addressIds[0]);
+    await userFaker.createClientAdmin();
 
     const breweryOwnerFaker = new BreweryOwnerFactory(dbclient);
     const breweryOwners = await breweryOwnerFaker.createMany(addressIds);
