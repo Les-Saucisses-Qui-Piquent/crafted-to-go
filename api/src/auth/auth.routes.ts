@@ -58,7 +58,7 @@ const openingHoursSchema = z.object({
 
 const breweryDetailSchema = z.object({
   description: z.string().min(10, "Description is required"),
-  social_links: z.array(z.string()).min(1, "At least one social link is required"),
+  social_links: z.array(z.string()).optional(),
   opening_hours: openingHoursSchema,
   has_taproom: z.boolean(),
   taproom_hours: openingHoursSchema,
@@ -82,15 +82,16 @@ export default async function (fastify: FastifyInstance) {
     { preHandler: validateRegister },
     async (request: FastifyRequest<{ Body: UserRegister }>, reply: FastifyReply) => {
       const { email, password, first_name, last_name, ...rest } = request.body;
+      const clientEmail = email.toLowerCase().trim();
       const prisma = request.server.prisma;
 
       try {
         const alreadyExistingUser = await prisma.user.findUnique({
-          where: { email: email.toLowerCase().trim() },
+          where: { email: clientEmail },
         });
         if (alreadyExistingUser) {
           return reply.status(400).send({
-            error: "User already exists",
+            clientMessage: "User already exists",
           });
         }
 
@@ -100,7 +101,7 @@ export default async function (fastify: FastifyInstance) {
           data: {
             ...rest,
             password: hashedPassword,
-            email: email.toLowerCase().trim(),
+            email: clientEmail,
             first_name: capitalize(first_name.trim()),
             last_name: allCaps(last_name.trim()),
           },
@@ -131,6 +132,20 @@ export default async function (fastify: FastifyInstance) {
       const prisma = request.server.prisma;
 
       try {
+        const clientEmail = request.body.owner_email.toLowerCase().trim();
+
+        const alreadyExistingUser = await prisma.user.findUnique({
+          where: { email: clientEmail },
+        });
+        console.info("alreadyExistingUser", alreadyExistingUser);
+        console.info("request.body.owner_email", clientEmail);
+        if (alreadyExistingUser) {
+          reply.status(400).send({
+            clientMessage: "User already exists",
+          });
+          return;
+        }
+
         await prisma.$transaction(async (tx) => {
           // 1) Create address
           const {
@@ -154,7 +169,6 @@ export default async function (fastify: FastifyInstance) {
 
           // 2.a) Create brewery owner
           const {
-            owner_email,
             password,
             first_name,
             last_name,
@@ -167,12 +181,13 @@ export default async function (fastify: FastifyInstance) {
 
           const breweryOwnerUser = await tx.user.create({
             data: {
-              email: owner_email,
+              email: clientEmail,
               password: hashedPassword,
               first_name: capitalize(first_name.trim()),
               last_name: allCaps(last_name.trim()),
               birth_date,
               phone_number: owner_phone_number,
+              role: "brewer",
             },
           });
 
@@ -287,7 +302,9 @@ const validateLogin = async (request: FastifyRequest<{ Body: UserLogin }>, reply
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(error.errors);
-      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
+      return reply
+        .status(400)
+        .send({ clientMessage: "Invalid request body", errors: error.errors });
     }
     throw error;
   }
@@ -303,7 +320,9 @@ const validateRegister = async (
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(error.errors);
-      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
+      return reply
+        .status(400)
+        .send({ clientMessage: "Invalid request body", errors: error.errors });
     }
     throw error;
   }
@@ -319,7 +338,9 @@ const validateBreweryRegister = async (
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(error.errors);
-      return reply.status(400).send({ message: "Invalid request body", errors: error.errors });
+      return reply
+        .status(400)
+        .send({ clientMessage: "Invalid request body", errors: error.errors });
     }
     throw error;
   }

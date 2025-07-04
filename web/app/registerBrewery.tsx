@@ -66,7 +66,6 @@ type FormErrors = {
   brewery_email?: string;
   description?: string;
   website?: string;
-  main_social?: string;
 };
 
 const ERROR_MESSAGES = {
@@ -101,7 +100,6 @@ const REQUIRED_FIELDS = {
   brewery_email: "Email de la brasserie",
   description: "Description",
   website: "Site internet",
-  main_social: "Réseau social principal",
   opening_hours: "Horaires d'ouverture",
 } as const;
 
@@ -222,7 +220,7 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
   return (
     <View style={styles.socialInputContainer}>
       <View style={styles.labelContainer}>
-        <Text style={styles.inputLabel}>Réseau social {index + 2}</Text>
+        <Text style={styles.inputLabel}>Réseau social {index + 1}</Text>
         <TouchableOpacity onPress={() => onRemove(index)}>
           <Text style={styles.removeText}>(supprimer)</Text>
         </TouchableOpacity>
@@ -528,8 +526,11 @@ const RegisterBrewery = () => {
         // Retrieve token and basic user info
         setToken(data.token);
         setUser(data.user);
-
-        router.push("/brewery/(tabs)");
+        if (data.user.role === "brewer") {
+          router.push("/brewery/(tabs)");
+        } else {
+          Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
+        }
       } catch (error) {
         console.error("Registration failed from brewery front:");
         console.error(error);
@@ -755,15 +756,6 @@ const RegisterBrewery = () => {
               placeholderTextColor={COLORS.black}
               error={formErrors.website}
               keyboardType="default"
-            />
-
-            <Input
-              label="Réseau social principal"
-              id="main_social"
-              onInputChanged={inputChangedHandler}
-              placeholder="https://instagram.com/ma-brasserie"
-              placeholderTextColor={COLORS.black}
-              error={formErrors.main_social}
             />
 
             {/* Additional Social Networks */}
