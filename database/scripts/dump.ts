@@ -16,7 +16,6 @@ export type Table =
   | "user_detail"
   | "beer"
   | "beer_color"
-  | "beer_beer_style"
   | "beer_style"
   | "address";
 
@@ -56,9 +55,6 @@ const config: Record<Table, () => Promise<any>> = {
   },
   beer_color: async () => {
     return prisma.beer_color.findMany();
-  },
-  beer_beer_style: async () => {
-    return prisma.beer_beer_style.findMany();
   },
   beer_style: async () => {
     return prisma.beer_style.findMany();
