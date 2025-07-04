@@ -1,11 +1,11 @@
 import AppIcon from "@/utils/AppIcon";
 import React from "react";
-import { View, Text, ImageBackground, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function FilterButton() {
   return (
     <View style={styles.filterButtonContainer}>
-      <Text style={styles.filter}>{`Filtrer par`}</Text>
+      <Text style={styles.filter}>{"Filtrer par"}</Text>
       <AppIcon name="filter" size={14} />
     </View>
   );
