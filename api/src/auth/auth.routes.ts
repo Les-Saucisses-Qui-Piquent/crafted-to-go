@@ -152,7 +152,7 @@ export default async function (fastify: FastifyInstance) {
             },
           });
 
-          // 2) Create brewery owner
+          // 2.a) Create brewery owner
           const {
             owner_email,
             password,
@@ -165,7 +165,7 @@ export default async function (fastify: FastifyInstance) {
 
           const hashedPassword = await hashPassword(password);
 
-          const breweryOwner = await tx.brewery_owner.create({
+          const breweryOwnerUser = await tx.user.create({
             data: {
               email: owner_email,
               password: hashedPassword,
@@ -173,6 +173,13 @@ export default async function (fastify: FastifyInstance) {
               last_name: allCaps(last_name.trim()),
               birth_date,
               phone_number: owner_phone_number,
+            },
+          });
+
+          // 2.b) // Joint on brewery_owner
+          await tx.brewery_owner.create({
+            data: {
+              user_id: breweryOwnerUser.id,
               address_id: address.id,
             },
           });
@@ -184,7 +191,7 @@ export default async function (fastify: FastifyInstance) {
               name: brewery_name,
               RIB: rib,
               siren,
-              brewery_owner_id: breweryOwner.id,
+              brewery_owner_id: breweryOwnerUser.id,
               address_id: address.id,
             },
           });
@@ -214,9 +221,9 @@ export default async function (fastify: FastifyInstance) {
           });
 
           const tokenizedBreweryOwnerUser = {
-            id: breweryOwner.id,
-            email: breweryOwner.email,
-            role: breweryOwner.role,
+            id: breweryOwnerUser.id,
+            email: breweryOwnerUser.email,
+            role: breweryOwnerUser.role,
           };
 
           const token = generateToken(tokenizedBreweryOwnerUser);

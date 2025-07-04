@@ -508,8 +508,11 @@ const RegisterBrewery = () => {
       try {
         console.info("Registering brewery...");
 
-        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/brewery/register`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register/brewery`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(formState),
         });
 
@@ -584,7 +587,7 @@ const RegisterBrewery = () => {
             />
 
             {/* TODO: Uncomment when date picker is needed */}
-            {/* <TextCTA
+            <TextCTA
               title="Date de naissance"
               onPress={() => setShowDatePicker(true)}
               width={350}
@@ -603,11 +606,11 @@ const RegisterBrewery = () => {
                 }}
                 maximumDate={new Date()}
               />
-            )} */}
+            )}
 
             <Input
               label="Email"
-              id="email"
+              id="owner_email"
               onInputChanged={inputChangedHandler}
               placeholder="email@exemple.com"
               placeholderTextColor={COLORS.black}
@@ -751,6 +754,7 @@ const RegisterBrewery = () => {
               placeholder="https://www.ma-brasserie.com"
               placeholderTextColor={COLORS.black}
               error={formErrors.website}
+              keyboardType="default"
             />
 
             <Input
