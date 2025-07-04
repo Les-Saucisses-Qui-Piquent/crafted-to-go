@@ -63,20 +63,23 @@ model beer_style {
 }
 
 model brewery {
-  id               String             @id @default(uuid()) @db.Uuid
-  name             String
-  RIB              String
-  siren            String
-  address_id       String             @db.Uuid
-  brewery_owner_id String             @db.Uuid
-  created_at       DateTime           @default(now())
-  updated_at       DateTime           @default(now())
-  beer             beer[]
-  address          address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_address_id_foreign")
-  brewery_owner    brewery_owner      @relation(fields: [brewery_owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_brewery_owner_id_foreign")
-  brewery_detail   brewery_detail[]
-  favorite_brewery favorite_brewery[]
-  order            order[]
+  id                      String             @id @default(uuid()) @db.Uuid
+  name                    String
+  RIB                     String
+  siren                   String
+  address_id              String             @db.Uuid
+  brewery_owner_id        String             @db.Uuid
+  created_at              DateTime           @default(now())
+  updated_at              DateTime           @default(now())
+  brewery_ownerAddress_id String?            @db.Uuid
+  brewery_ownerUser_id    String?            @db.Uuid
+  beer                    beer[]
+  address                 address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_address_id_foreign")
+  brewery_owner           brewery_owner?     @relation(fields: [brewery_ownerUser_id, brewery_ownerAddress_id], references: [user_id, address_id])
+  user                    user               @relation(fields: [brewery_owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_user_id_foreign")
+  brewery_detail          brewery_detail[]
+  favorite_brewery        favorite_brewery[]
+  order                   order[]
 }
 
 model brewery_detail {
@@ -97,19 +100,13 @@ model brewery_detail {
 }
 
 model brewery_owner {
-  id           String    @id @default(uuid()) @db.Uuid
-  first_name   String
-  last_name    String
-  address_id   String    @db.Uuid
-  birth_date   DateTime  @db.Date
-  phone_number String
-  email        String    @unique
-  password     String
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @default(now())
-  role         UserRole  @default(brewer)
-  brewery      brewery[]
-  address      address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
+  address_id String    @db.Uuid
+  user_id    String    @db.Uuid
+  brewery    brewery[]
+  address    address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
+  user       user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_user_id_foreign")
+
+  @@unique([user_id, address_id])
 }
 
 model favorite_beer {
@@ -187,6 +184,8 @@ model user {
   created_at       DateTime           @default(now())
   updated_at       DateTime           @default(now())
   role             UserRole           @default(client)
+  brewery          brewery[]
+  brewery_owner    brewery_owner[]
   favorite_beer    favorite_beer[]
   favorite_brewery favorite_brewery[]
   order            order[]

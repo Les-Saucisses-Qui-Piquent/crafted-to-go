@@ -7,7 +7,7 @@ import {
   Alert,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants";
 import { router } from "expo-router";
@@ -66,7 +66,6 @@ type FormErrors = {
   brewery_email?: string;
   description?: string;
   website?: string;
-  main_social?: string;
 };
 
 const ERROR_MESSAGES = {
@@ -101,7 +100,6 @@ const REQUIRED_FIELDS = {
   brewery_email: "Email de la brasserie",
   description: "Description",
   website: "Site internet",
-  main_social: "Réseau social principal",
   opening_hours: "Horaires d'ouverture",
 } as const;
 
@@ -222,7 +220,7 @@ const AdditionalSocialInput: React.FC<AdditionalSocialInputProps> = ({
   return (
     <View style={styles.socialInputContainer}>
       <View style={styles.labelContainer}>
-        <Text style={styles.inputLabel}>Réseau social {index + 2}</Text>
+        <Text style={styles.inputLabel}>Réseau social {index + 1}</Text>
         <TouchableOpacity onPress={() => onRemove(index)}>
           <Text style={styles.removeText}>(supprimer)</Text>
         </TouchableOpacity>
@@ -300,10 +298,30 @@ const RegisterBrewery = () => {
     brewery_email: "",
   });
 
+  useEffect(() => {
+    if (
+      formState.password &&
+      formState.confirmPassword &&
+      formState.password !== formState.confirmPassword
+    ) {
+      setFormErrors((prev) => ({
+        ...prev,
+        confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
+      }));
+    }
+
+    if (formState.password && formState.password.length < 12) {
+      setFormErrors((prev) => ({
+        ...prev,
+        password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
+      }));
+    }
+  }, [formState.password, formState.confirmPassword]);
+
   const inputChangedHandler = (id: string, text: string) => {
     setFormState((prev) => ({
       ...prev,
-      [id]: text,
+      ...{ [id]: text },
     }));
 
     // Valider le champ en temps réel
@@ -312,27 +330,6 @@ const RegisterBrewery = () => {
       ...prev,
       [id]: error,
     }));
-
-    // Vérifier les mots de passe si nécessaire
-    if (id === "password" || id === "confirmPassword") {
-      if (id === "password" && text.length < 12) {
-        setFormErrors((prev) => ({
-          ...prev,
-          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
-        }));
-      }
-      if (formState.confirmPassword && text !== formState.confirmPassword) {
-        setFormErrors((prev) => ({
-          ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
-        }));
-      } else if (formState.password && text !== formState.password) {
-        setFormErrors((prev) => ({
-          ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
-        }));
-      }
-    }
   };
 
   const toggleTaproom = () => {
@@ -508,8 +505,11 @@ const RegisterBrewery = () => {
       try {
         console.info("Registering brewery...");
 
-        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/brewery/register`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/register/brewery`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(formState),
         });
 
@@ -525,8 +525,11 @@ const RegisterBrewery = () => {
         // Retrieve token and basic user info
         setToken(data.token);
         setUser(data.user);
-
-        router.push("/brewery/(tabs)");
+        if (data.user.role === "brewer") {
+          router.push("/brewery/(tabs)");
+        } else {
+          Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription");
+        }
       } catch (error) {
         console.error("Registration failed from brewery front:");
         console.error(error);
@@ -584,7 +587,7 @@ const RegisterBrewery = () => {
             />
 
             {/* TODO: Uncomment when date picker is needed */}
-            {/* <TextCTA
+            <TextCTA
               title="Date de naissance"
               onPress={() => setShowDatePicker(true)}
               width={350}
@@ -603,11 +606,11 @@ const RegisterBrewery = () => {
                 }}
                 maximumDate={new Date()}
               />
-            )} */}
+            )}
 
             <Input
               label="Email"
-              id="email"
+              id="owner_email"
               onInputChanged={inputChangedHandler}
               placeholder="email@exemple.com"
               placeholderTextColor={COLORS.black}
@@ -751,15 +754,7 @@ const RegisterBrewery = () => {
               placeholder="https://www.ma-brasserie.com"
               placeholderTextColor={COLORS.black}
               error={formErrors.website}
-            />
-
-            <Input
-              label="Réseau social principal"
-              id="main_social"
-              onInputChanged={inputChangedHandler}
-              placeholder="https://instagram.com/ma-brasserie"
-              placeholderTextColor={COLORS.black}
-              error={formErrors.main_social}
+              keyboardType="default"
             />
 
             {/* Additional Social Networks */}

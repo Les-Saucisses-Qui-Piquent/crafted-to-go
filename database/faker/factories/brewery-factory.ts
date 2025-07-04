@@ -17,7 +17,7 @@ export class BreweryFactory implements FakerImplementation {
           id: addressId,
         },
       },
-      brewery_owner_fk: {
+      user_fk: {
         connect: {
           id: breweryOwnerId,
         },
