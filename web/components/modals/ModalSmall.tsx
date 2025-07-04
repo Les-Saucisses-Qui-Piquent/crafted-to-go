@@ -1,6 +1,6 @@
 import AppIcon from "@/utils/AppIcon";
 import React from "react";
-import { View, ImageBackground, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function ModalSmall() {
   return (

@@ -21,13 +21,12 @@ export default function SelectInput({
   label,
   items,
   small = false,
-  multiple = false,
   width,
   onValueChange,
   selectedValue: propSelectedValue,
 }: SelectInputProps) {
   const [internalSelectedValue, setInternalSelectedValue] = useState<string>(items[0]?.value ?? "");
-  
+
   const selectedValue = propSelectedValue || internalSelectedValue;
   const containerWidth = width || (small ? 292 : 391);
 
@@ -42,11 +41,7 @@ export default function SelectInput({
   return (
     <View style={[styles.inputContainer, { width: containerWidth }]}>
       <Text style={styles.label}>{label}</Text>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={handleValueChange}
-        style={styles.picker}
-      >
+      <Picker selectedValue={selectedValue} onValueChange={handleValueChange} style={styles.picker}>
         {items.map((item) => (
           <Picker.Item key={item.value} label={item.label} value={item.value} />
         ))}
@@ -93,5 +88,4 @@ const styles = StyleSheet.create({
     height: 40,
     width: "100%",
   },
-
 });
