@@ -58,9 +58,9 @@ model beer {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model beer_color {
-  id          String   @id @default(uuid()) @db.Uuid
-  label       String   @db.VarChar(255)
-  beer_levels Int[]    @db.Integer
+  id          String @id @default(uuid()) @db.Uuid
+  label       String @db.VarChar(255)
+  beer_levels Int[]  @db.Integer
 
   //Relations
   beer_fk        beer[]
@@ -69,9 +69,9 @@ model beer_color {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model beer_style {
-  id         String   @id @default(uuid()) @db.Uuid
-  label      String   @db.VarChar(255)
-  beer_levels Int[]    @db.Integer
+  id          String @id @default(uuid()) @db.Uuid
+  label       String @db.VarChar(255)
+  beer_levels Int[]  @db.Integer
 
   //Relations
   beer_fk        beer[]
@@ -89,12 +89,15 @@ model brewery {
   updated_at       DateTime @default(now()) @db.Timestamp(3)
 
   //Relations
-  address_fk          address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_address_id_foreign")
-  brewery_owner_fk    brewery_owner      @relation(fields: [brewery_owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_brewery_owner_id_foreign")
-  beer_fk             beer[]
-  brewery_detail_fk   brewery_detail[]
-  favorite_brewery_fk favorite_brewery[]
-  order_fk            order[]
+  address_fk              address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_address_id_foreign")
+  user_fk                 user               @relation(fields: [brewery_owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_user_id_foreign")
+  beer_fk                 beer[]
+  brewery_detail_fk       brewery_detail[]
+  favorite_brewery_fk     favorite_brewery[]
+  order_fk                order[]
+  brewery_owner           brewery_owner?     @relation(fields: [brewery_ownerUser_id, brewery_ownerAddress_id], references: [user_id, address_id])
+  brewery_ownerUser_id    String?            @db.Uuid
+  brewery_ownerAddress_id String?            @db.Uuid
 }
 
 model brewery_detail {
@@ -118,20 +121,13 @@ model brewery_detail {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model brewery_owner {
-  id           String   @id @default(uuid()) @db.Uuid
-  first_name   String
-  last_name    String
-  address_id   String   @db.Uuid
-  birth_date   DateTime @db.Date
-  phone_number String
-  email        String   @unique
-  password     String
-  created_at   DateTime @default(now()) @db.Timestamp(3)
-  updated_at   DateTime @default(now()) @db.Timestamp(3)
-  role         UserRole @default(brewer)
+  user_id    String    @db.Uuid
+  address_id String    @db.Uuid
 
   //Relations
+  @@unique([user_id, address_id])
   brewery_fk brewery[]
+  user_fk    user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_user_id_foreign")
   address_fk address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
 }
 
@@ -226,6 +222,8 @@ model user {
   favorite_brewery_fk favorite_brewery[]
   order_fk            order[]
   user_detail_fk      user_detail[]
+  brewery             brewery[]
+  brewery_owner       brewery_owner[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -235,7 +233,7 @@ model user_detail {
   image          String
   color_ids      String[] @db.Uuid
   style_ids      String[] @db.Uuid
-  beer_level     Int   @db.Integer
+  beer_level     Int      @db.Integer
   address_id     String   @db.Uuid
   payment_method String?
   created_at     DateTime @default(now()) @db.Timestamp(3)
