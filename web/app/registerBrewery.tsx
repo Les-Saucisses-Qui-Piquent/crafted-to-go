@@ -7,7 +7,7 @@ import {
   Alert,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS } from "../constants";
 import { router } from "expo-router";
@@ -298,10 +298,30 @@ const RegisterBrewery = () => {
     brewery_email: "",
   });
 
+  useEffect(() => {
+    if (
+      formState.password &&
+      formState.confirmPassword &&
+      formState.password !== formState.confirmPassword
+    ) {
+      setFormErrors((prev) => ({
+        ...prev,
+        confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
+      }));
+    }
+
+    if (formState.password && formState.password.length < 12) {
+      setFormErrors((prev) => ({
+        ...prev,
+        password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
+      }));
+    }
+  }, [formState.password, formState.confirmPassword]);
+
   const inputChangedHandler = (id: string, text: string) => {
     setFormState((prev) => ({
       ...prev,
-      [id]: text,
+      ...{ [id]: text },
     }));
 
     // Valider le champ en temps réel
@@ -310,27 +330,6 @@ const RegisterBrewery = () => {
       ...prev,
       [id]: error,
     }));
-
-    // Vérifier les mots de passe si nécessaire
-    if (id === "password" || id === "confirmPassword") {
-      if (id === "password" && text.length < 12) {
-        setFormErrors((prev) => ({
-          ...prev,
-          password: ERROR_MESSAGES.PASSWORD_TOO_SHORT,
-        }));
-      }
-      if (formState.confirmPassword && text !== formState.confirmPassword) {
-        setFormErrors((prev) => ({
-          ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
-        }));
-      } else if (formState.password && text !== formState.password) {
-        setFormErrors((prev) => ({
-          ...prev,
-          confirmPassword: ERROR_MESSAGES.PASSWORDS_DONT_MATCH,
-        }));
-      }
-    }
   };
 
   const toggleTaproom = () => {
