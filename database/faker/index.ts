@@ -29,11 +29,12 @@ const main = async (dbclient: PrismaClient) => {
     const users = await userFaker.createMany(10);
     const userIds = users.map((user) => user.id);
 
-    await userFaker.createAdmin();
-
     const addressFaker = new AddressFactory(dbclient);
     const addresses = await addressFaker.createMany(10);
     const addressIds = addresses.map((address) => address.id);
+
+    await userFaker.createAdmin();
+    await userFaker.createBrewerAdmin(addressIds[0]);
 
     const breweryOwnerFaker = new BreweryOwnerFactory(dbclient);
     const breweryOwners = await breweryOwnerFaker.createMany(addressIds);
