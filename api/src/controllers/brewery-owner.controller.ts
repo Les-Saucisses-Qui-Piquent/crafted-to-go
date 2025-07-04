@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type BreweryOwnerInsert = Prisma.brewery_ownerCreateInput;
 type BreweryOwnerUpdate = Prisma.brewery_ownerUpdateInput;
 
 export default class BreweryOwnerController {
-  static async getBreweryOwners(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getBreweryOwners(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
     try {
       const breweryOwners = await prisma.brewery_owner.findMany();
       reply.send(breweryOwners);
@@ -23,7 +23,7 @@ export default class BreweryOwnerController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -49,7 +49,7 @@ export default class BreweryOwnerController {
     request: FastifyRequest<{ Body: BreweryOwnerInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const breweryOwner = await prisma.brewery_owner.create({
         data: request.body,
@@ -67,7 +67,7 @@ export default class BreweryOwnerController {
     request: FastifyRequest<{ Params: { id: string }; Body: BreweryOwnerUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -96,7 +96,7 @@ export default class BreweryOwnerController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);

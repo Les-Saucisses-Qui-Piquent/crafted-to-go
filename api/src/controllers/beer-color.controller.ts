@@ -1,13 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 type BeerColorInsert = Prisma.beer_colorCreateInput;
 type BeerColorUpdate = Prisma.beer_colorUpdateInput;
 
 export default class BeerColorController {
-  static async getBeerColors(_request: FastifyRequest, reply: FastifyReply) {
-    const prisma = new PrismaClient();
+  static async getBeerColors(request: FastifyRequest, reply: FastifyReply) {
+    const prisma = request.server.prisma;
     try {
       const beerColors = await prisma.beer_color.findMany();
       reply.send(beerColors);
@@ -23,7 +23,7 @@ export default class BeerColorController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -49,7 +49,7 @@ export default class BeerColorController {
     request: FastifyRequest<{ Body: BeerColorInsert }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     try {
       const beerColor = await prisma.beer_color.create({
         data: request.body,
@@ -67,7 +67,7 @@ export default class BeerColorController {
     request: FastifyRequest<{ Params: { id: string }; Body: BeerColorUpdate }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
@@ -96,7 +96,7 @@ export default class BeerColorController {
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
   ) {
-    const prisma = new PrismaClient();
+    const prisma = request.server.prisma;
     const { id } = request.params;
     try {
       const { success } = z.string().uuid().safeParse(id);
