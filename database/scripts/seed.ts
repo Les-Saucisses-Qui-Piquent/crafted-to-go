@@ -10,7 +10,6 @@ type CreateInputTypes = {
   beer: Prisma.beerCreateInput;
   beer_color: Prisma.beer_colorCreateInput;
   beer_style: Prisma.beer_styleCreateInput;
-  beer_beer_style: Prisma.beer_beer_styleCreateInput;
   brewery: Prisma.breweryCreateInput;
   brewery_detail: Prisma.brewery_detailCreateInput;
   brewery_owner: Prisma.brewery_ownerCreateInput;
