@@ -125,7 +125,7 @@ export default async function (fastify: FastifyInstance) {
   );
 
   fastify.post(
-    "/auth/brewery/register",
+    "/auth/register/brewery",
     { preHandler: validateBreweryRegister },
     async (request: FastifyRequest<{ Body: BreweryRegister }>, reply: FastifyReply) => {
       const prisma = request.server.prisma;
