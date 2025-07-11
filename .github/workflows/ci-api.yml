@@ -25,6 +25,10 @@ jobs:
         working-directory: api
         run: npm install
 
+      - name: Run Typescript check
+        working-directory: api
+        run: npm run check:ts
+
       - name: Start API
         working-directory: api
         run: npm run test:api-start
@@ -35,7 +39,3 @@ jobs:
       - name: Run tests
         working-directory: api
         run: npm run test
-
-      - name: Run Typescript check
-        working-directory: api
-        run: npm run check:ts
