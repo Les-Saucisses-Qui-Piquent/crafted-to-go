@@ -9,7 +9,6 @@ import beerColorRoutes from "./beer-color.routes";
 import beerStyleRoutes from "./beer-style.routes";
 import userDetailRoutes from "./user-detail.routes";
 import breweryDetailRoutes from "./brewery-detail.routes";
-import breweryOwnerRoutes from "./brewery-owner.routes";
 import orderDetailRoutes from "./order-detail.routes";
 
 export default {
@@ -24,6 +23,5 @@ export default {
   beerStyleRoutes,
   userDetailRoutes,
   breweryDetailRoutes,
-  breweryOwnerRoutes,
   orderDetailRoutes,
 };

@@ -200,7 +200,7 @@ model user {
   created_at   DateTime @default(now()) @db.Timestamp(3)
   updated_at   DateTime @default(now()) @db.Timestamp(3)
   role         UserRole @default(client)
-  address_id   String   @db.Uuid
+  address_id   String?  @db.Uuid
 
   //Relations
   favorite_beer_fk    favorite_beer[]
@@ -208,7 +208,7 @@ model user {
   order_fk            order[]
   user_detail_fk      user_detail[]
   brewery             brewery[]
-  address_fk          address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
+  address_fk          address?           @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

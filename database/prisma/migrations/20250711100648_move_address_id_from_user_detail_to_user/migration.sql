@@ -7,7 +7,6 @@
   - You are about to drop the column `address_id` on the `user_detail` table. All the data in the column will be lost.
   - You are about to drop the `brewery_owner` table. If the table is not empty, all the data it contains will be lost.
   - Added the required column `owner_id` to the `brewery` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `address_id` to the `user` table without a default value. This is not possible if the table is not empty.
 
 */
 -- DropForeignKey
@@ -32,7 +31,7 @@ DROP COLUMN "brewery_owner_id",
 ADD COLUMN     "owner_id" UUID NOT NULL;
 
 -- AlterTable
-ALTER TABLE "user" ADD COLUMN     "address_id" UUID NOT NULL;
+ALTER TABLE "user" ADD COLUMN     "address_id" UUID;
 
 -- AlterTable
 ALTER TABLE "user_detail" DROP COLUMN "address_id";

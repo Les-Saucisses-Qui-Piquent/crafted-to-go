@@ -170,12 +170,12 @@ model user {
   created_at       DateTime           @default(now())
   updated_at       DateTime           @default(now())
   role             UserRole           @default(client)
-  address_id       String             @db.Uuid
+  address_id       String?            @db.Uuid
   brewery          brewery[]
   favorite_beer    favorite_beer[]
   favorite_brewery favorite_brewery[]
   order            order[]
-  address          address            @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
+  address          address?           @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_detail_address_id_foreign")
   user_detail      user_detail[]
 }
 
