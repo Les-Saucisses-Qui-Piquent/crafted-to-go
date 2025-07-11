@@ -48,7 +48,7 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always",
+    "source.fixAll.eslint": "explicit",
     "source.fixAll": "always"
   },
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
@@ -57,5 +57,8 @@
     "editor.formatOnSave": true
   },
   "SQL-Formatter-VSCode.dialect": "postgresql",
-  "SQL-Formatter-VSCode.keywordCase": "upper"
+  "SQL-Formatter-VSCode.keywordCase": "upper",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
