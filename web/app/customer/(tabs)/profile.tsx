@@ -1,324 +1,356 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
-import React, { useState, useRef } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
-import Button from '@/components/Button';
-import { COLORS, SIZES } from '@/constants';
-import { Image } from 'expo-image';
-import { useNavigation } from 'expo-router';
-
-type Nav = {
-  navigate: (value: string) => void
-}
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import { useApiClient } from "@/utils/api-client";
+import { useAuth } from "@/contexts/AuthContext";
+import Button from "@/components/Button";
+import AppIcon from "@/utils/AppIcon";
+import { COLORS } from "@/constants";
+import { Image } from "expo-image";
 
 const Profile = () => {
-  const refRBSheet = useRef<any>(null);
-  const { navigate } = useNavigation<Nav>();
-  /**
-   * render header
-   */
-  const renderHeader = () => {
+  const { apiClient } = useApiClient();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // States
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
+  // User info
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // blank = no change
+  const [profileImage, setProfileImage] = useState(""); // à compléter selon ton modèle
+
+  // Address
+  const [addressId, setAddressId] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("");
+
+  // Payment method
+  const [paymentMethod, setPaymentMethod] = useState("");
+
+  // User details id (for update)
+  const [userDetailsId, setUserDetailsId] = useState("");
+
+  // Load profile info
+  useEffect(() => {
+    if (!user?.id) return;
+    setLoading(true);
+    (async () => {
+      try {
+        // User info
+        const userRes = await apiClient(`/users/${user.id}`, { method: "GET" });
+        const userData = await userRes.json();
+        setFirstName(userData.first_name || "");
+        setLastName(userData.last_name || "");
+        setEmail(userData.email || "");
+
+        // User details (payment, address id, image)
+        const detailsRes = await apiClient(`/user-details/user/${user.id}`, { method: "GET" });
+        const detailsData = await detailsRes.json();
+        if (detailsData) {
+          setUserDetailsId(detailsData.id);
+          setPaymentMethod(detailsData.payment_method || "");
+          if (detailsData.address_id) setAddressId(detailsData.address_id);
+          if (detailsData.image) setProfileImage(detailsData.image);
+        }
+
+        // Address
+        if (detailsData?.address_id) {
+          const addrRes = await apiClient(`/addresses/${detailsData.address_id}`, {
+            method: "GET",
+          });
+          const addrData = await addrRes.json();
+          setAddress(addrData.line_1 || "");
+          setCity(addrData.city || "");
+          setPostalCode(addrData.postal_code?.toString() || "");
+          setCountry(addrData.country || "");
+        }
+      } catch (err) {
+        Alert.alert("Erreur", "Impossible de charger le profil.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // Save profile
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // 1. Update user (email, password)
+      await apiClient(`/users/${user?.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          email,
+          ...(password ? { password } : {}),
+        }),
+      });
+
+      // 2. Update address
+      if (addressId) {
+        await apiClient(`/addresses/${addressId}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            line_1: address,
+            city,
+            postal_code: postalCode,
+            country,
+          }),
+        });
+      }
+
+      // 3. Update payment method
+      if (userDetailsId) {
+        await apiClient(`/user-details/${userDetailsId}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            payment_method: paymentMethod,
+            // image: profileImage, // à gérer si tu veux permettre l'édition de la photo
+          }),
+        });
+      }
+
+      setEditMode(false);
+      Alert.alert("Succès", "Profil mis à jour !");
+    } catch (err) {
+      Alert.alert("Erreur", "Impossible de sauvegarder le profil.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <TouchableOpacity style={styles.headerContainer}>
-        <View style={styles.headerLeft}>
-          
-          <Text style={[styles.headerTitle, {
-            color: COLORS.greyscale900
-          }]}>Profile</Text>
+      <SafeAreaView style={styles.area}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
-        <TouchableOpacity>
-          
-        </TouchableOpacity>
-      </TouchableOpacity>
-    )
+      </SafeAreaView>
+    );
   }
-  /**
-   * render user profile
-   */
-  const renderProfile = () => {
-    return (
-      <View style={styles.profileContainer}>
-        <View>
-          <Text>IMAGE</Text>
-          <TouchableOpacity
-            style={styles.picContainer}>
-            <MaterialIcons name="edit" size={16} color={COLORS.white} />
+
+  return (
+    <SafeAreaView style={styles.area}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* --- HEADER --- */}
+        <View style={styles.headerRow}>
+          <View style={styles.profileHeader}>
+            {profileImage ? (
+              <View style={styles.avatarWrapper}>
+                <Image source={{ uri: profileImage }} style={styles.avatar} />
+              </View>
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <AppIcon name="person" size={64} color={COLORS.primary} />
+              </View>
+            )}
+            <View style={styles.headerInfo}>
+              <Text style={styles.name}>
+                {firstName} {lastName}
+              </Text>
+              <Text style={styles.email}>{email}</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => setEditMode((prev) => !prev)}>
+            <AppIcon name={editMode ? "close" : "edit"} size={28} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
-        <Text style={[styles.title, { color: COLORS.greyscale900 }]}>Nathalie Erneson</Text>
-        <Text style={[styles.subtitle, { color: COLORS.greyscale900 }]}>nathalie_erneson@gmail.com</Text>
-      </View>
-    );
-  };
-  /**
-   * Render Settings
-   */
-  const renderSettings = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false);
 
-    const toggleDarkMode = () => {
-      setIsDarkMode((prev) => !prev);
-    };
-
-    return (
-      <View style={styles.settingsContainer}>
-        
-        <TouchableOpacity
-          style={styles.settingsItemContainer}>
-          <View style={styles.leftContainer}>
-            <Text>MORE</Text>
-            <Text style={[styles.settingsName, {
-              color: COLORS.greyscale900
-            }]}>Language & Region</Text>
-          </View>
-          <View style={styles.rightContainer}>
-            <Text style={[styles.rightLanguage, {
-              color: COLORS.greyscale900
-            }]}>English (US)</Text>
-            
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.settingsItemContainer}>
-          <View style={styles.leftContainer}>
-           
-            <Text style={[styles.settingsName, {
-              color: COLORS.greyscale900
-            }]}>Dark Mode</Text>
-          </View>
-          <View style={styles.rightContainer}>
-            <Switch
-              value={isDarkMode}
-              onValueChange={toggleDarkMode}
-              thumbColor={isDarkMode ? '#fff' : COLORS.white}
-              trackColor={{ false: '#EEEEEE', true: COLORS.primary }}
-              ios_backgroundColor={COLORS.white}
-              style={styles.switch}
+        {/* --- INFOS --- */}
+        {editMode ? (
+          <>
+            <Text style={styles.label}>Adresse e-mail</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
+
+            <Text style={styles.label}>Nouveau mot de passe</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              autoCapitalize="none"
+              secureTextEntry
+              placeholder="Laisser vide pour ne pas changer"
+            />
+
+            <Text style={styles.label}>Adresse</Text>
+            <TextInput
+              style={styles.input}
+              value={address}
+              onChangeText={setAddress}
+              placeholder="Adresse"
+            />
+            <TextInput
+              style={styles.input}
+              value={city}
+              onChangeText={setCity}
+              placeholder="Ville"
+            />
+            <TextInput
+              style={styles.input}
+              value={postalCode}
+              onChangeText={setPostalCode}
+              placeholder="Code postal"
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              value={country}
+              onChangeText={setCountry}
+              placeholder="Pays"
+            />
+
+            <Text style={styles.label}>Moyen de paiement</Text>
+            <TextInput
+              style={styles.input}
+              value={paymentMethod}
+              onChangeText={setPaymentMethod}
+              placeholder="Carte, Paypal, etc."
+            />
+
+            <Button
+              title={saving ? "Sauvegarde..." : "Enregistrer"}
+              onPress={handleSave}
+              disabled={saving}
+              style={styles.saveButton}
+            />
+          </>
+        ) : (
+          <>
+            <View style={styles.infoBlock}>
+              <AppIcon name="mail" size={20} color={COLORS.primary} />
+              <Text style={styles.infoText}>{email}</Text>
+            </View>
+            <View style={styles.infoBlock}>
+              <AppIcon name="location-on" size={20} color={COLORS.primary} />
+              <Text style={styles.infoText}>
+                {address}, {city} {postalCode} {country}
+              </Text>
+            </View>
+            <View style={styles.infoBlock}>
+              <AppIcon name="credit-card" size={20} color={COLORS.primary} />
+              <Text style={styles.infoText}>{paymentMethod || "Aucun"}</Text>
+            </View>
+          </>
+        )}
+
+        <View style={styles.bottomRow}>
+          <View style={styles.bottomRow}>
+            <TouchableOpacity style={styles.bottomButton} onPress={() => router.push("/favorite")}>
+              <AppIcon name="heart" size={22} color={COLORS.primary} />
+              <Text style={styles.buttonText}>Mes favoris</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.bottomButton, { marginLeft: 8 }]}
+              onPress={() =>
+                Alert.alert("À venir", "Gestion des moyens de paiement bientôt disponible !")
+              }
+            >
+              <AppIcon name="credit-card" size={22} color={COLORS.primary} />
+              <Text style={styles.buttonText}>Moyens de paiement</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-       
-        <TouchableOpacity
-          style={styles.logoutContainer}>
-          <View style={styles.logoutLeftContainer}>
-            
-            <Text style={[styles.logoutName, {
-              color: "red"
-            }]}>Logout</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-  return (
-    <SafeAreaView style={[styles.area, { backgroundColor: COLORS.white }]}>
-      <View style={[styles.container, { backgroundColor: COLORS.white }]}>
-      
-      </View>
-     
-        <Text style={styles.bottomTitle}>Logout</Text>
-        <View style={[styles.separateLine, {
-          backgroundColor: COLORS.grayscale200,
-        }]} />
-        <Text style={[styles.bottomSubtitle, {
-          color: COLORS.black
-        }]}>Are you sure you want to log out?</Text>
-        <View style={styles.bottomContainer}>
-          <Button
-            title="Cancel"
-            style={{
-              width: (SIZES.width - 32) / 2 - 8,
-              backgroundColor: COLORS.tansparentPrimary,
-              borderRadius: 32,
-              borderColor: COLORS.tansparentPrimary
-            }}
-            textColor={COLORS.primary}
-            onPress={() => refRBSheet.current.close()}
-          />
-          <Button
-            title="Yes, Logout"
-            filled
-            style={styles.logoutButton}
-            onPress={() => refRBSheet.current.close()}
-          />
         </View>
+      </ScrollView>
     </SafeAreaView>
-  )
+  );
 };
 
 const styles = StyleSheet.create({
-  area: {
-    flex: 1,
-    backgroundColor: COLORS.white
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    padding: 16,
-    marginBottom: 32
-  },
-  headerContainer: {
+  area: { flex: 1, backgroundColor: COLORS.white },
+  container: { padding: 20, backgroundColor: COLORS.white },
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    marginBottom: 24,
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  logo: {
-    height: 32,
-    width: 32,
-    tintColor: COLORS.primary
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontFamily: "bold",
-    color: COLORS.greyscale900,
-    marginLeft: 12
-  },
-  headerIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900
-  },
-  profileContainer: {
-    alignItems: "center",
-    borderBottomColor: COLORS.grayscale400,
-    borderBottomWidth: .4,
-    paddingVertical: 20
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 999
-  },
-  picContainer: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
+  profileHeader: { flexDirection: "row", alignItems: "center" },
+  avatarWrapper: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    overflow: "hidden",
+    marginRight: 16,
+    backgroundColor: COLORS.grayscale200,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    position: "absolute",
-    right: 0,
-    bottom: 12
   },
-  title: {
-    fontSize: 18,
-    fontFamily: "bold",
-    color: COLORS.greyscale900,
-    marginTop: 12
-  },
-  subtitle: {
-    fontSize: 16,
-    color: COLORS.greyscale900,
-    fontFamily: "medium",
-    marginTop: 4
-  },
-  settingsContainer: {
-    marginVertical: 12
-  },
-  settingsItemContainer: {
-    width: SIZES.width - 32,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12
-  },
-  leftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  settingsIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900
-  },
-  settingsName: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginLeft: 12
-  },
-  settingsArrowRight: {
-    width: 24,
-    height: 24,
-    tintColor: COLORS.greyscale900
-  },
-  rightContainer: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  rightLanguage: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginRight: 8
-  },
-  switch: {
-    marginLeft: 8,
-    transform: [{ scaleX: .8 }, { scaleY: .8 }], // Adjust the size of the switch
-  },
-  logoutContainer: {
-    width: SIZES.width - 32,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12
-  },
-  logoutLeftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logoutIcon: {
-    height: 24,
-    width: 24,
-    tintColor: COLORS.greyscale900
-  },
-  logoutName: {
-    fontSize: 18,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    marginLeft: 12
-  },
-  bottomContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginVertical: 12,
-    paddingHorizontal: 16
-  },
-  cancelButton: {
-    width: (SIZES.width - 32) / 2 - 8,
-    backgroundColor: COLORS.tansparentPrimary,
-    borderRadius: 32
-  },
-  logoutButton: {
-    width: (SIZES.width - 32) / 2 - 8,
-    backgroundColor: COLORS.primary,
-    borderRadius: 32
-  },
-  bottomTitle: {
-    fontSize: 24,
-    fontFamily: "semiBold",
-    color: "red",
-    textAlign: "center",
-    marginTop: 12
-  },
-  bottomSubtitle: {
-    fontSize: 20,
-    fontFamily: "semiBold",
-    color: COLORS.greyscale900,
-    textAlign: "center",
-    marginVertical: 28
-  },
-  separateLine: {
-    width: SIZES.width,
-    height: 1,
+  avatar: { width: 80, height: 80, borderRadius: 40 },
+  avatarPlaceholder: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: COLORS.grayscale200,
-    marginTop: 12
-  }
-})
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  headerInfo: {},
+  name: { fontSize: 20, fontWeight: "600", color: COLORS.greyscale900 },
+  email: { fontSize: 15, color: COLORS.greyscale900, marginTop: 2 },
+  editButton: { padding: 8 },
+  label: { fontSize: 16, color: COLORS.greyscale900, marginTop: 18, marginBottom: 6 },
+  input: {
+    backgroundColor: COLORS.grayscale100,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 8,
+    color: COLORS.greyscale900,
+  },
+  infoBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 2,
+  },
+  infoText: { marginLeft: 8, fontSize: 16, color: COLORS.greyscale900 },
+  saveButton: { marginTop: 24 },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 36,
+  },
+  bottomButton: {
+    flex: 1,
+    borderRadius: 32,
+    backgroundColor: COLORS.grayscale100,
+    marginHorizontal: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+});
 
-export default Profile
+export default Profile;

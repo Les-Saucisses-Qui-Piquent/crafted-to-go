@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
 export interface BeerCardProps {
+  id?: string;
   title?: string;
   style?: string;
   color?: string;
