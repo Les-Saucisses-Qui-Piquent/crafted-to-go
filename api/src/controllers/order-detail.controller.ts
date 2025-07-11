@@ -1,18 +1,16 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type OrderDetailInsert = Prisma.order_detailCreateInput;
-type OrderDetailUpdate = Prisma.order_detailUpdateInput;
+import type { OrderDetailInsert, OrderDetailUpdate } from "../interfaces/IOrderDetail";
+import OrderDetailRepository from "../repository/order-detail.repository";
 
 export default class OrderDetailController {
   static async getOrderDetails(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const orderDetails = await prisma.order_detail.findMany();
+      const orderDetails = await orderDetailRepository.getOrderDetails();
       reply.send(orderDetails);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -25,20 +23,16 @@ export default class OrderDetailController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
-        return;
-      }
-      const orderDetail = await prisma.order_detail.findUnique({ where: { id } });
+      const orderDetail = await orderDetailRepository.getOrderDetail(id);
       if (!orderDetail) {
         reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
       reply.send(orderDetail);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -51,24 +45,16 @@ export default class OrderDetailController {
   ) {
     const prisma = request.server.prisma;
     const { orderId } = request.params;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(orderId);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
-        return;
-      }
-
-      const orderDetails = await prisma.order_detail.findMany({
-        where: { order_id: orderId },
-      });
+      const orderDetails = await orderDetailRepository.getDetailFromOrder(orderId);
       if (!orderDetails) {
         reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
-
       reply.send(orderDetails);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -80,13 +66,12 @@ export default class OrderDetailController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const orderDetail = await prisma.order_detail.create({
-        data: request.body,
-      });
+      const orderDetail = await orderDetailRepository.createOrderDetail(request.body);
       reply.send(orderDetail);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
@@ -99,23 +84,17 @@ export default class OrderDetailController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
-        return;
-      }
-      const orderDetail = await prisma.order_detail.update({
-        where: { id },
-        data: request.body,
-      });
+      const orderDetail = await orderDetailRepository.getOrderDetail(id);
       if (!orderDetail) {
         reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
-      reply.send(orderDetail);
+      const orderDetailUpdated = await orderDetailRepository.updateOrderDetail(id, request.body);
+      reply.send(orderDetailUpdated);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -128,16 +107,17 @@ export default class OrderDetailController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
+      const orderDetail = await orderDetailRepository.getOrderDetail(id);
+      if (!orderDetail) {
+        reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
-      await prisma.order_detail.delete({ where: { id } });
-      reply.send({ clientMessage: "OrderDetail deleted" });
+      const deletedOrderDetail = await orderDetailRepository.deleteOrderDetail(id);
+      reply.send(deletedOrderDetail);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
