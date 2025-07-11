@@ -2,9 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { IBeerStyle, type BeerStyleInsert, type BeerStyleUpdate } from "../interfaces/IBeerStyle";
 import z from "zod";
 
-const BeerStyleRepository: new (prisma: PrismaClient) => IBeerStyle = class BeerStyleRepository
-  implements IBeerStyle
-{
+export default class BeerStyleRepository implements IBeerStyle {
   constructor(private prisma: PrismaClient) {}
 
   getBeerStyles = async () => {
@@ -38,6 +36,4 @@ const BeerStyleRepository: new (prisma: PrismaClient) => IBeerStyle = class Beer
     }
     return await this.prisma.beer_style.delete({ where: { id } });
   };
-};
-
-export default BeerStyleRepository;
+}

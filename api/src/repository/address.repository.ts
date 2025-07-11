@@ -2,9 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { IAddress, type AddressInsert, type AddressUpdate } from "../interfaces/IAddress";
 import z from "zod";
 
-const AddressRepository: new (prisma: PrismaClient) => IAddress = class AddressRepository
-  implements IAddress
-{
+export default class AddressRepository implements IAddress {
   constructor(private prisma: PrismaClient) {}
 
   getAddresses = async () => {
@@ -38,6 +36,4 @@ const AddressRepository: new (prisma: PrismaClient) => IAddress = class AddressR
     }
     return await this.prisma.address.delete({ where: { id } });
   };
-};
-
-export default AddressRepository;
+}
