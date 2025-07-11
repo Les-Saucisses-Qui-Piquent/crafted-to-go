@@ -1,18 +1,16 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type BeerColorInsert = Prisma.beer_colorCreateInput;
-type BeerColorUpdate = Prisma.beer_colorUpdateInput;
+import type { BeerColorInsert, BeerColorUpdate } from "../interfaces/IBeerColor";
+import BeerColorRepository from "../repository/beer-color.repository";
 
 export default class BeerColorController {
   static async getBeerColors(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const beerColorRepository = new BeerColorRepository(prisma);
     try {
-      const beerColors = await prisma.beer_color.findMany();
+      const beerColors = await beerColorRepository.getBeerColors();
       reply.send(beerColors);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -25,20 +23,16 @@ export default class BeerColorController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerColorRepository = new BeerColorRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
-        return;
-      }
-      const beerColor = await prisma.beer_color.findUnique({ where: { id } });
+      const beerColor = await beerColorRepository.getBeerColor(id);
       if (!beerColor) {
         reply.status(404).send({ clientMessage: "BeerColor not found" });
         return;
       }
       reply.send(beerColor);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -50,13 +44,12 @@ export default class BeerColorController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const beerColorRepository = new BeerColorRepository(prisma);
     try {
-      const beerColor = await prisma.beer_color.create({
-        data: request.body,
-      });
+      const beerColor = await beerColorRepository.createBeerColor(request.body);
       reply.send(beerColor);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
@@ -69,23 +62,17 @@ export default class BeerColorController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerColorRepository = new BeerColorRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
-        return;
-      }
-      const beerColor = await prisma.beer_color.update({
-        where: { id },
-        data: request.body,
-      });
+      const beerColor = await beerColorRepository.getBeerColor(id);
       if (!beerColor) {
         reply.status(404).send({ clientMessage: "BeerColor not found" });
         return;
       }
-      reply.send(beerColor);
+      const beerColorUpdated = await beerColorRepository.updateBeerColor(id, request.body);
+      reply.send(beerColorUpdated);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
@@ -98,16 +85,17 @@ export default class BeerColorController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerColorRepository = new BeerColorRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ clientMessage: "Invalid uuid" });
+      const beerColor = await beerColorRepository.getBeerColor(id);
+      if (!beerColor) {
+        reply.status(404).send({ clientMessage: "BeerColor not found" });
         return;
       }
-      await prisma.beer_color.delete({ where: { id } });
-      reply.send({ clientMessage: "BeerColor deleted" });
+      const deletedBeerColor = await beerColorRepository.deleteBeerColor(id);
+      reply.send(deletedBeerColor);
     } catch (error) {
-      console.error(error);
+      request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
