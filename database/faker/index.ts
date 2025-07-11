@@ -31,13 +31,14 @@ const main = async (dbclient: PrismaClient) => {
     const userFaker = new UserFactory(dbclient);
     const users = await userFaker.createMany(10, addressIds[0]);
     const userIds = users.map((user) => user.id);
+    const userBrewerIds = users.filter((user) => user.role === "brewer").map((user) => user.id);
 
     await userFaker.createAdmin(addressIds[0]);
     await userFaker.createBrewerAdmin(addressIds[0]);
     await userFaker.createClientAdmin(addressIds[0]);
 
     const breweryFaker = new BreweryFactory(dbclient);
-    const breweries = await breweryFaker.createMany(addressIds, userIds);
+    const breweries = await breweryFaker.createMany(addressIds, userBrewerIds);
     const breweryIds = breweries.map((brewery) => brewery.id);
 
     const breweryDetailFaker = new BreweryDetailFactory(dbclient);
