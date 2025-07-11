@@ -1,4 +1,3 @@
-import { fakerFR as faker } from "@faker-js/faker";
 import { Prisma, PrismaClient } from "@prisma/client";
 import type { FakerImplementation } from "./types";
 
@@ -7,14 +6,13 @@ type BreweryOwner = Prisma.brewery_ownerCreateInput;
 export class BreweryOwnerFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
 
-  private generate = (addressId: string): BreweryOwner => {
+  private generate = (userId: string, addressId: string): BreweryOwner => {
     return {
-      first_name: faker.person.firstName(),
-      last_name: faker.person.lastName(),
-      birth_date: faker.date.birthdate(),
-      phone_number: faker.phone.number(),
-      email: faker.internet.email(),
-      password: faker.internet.password(),
+      user_fk: {
+        connect: {
+          id: userId,
+        },
+      },
       address_fk: {
         connect: {
           id: addressId,
@@ -23,15 +21,29 @@ export class BreweryOwnerFactory implements FakerImplementation {
     };
   };
 
-  createOne = async (addressId: string) => {
-    const breweryOwner = this.generate(addressId);
+  private randomUserId = (userIds: string[]) => {
+    return userIds[Math.floor(Math.random() * userIds.length)];
+  };
+
+  createOne = async (userId: string, addressId: string) => {
+    const breweryOwner = this.generate(userId, addressId);
     const createdBreweryOwner = await this.dbClient.brewery_owner.create({ data: breweryOwner });
 
     return createdBreweryOwner;
   };
 
-  createMany = async (addressIds: string[]) => {
-    const brewers = await Promise.all(addressIds.map((addressId) => this.createOne(addressId)));
+  createMany = async (userIds: string[], addressIds: string[]) => {
+    const possibleUserIds = [...userIds];
+    const brewers = [];
+
+    for (const addressId of addressIds) {
+      const randomUserId = possibleUserIds[Math.floor(Math.random() * possibleUserIds.length)];
+
+      const breweryOwner = await this.createOne(randomUserId, addressId);
+      brewers.push(breweryOwner);
+
+      possibleUserIds.splice(possibleUserIds.indexOf(randomUserId), 1);
+    }
 
     return brewers;
   };
