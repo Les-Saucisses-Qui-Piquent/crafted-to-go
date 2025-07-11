@@ -127,8 +127,8 @@ model brewery_owner {
   //Relations
   @@unique([user_id, address_id])
   brewery_fk brewery[]
-  user_fk    user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_user_id_foreign")
-  address_fk address   @relation(fields: [address_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
+  user_fk    user      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brewery_owner_user_id_foreign")
+  address_fk address   @relation(fields: [address_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brewery_owner_address_id_foreign")
 }
 
 model favorite_beer {
