@@ -10,15 +10,4 @@ export default async function (fastify: FastifyInstance) {
     handler: BreweryOwnerController.getBreweryOwner,
   });
 
-  fastify.post("/brewery-owners", {
-    handler: BreweryOwnerController.createBreweryOwner,
-  });
-
-  fastify.put("/brewery-owners/:id", {
-    handler: BreweryOwnerController.updateBreweryOwner,
-  });
-
-  fastify.delete("/brewery-owners/:id", {
-    handler: BreweryOwnerController.deleteBreweryOwner,
-  });
 }
