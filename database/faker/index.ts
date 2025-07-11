@@ -3,7 +3,6 @@ import {
   AddressFactory,
   BeerColorFactory,
   BeerStyleFactory,
-  BreweryOwnerFactory,
   BreweryFactory,
   BreweryDetailFactory,
   BeerFactory,
@@ -15,33 +14,31 @@ import {
 } from "./factories";
 import { PrismaClient } from "@prisma/client";
 
-/* eslint-disable no-console */
-
 const main = async (dbclient: PrismaClient) => {
   if (process.env.NODE_ENV !== "develop") {
+    /* eslint-disable-next-line no-console */
     console.log("-== Skipping faker  ==-");
     return;
   }
 
+  /* eslint-disable-next-line no-console */
   console.log("-== Starting faker ==-");
   try {
-    const userFaker = new UserFactory(dbclient);
-    const users = await userFaker.createMany(10);
-    const userIds = users.map((user) => user.id);
-
     const addressFaker = new AddressFactory(dbclient);
     const addresses = await addressFaker.createMany(10);
     const addressIds = addresses.map((address) => address.id);
 
-    await userFaker.createAdmin();
-    await userFaker.createBrewerAdmin(addressIds[0]);
-    await userFaker.createClientAdmin();
+    const userFaker = new UserFactory(dbclient);
+    const users = await userFaker.createMany(10, addressIds[0]);
+    const userIds = users.map((user) => user.id);
+    const userBrewerIds = users.filter((user) => user.role === "brewer").map((user) => user.id);
 
-    const breweryOwnerFaker = new BreweryOwnerFactory(dbclient);
-    await breweryOwnerFaker.createMany(userIds, addressIds);
+    await userFaker.createAdmin(addressIds[0]);
+    await userFaker.createBrewerAdmin(addressIds[0]);
+    await userFaker.createClientAdmin(addressIds[0]);
 
     const breweryFaker = new BreweryFactory(dbclient);
-    const breweries = await breweryFaker.createMany(addressIds, userIds);
+    const breweries = await breweryFaker.createMany(addressIds, userBrewerIds);
     const breweryIds = breweries.map((brewery) => brewery.id);
 
     const breweryDetailFaker = new BreweryDetailFactory(dbclient);
@@ -66,7 +63,7 @@ const main = async (dbclient: PrismaClient) => {
     await favoriteBreweryFaker.createMany(breweryIds, userIds);
 
     const userDetailFaker = new UserDetailFactory(dbclient);
-    await userDetailFaker.createMany(userIds, addressIds);
+    await userDetailFaker.createMany(userIds);
 
     const orderFaker = new OrderFactory(dbclient);
     const orders = await orderFaker.createMany(userIds, breweryIds);
@@ -75,9 +72,12 @@ const main = async (dbclient: PrismaClient) => {
     const orderDetailFaker = new OrderDetailFactory(dbclient);
     await orderDetailFaker.createMany(orderIds, beerIds);
 
+    /* eslint-disable-next-line no-console */
     console.log("-== Completed fake seeding ==-");
   } catch (error) {
+    /* eslint-disable-next-line no-console */
     console.error("/!\\ Error while running faker /!\\");
+    /* eslint-disable-next-line no-console */
     console.error(error);
     process.exit(1);
   }

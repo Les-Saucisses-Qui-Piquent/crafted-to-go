@@ -137,8 +137,7 @@ export default async function (fastify: FastifyInstance) {
         const alreadyExistingUser = await prisma.user.findUnique({
           where: { email: clientEmail },
         });
-        console.info("alreadyExistingUser", alreadyExistingUser);
-        console.info("request.body.owner_email", clientEmail);
+
         if (alreadyExistingUser) {
           reply.status(400).send({
             clientMessage: "User already exists",
@@ -167,7 +166,7 @@ export default async function (fastify: FastifyInstance) {
             },
           });
 
-          // 2.a) Create brewery owner
+          // 2  ) Create brewery owner
           const {
             password,
             first_name,
@@ -188,14 +187,7 @@ export default async function (fastify: FastifyInstance) {
               birth_date,
               phone_number: owner_phone_number,
               role: "brewer",
-            },
-          });
-
-          // 2.b) // Joint on brewery_owner
-          await tx.brewery_owner.create({
-            data: {
-              user_id: breweryOwnerUser.id,
-              address_id: address.id,
+              address: { connect: { id: address.id } },
             },
           });
 
@@ -206,8 +198,8 @@ export default async function (fastify: FastifyInstance) {
               name: brewery_name,
               RIB: rib,
               siren,
-              brewery_owner_id: breweryOwnerUser.id,
-              address_id: address.id,
+              address: { connect: { id: address.id } },
+              user: { connect: { id: breweryOwnerUser.id } },
             },
           });
 

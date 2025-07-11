@@ -7,7 +7,7 @@ type Brewery = Prisma.breweryCreateInput;
 export class BreweryFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
 
-  private generate = (addressId: string, breweryOwnerId: string): Brewery => {
+  private generate = (addressId: string, ownerId: string): Brewery => {
     return {
       name: faker.company.name(),
       RIB: faker.finance.accountNumber(),
@@ -17,9 +17,9 @@ export class BreweryFactory implements FakerImplementation {
           id: addressId,
         },
       },
-      user_fk: {
+      owner_fk: {
         connect: {
-          id: breweryOwnerId,
+          id: ownerId,
         },
       },
     };
@@ -29,8 +29,8 @@ export class BreweryFactory implements FakerImplementation {
     return breweryOwnerIds[Math.floor(Math.random() * breweryOwnerIds.length)];
   };
 
-  createOne = async (addressId: string, breweryOwnerId: string[]) => {
-    const brewery = this.generate(addressId, this.randomBreweryOwnerId(breweryOwnerId));
+  createOne = async (addressId: string, ownerIds: string[]) => {
+    const brewery = this.generate(addressId, this.randomBreweryOwnerId(ownerIds));
     const createdBrewery = await this.dbClient.brewery.create({ data: brewery });
 
     return createdBrewery;
