@@ -1,19 +1,18 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type BreweryInsert = Prisma.breweryCreateInput;
-type BreweryUpdate = Prisma.breweryUpdateInput;
+import type { BreweryInsert, BreweryUpdate } from "../interfaces/IBrewery";
+import BreweryRepository from "../repository/brewery.repository";
 
 export default class BreweryController {
   static async getBreweries(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const breweryRepository = new BreweryRepository(prisma);
+
     try {
-      const breweries = await prisma.brewery.findMany();
+      const breweries = await breweryRepository.getBreweries();
       reply.send(breweries);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -25,21 +24,18 @@ export default class BreweryController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const breweryRepository = new BreweryRepository(prisma);
+
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      const brewery = await prisma.brewery.findUnique({ where: { id } });
+      const brewery = await breweryRepository.getBrewery(id);
       if (!brewery) {
-        reply.status(404).send({ message: "Brewery not found" });
+        reply.status(404).send({ clientMessage: "Brewery not found" });
         return;
       }
       reply.send(brewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -50,14 +46,13 @@ export default class BreweryController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const breweryRepository = new BreweryRepository(prisma);
     try {
-      const brewery = await prisma.brewery.create({
-        data: request.body,
-      });
+      const brewery = await breweryRepository.createBrewery(request.body);
       reply.send(brewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -69,24 +64,20 @@ export default class BreweryController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const breweryRepository = new BreweryRepository(prisma);
+
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      const brewery = await prisma.brewery.update({
-        where: { id },
-        data: request.body,
-      });
+      const brewery = await breweryRepository.getBrewery(id);
       if (!brewery) {
-        reply.status(404).send({ message: "Brewery not found" });
+        reply.status(404).send({ clientMessage: "Brewery not found" });
         return;
       }
-      reply.send(brewery);
+
+      const breweryUpdated = await breweryRepository.updateBrewery(id, request.body);
+      reply.send(breweryUpdated);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -98,17 +89,19 @@ export default class BreweryController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const breweryRepository = new BreweryRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+      const brewery = await breweryRepository.getBrewery(id);
+      if (!brewery) {
+        reply.status(404).send({ clientMessage: "Brewery not found" });
         return;
       }
-      await prisma.brewery.delete({ where: { id } });
-      reply.send({ message: "Brewery deleted" });
+
+      const deletedBrewery = await breweryRepository.deleteBrewery(id);
+      reply.send(deletedBrewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
