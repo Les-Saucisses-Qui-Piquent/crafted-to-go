@@ -13,7 +13,7 @@ export default class UserDetailController {
       reply.send(userDetails);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -28,7 +28,7 @@ export default class UserDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
 
@@ -36,14 +36,14 @@ export default class UserDetailController {
         where: { id },
       });
       if (!detail) {
-        reply.status(404).send({ message: "UserDetail not found" });
+        reply.status(404).send({ clientMessage: "UserDetail not found" });
         return;
       }
 
       reply.send(detail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -58,7 +58,7 @@ export default class UserDetailController {
     try {
       const { success } = z.string().uuid().safeParse(userId);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
 
@@ -66,14 +66,14 @@ export default class UserDetailController {
         where: { user_id: userId },
       });
       if (!userDetails) {
-        reply.status(404).send({ message: "UserDetail not found" });
+        reply.status(404).send({ clientMessage: "UserDetail not found" });
         return;
       }
 
       reply.send(userDetails);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -91,7 +91,7 @@ export default class UserDetailController {
       reply.send(userDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -106,7 +106,7 @@ export default class UserDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const userDetail = await prisma.user_detail.update({
@@ -114,13 +114,13 @@ export default class UserDetailController {
         data: request.body,
       });
       if (!userDetail) {
-        reply.status(404).send({ message: "UserDetail not found" });
+        reply.status(404).send({ clientMessage: "UserDetail not found" });
         return;
       }
       reply.send(userDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -135,14 +135,14 @@ export default class UserDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       await prisma.user_detail.delete({ where: { id } });
       reply.send({ message: "UserDetail deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

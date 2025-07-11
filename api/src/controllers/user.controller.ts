@@ -13,7 +13,7 @@ export default class UserController {
       reply.send(users);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -25,20 +25,20 @@ export default class UserController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
 
       const user = await prisma.user.findUnique({ where: { id } });
       if (!user) {
-        reply.status(404).send({ message: "User not found" });
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
 
       reply.send(user);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -51,7 +51,7 @@ export default class UserController {
       reply.send(user);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -66,7 +66,7 @@ export default class UserController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
 
@@ -75,13 +75,13 @@ export default class UserController {
         data: request.body,
       });
       if (!user) {
-        reply.status(404).send({ message: "User not found" });
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
       reply.send(user);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -96,15 +96,15 @@ export default class UserController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(404).send({ message: "User not found" });
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
 
       await prisma.user.delete({ where: { id } });
-      reply.send({ message: "User deleted" });
+      reply.send({ clientMessage: "User deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

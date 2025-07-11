@@ -13,7 +13,7 @@ export default class OrderController {
       reply.send(orders);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -25,18 +25,18 @@ export default class OrderController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const order = await prisma.order.findUnique({ where: { id } });
       if (!order) {
-        reply.status(404).send({ message: "Order not found" });
+        reply.status(404).send({ clientMessage: "Order not found" });
         return;
       }
       reply.send(order);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -49,7 +49,7 @@ export default class OrderController {
       reply.send(order);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -64,7 +64,7 @@ export default class OrderController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const order = await prisma.order.update({
@@ -72,13 +72,13 @@ export default class OrderController {
         data: request.body,
       });
       if (!order) {
-        reply.status(404).send({ message: "Order not found" });
+        reply.status(404).send({ clientMessage: "Order not found" });
         return;
       }
       reply.send(order);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -93,14 +93,14 @@ export default class OrderController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       await prisma.order.delete({ where: { id } });
-      reply.send({ message: "Order deleted" });
+      reply.send({ clientMessage: "Order deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

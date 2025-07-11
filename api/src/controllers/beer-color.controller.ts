@@ -13,7 +13,7 @@ export default class BeerColorController {
       reply.send(beerColors);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -28,18 +28,18 @@ export default class BeerColorController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const beerColor = await prisma.beer_color.findUnique({ where: { id } });
       if (!beerColor) {
-        reply.status(404).send({ message: "BeerColor not found" });
+        reply.status(404).send({ clientMessage: "BeerColor not found" });
         return;
       }
       reply.send(beerColor);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -57,7 +57,7 @@ export default class BeerColorController {
       reply.send(beerColor);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -72,7 +72,7 @@ export default class BeerColorController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const beerColor = await prisma.beer_color.update({
@@ -80,13 +80,13 @@ export default class BeerColorController {
         data: request.body,
       });
       if (!beerColor) {
-        reply.status(404).send({ message: "BeerColor not found" });
+        reply.status(404).send({ clientMessage: "BeerColor not found" });
         return;
       }
       reply.send(beerColor);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -101,14 +101,14 @@ export default class BeerColorController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       await prisma.beer_color.delete({ where: { id } });
-      reply.send({ message: "BeerColor deleted" });
+      reply.send({ clientMessage: "BeerColor deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

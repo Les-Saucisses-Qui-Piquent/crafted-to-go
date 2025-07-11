@@ -13,7 +13,7 @@ export default class OrderDetailController {
       reply.send(orderDetails);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -28,18 +28,18 @@ export default class OrderDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const orderDetail = await prisma.order_detail.findUnique({ where: { id } });
       if (!orderDetail) {
-        reply.status(404).send({ message: "OrderDetail not found" });
+        reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
       reply.send(orderDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -54,7 +54,7 @@ export default class OrderDetailController {
     try {
       const { success } = z.string().uuid().safeParse(orderId);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
 
@@ -62,14 +62,14 @@ export default class OrderDetailController {
         where: { order_id: orderId },
       });
       if (!orderDetails) {
-        reply.status(404).send({ message: "OrderDetail not found" });
+        reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
 
       reply.send(orderDetails);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -87,7 +87,7 @@ export default class OrderDetailController {
       reply.send(orderDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -102,7 +102,7 @@ export default class OrderDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const orderDetail = await prisma.order_detail.update({
@@ -110,13 +110,13 @@ export default class OrderDetailController {
         data: request.body,
       });
       if (!orderDetail) {
-        reply.status(404).send({ message: "OrderDetail not found" });
+        reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
       reply.send(orderDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -131,14 +131,14 @@ export default class OrderDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       await prisma.order_detail.delete({ where: { id } });
-      reply.send({ message: "OrderDetail deleted" });
+      reply.send({ clientMessage: "OrderDetail deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

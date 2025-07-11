@@ -13,7 +13,7 @@ export default class BreweryDetailController {
       reply.send(breweryDetails);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -28,18 +28,18 @@ export default class BreweryDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const breweryDetail = await prisma.brewery_detail.findUnique({ where: { id } });
       if (!breweryDetail) {
-        reply.status(404).send({ message: "BreweryDetail not found" });
+        reply.status(404).send({ clientMessage: "BreweryDetail not found" });
         return;
       }
       reply.send(breweryDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -57,7 +57,7 @@ export default class BreweryDetailController {
       reply.send(breweryDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -72,7 +72,7 @@ export default class BreweryDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       const breweryDetail = await prisma.brewery_detail.update({
@@ -80,13 +80,13 @@ export default class BreweryDetailController {
         data: request.body,
       });
       if (!breweryDetail) {
-        reply.status(404).send({ message: "BreweryDetail not found" });
+        reply.status(404).send({ clientMessage: "BreweryDetail not found" });
         return;
       }
       reply.send(breweryDetail);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -101,14 +101,14 @@ export default class BreweryDetailController {
     try {
       const { success } = z.string().uuid().safeParse(id);
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
         return;
       }
       await prisma.brewery_detail.delete({ where: { id } });
-      reply.send({ message: "BreweryDetail deleted" });
+      reply.send({ clientMessage: "BreweryDetail deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

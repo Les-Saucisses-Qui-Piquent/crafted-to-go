@@ -13,7 +13,7 @@ export default class AddressController {
       reply.send(addresses);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -29,20 +29,20 @@ export default class AddressController {
       const { success } = z.string().uuid().safeParse(id);
 
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
       }
       const address = await prisma.address.findUnique({
         where: { id: id },
       });
       if (!address) {
         console.warn({ id }, "Address not found");
-        reply.status(404).send({ message: "Address not found" });
+        reply.status(404).send({ clientMessage: "Address not found" });
         return;
       }
       reply.send(address);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -59,7 +59,7 @@ export default class AddressController {
       reply.send(address);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -76,20 +76,20 @@ export default class AddressController {
       const { success } = z.string().uuid().safeParse(id);
 
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
       }
       const address = await prisma.address.update({
         where: { id: id },
         data: data,
       });
       if (!address) {
-        reply.status(404).send({ message: "Address not found" });
+        reply.status(404).send({ clientMessage: "Address not found" });
         return;
       }
       reply.send(address);
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -105,16 +105,16 @@ export default class AddressController {
       const { success } = z.string().uuid().safeParse(id);
 
       if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+        reply.status(400).send({ clientMessage: "Invalid uuid" });
       }
       await prisma.address.delete({
         where: { id: id },
       });
       console.warn({ id }, "Deleted address");
-      reply.send({ message: "Address deleted" });
+      reply.send({ clientMessage: "Address deleted" });
     } catch (error) {
       console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
