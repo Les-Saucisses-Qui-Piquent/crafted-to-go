@@ -35,22 +35,5 @@ services:
       ADMINER_DESIGN: dracula
     restart: unless-stopped
 
-configs:
-  servers.json:
-    content: |
-      {
-        "Servers": {
-          "1": {
-            "Group": "Servers",
-            "Name": "Local-Postgres",
-            "Host": "${PGADMIN_SERVER_1_HOST}",
-            "Port": ${PGADMIN_SERVER_1_PORT},
-            "MaintenanceDB": "${POSTGRES_DB}",
-            "Username": "${POSTGRES_USER}",
-            "SSLMode": "${PGADMIN_SERVER_1_SSL_MODE}",
-            "Comment": "This server will connect to the instance we've created in our compose file."
-          }
-        }
-      }
 volumes:
   database-data:
