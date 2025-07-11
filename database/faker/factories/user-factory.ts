@@ -7,7 +7,7 @@ type User = Prisma.userCreateInput;
 export class UserFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
 
-  private generate = (): User => {
+  private generate = (addressId: string): User => {
     return {
       email: faker.internet.email(),
       password: faker.internet.password(),
@@ -15,23 +15,27 @@ export class UserFactory implements FakerImplementation {
       last_name: faker.person.lastName(),
       birth_date: faker.date.birthdate(),
       phone_number: faker.phone.number(),
+      role: faker.helpers.arrayElement(["brewer", "client"]),
+      address_fk: { connect: { id: addressId } },
     };
   };
 
-  createOne = async () => {
-    const user = this.generate();
-    const createdUser = await this.dbClient.user.create({ data: user });
+  createOne = async (addressId: string) => {
+    const user = this.generate(addressId);
+    const createdUser = await this.dbClient.user.create({
+      data: user,
+    });
 
     return createdUser;
   };
 
-  createMany = async (count: number) => {
-    const users = await Promise.all(Array.from({ length: count }, () => this.createOne()));
+  createMany = async (count: number, addressId: string) => {
+    const users = await Promise.all(Array.from({ length: count }, () => this.createOne(addressId)));
 
     return users;
   };
 
-  createAdmin = async () => {
+  createAdmin = async (addressId: string) => {
     const adminData: User = {
       email: "admin@rncp.com",
       password:
@@ -41,6 +45,7 @@ export class UserFactory implements FakerImplementation {
       birth_date: new Date("1990-01-01"),
       phone_number: "0000000000",
       role: "admin",
+      address_fk: { connect: { id: addressId } },
     };
 
     const adminUser = await this.dbClient.user.create({ data: adminData });
@@ -58,24 +63,15 @@ export class UserFactory implements FakerImplementation {
       birth_date: new Date("1990-01-01"),
       phone_number: "0000000000",
       role: "brewer",
+      address_fk: { connect: { id: addressId } },
     };
 
     const brewerAdminUser = await this.dbClient.user.create({ data: brewerAdminData });
-    await this.dbClient.brewery_owner.create({
-      data: {
-        user_fk: {
-          connect: { id: brewerAdminUser.id },
-        },
-        address_fk: {
-          connect: { id: addressId },
-        },
-      },
-    });
 
     return brewerAdminUser;
   };
 
-  createClientAdmin = async () => {
+  createClientAdmin = async (addressId: string) => {
     const clientData: User = {
       email: "client@rncp.com",
       password:
@@ -85,6 +81,7 @@ export class UserFactory implements FakerImplementation {
       birth_date: new Date("1990-01-01"),
       phone_number: "0000000000",
       role: "client",
+      address_fk: { connect: { id: addressId } },
     };
 
     const clientUser = await this.dbClient.user.create({ data: clientData });

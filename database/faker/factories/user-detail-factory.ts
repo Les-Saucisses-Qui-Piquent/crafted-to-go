@@ -7,16 +7,11 @@ type UserDetail = Prisma.user_detailCreateInput;
 export class UserDetailFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
 
-  private generate = (userId: string, addressId: string): UserDetail => {
+  private generate = (userId: string): UserDetail => {
     return {
       user_fk: {
         connect: {
           id: userId,
-        },
-      },
-      address_fk: {
-        connect: {
-          id: addressId,
         },
       },
       image: faker.image.url(),
@@ -28,20 +23,15 @@ export class UserDetailFactory implements FakerImplementation {
     return ids[Math.floor(Math.random() * ids.length)];
   };
 
-  createOne = async (userId: string, addressId: string) => {
-    const userDetail = this.generate(userId, addressId);
+  createOne = async (userId: string) => {
+    const userDetail = this.generate(userId);
     const createdUserDetail = await this.dbClient.user_detail.create({ data: userDetail });
 
     return createdUserDetail;
   };
 
-  createMany = async (userIds: string[], addressIds: string[]) => {
-    const userDetails = await Promise.all(
-      userIds.map((userId) => {
-        const addressId = this.randomId(addressIds);
-        return this.createOne(userId, addressId);
-      }),
-    );
+  createMany = async (userIds: string[]) => {
+    const userDetails = await Promise.all(userIds.map((userId) => this.createOne(userId)));
 
     return userDetails;
   };
