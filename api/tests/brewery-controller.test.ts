@@ -5,7 +5,7 @@ import BreweryController from "../src/controllers/brewery.controller";
 import { mockedReply, mockRequest } from "../utils/mock-fastify";
 import { BreweryInsert, BreweryUpdate } from "../src/interfaces/IBrewery";
 
-describe("Brewery Controller", () => {
+describe("🍻 Brewery", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

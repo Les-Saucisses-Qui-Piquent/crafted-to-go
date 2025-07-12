@@ -5,7 +5,7 @@ import AddressController from "../src/controllers/address.controller";
 import { mockedReply, mockRequest } from "../utils/mock-fastify";
 import { AddressInsert, AddressUpdate } from "../src/interfaces/IAddress";
 
-describe("Address Controller", () => {
+describe("📮 Address", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
