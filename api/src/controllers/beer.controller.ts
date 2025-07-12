@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { BeerInsert, BeerUpdate } from "../interfaces/IBeer";
 import BeerRepository from "../repository/beer.repository";
+import { validateUUID } from "../../utils";
 
 export default class BeerController {
   static async getBeers(request: FastifyRequest, reply: FastifyReply) {
@@ -21,6 +22,9 @@ export default class BeerController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerRepository = new BeerRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beer = await beerRepository.getBeer(id);
       if (!beer) {
@@ -57,6 +61,9 @@ export default class BeerController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerRepository = new BeerRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beer = await beerRepository.getBeer(id);
       if (!beer) {
@@ -80,6 +87,9 @@ export default class BeerController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerRepository = new BeerRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beer = await beerRepository.getBeer(id);
       if (!beer) {

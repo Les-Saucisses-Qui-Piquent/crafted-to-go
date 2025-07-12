@@ -1,6 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import type { IOrder, OrderInsert, OrderUpdate } from "../interfaces/IOrder";
-import z from "zod";
 
 export default class OrderRepository implements IOrder {
   constructor(private prisma: PrismaClient) {}
@@ -10,10 +9,6 @@ export default class OrderRepository implements IOrder {
   };
 
   getOrder = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.order.findUnique({ where: { id } });
   };
 
@@ -22,18 +17,10 @@ export default class OrderRepository implements IOrder {
   };
 
   updateOrder = async (id: string, payload: OrderUpdate) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.order.update({ where: { id }, data: payload });
   };
 
   deleteOrder = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.order.delete({ where: { id } });
   };
 }

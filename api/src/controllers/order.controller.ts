@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { OrderInsert, OrderUpdate } from "../interfaces/IOrder";
 import OrderRepository from "../repository/order.repository";
+import { validateUUID } from "../../utils";
 
 export default class OrderController {
   static async getOrders(request: FastifyRequest, reply: FastifyReply) {
@@ -21,6 +22,9 @@ export default class OrderController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderRepository = new OrderRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const order = await orderRepository.getOrder(id);
       if (!order) {
@@ -57,6 +61,9 @@ export default class OrderController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderRepository = new OrderRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const order = await orderRepository.getOrder(id);
       if (!order) {
@@ -80,6 +87,9 @@ export default class OrderController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderRepository = new OrderRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const order = await orderRepository.getOrder(id);
       if (!order) {

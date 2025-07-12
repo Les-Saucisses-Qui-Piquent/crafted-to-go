@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { UserDetailInsert, UserDetailUpdate } from "../interfaces/IUserDetail";
 import UserDetailRepository from "../repository/user-detail.repository";
+import { validateUUID } from "../../utils";
 
 export default class UserDetailController {
   static async getUserDetails(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class UserDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userDetailRepository = new UserDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const detail = await userDetailRepository.getUserDetail(id);
       if (!detail) {
@@ -46,9 +50,12 @@ export default class UserDetailController {
     const prisma = request.server.prisma;
     const { userId } = request.params;
     const userDetailRepository = new UserDetailRepository(prisma);
+
+    validateUUID(userId, reply);
+
     try {
       const userDetails = await userDetailRepository.getDetailFromUser(userId);
-      if (!userDetails) {
+      if (!userDetails.length) {
         reply.status(404).send({ clientMessage: "UserDetail not found" });
         return;
       }
@@ -85,6 +92,9 @@ export default class UserDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userDetailRepository = new UserDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const userDetail = await userDetailRepository.getUserDetail(id);
       if (!userDetail) {
@@ -108,6 +118,9 @@ export default class UserDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userDetailRepository = new UserDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const userDetail = await userDetailRepository.getUserDetail(id);
       if (!userDetail) {

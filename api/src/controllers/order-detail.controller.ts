@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { OrderDetailInsert, OrderDetailUpdate } from "../interfaces/IOrderDetail";
 import OrderDetailRepository from "../repository/order-detail.repository";
+import { validateUUID } from "../../utils";
 
 export default class OrderDetailController {
   static async getOrderDetails(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class OrderDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderDetailRepository = new OrderDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const orderDetail = await orderDetailRepository.getOrderDetail(id);
       if (!orderDetail) {
@@ -46,9 +50,12 @@ export default class OrderDetailController {
     const prisma = request.server.prisma;
     const { orderId } = request.params;
     const orderDetailRepository = new OrderDetailRepository(prisma);
+
+    validateUUID(orderId, reply);
+
     try {
       const orderDetails = await orderDetailRepository.getDetailFromOrder(orderId);
-      if (!orderDetails) {
+      if (!orderDetails.length) {
         reply.status(404).send({ clientMessage: "OrderDetail not found" });
         return;
       }
@@ -85,6 +92,9 @@ export default class OrderDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderDetailRepository = new OrderDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const orderDetail = await orderDetailRepository.getOrderDetail(id);
       if (!orderDetail) {
@@ -108,6 +118,9 @@ export default class OrderDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const orderDetailRepository = new OrderDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const orderDetail = await orderDetailRepository.getOrderDetail(id);
       if (!orderDetail) {

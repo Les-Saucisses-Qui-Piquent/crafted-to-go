@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { BeerColorInsert, BeerColorUpdate } from "../interfaces/IBeerColor";
 import BeerColorRepository from "../repository/beer-color.repository";
+import { validateUUID } from "../../utils";
 
 export default class BeerColorController {
   static async getBeerColors(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class BeerColorController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerColorRepository = new BeerColorRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerColor = await beerColorRepository.getBeerColor(id);
       if (!beerColor) {
@@ -63,6 +67,9 @@ export default class BeerColorController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerColorRepository = new BeerColorRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerColor = await beerColorRepository.getBeerColor(id);
       if (!beerColor) {
@@ -86,6 +93,9 @@ export default class BeerColorController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerColorRepository = new BeerColorRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerColor = await beerColorRepository.getBeerColor(id);
       if (!beerColor) {

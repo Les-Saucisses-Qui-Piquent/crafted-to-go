@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { UserInsert, UserUpdate } from "../interfaces/IUser";
 import UserRepository from "../repository/user.repository";
+import { validateUUID } from "../../utils";
 
 export default class UserController {
   static async getUsers(request: FastifyRequest, reply: FastifyReply) {
@@ -21,6 +22,9 @@ export default class UserController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userRepository = new UserRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const user = await userRepository.getUser(id);
       if (!user) {
@@ -57,6 +61,9 @@ export default class UserController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userRepository = new UserRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const user = await userRepository.getUser(id);
       if (!user) {
@@ -80,6 +87,9 @@ export default class UserController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const userRepository = new UserRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const user = await userRepository.getUser(id);
       if (!user) {

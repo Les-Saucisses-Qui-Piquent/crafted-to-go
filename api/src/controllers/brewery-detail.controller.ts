@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { BreweryDetailInsert, BreweryDetailUpdate } from "../interfaces/IBreweryDetail";
 import BreweryDetailRepository from "../repository/brewery-detail.repository";
+import { validateUUID } from "../../utils";
 
 export default class BreweryDetailController {
   static async getBreweryDetails(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class BreweryDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
       if (!breweryDetail) {
@@ -63,6 +67,9 @@ export default class BreweryDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
       if (!breweryDetail) {
@@ -89,6 +96,9 @@ export default class BreweryDetailController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
       if (!breweryDetail) {

@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { BeerStyleInsert, BeerStyleUpdate } from "../interfaces/IBeerStyle";
 import BeerStyleRepository from "../repository/beer-style.repository";
+import { validateUUID } from "../../utils";
 
 export default class BeerStyleController {
   static async getBeerStyles(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class BeerStyleController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerStyleRepository = new BeerStyleRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerStyle = await beerStyleRepository.getBeerStyle(id);
       if (!beerStyle) {
@@ -63,6 +67,9 @@ export default class BeerStyleController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerStyleRepository = new BeerStyleRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerStyle = await beerStyleRepository.getBeerStyle(id);
       if (!beerStyle) {
@@ -86,6 +93,9 @@ export default class BeerStyleController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const beerStyleRepository = new BeerStyleRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const beerStyle = await beerStyleRepository.getBeerStyle(id);
       if (!beerStyle) {

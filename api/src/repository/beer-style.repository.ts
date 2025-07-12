@@ -1,6 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import { IBeerStyle, type BeerStyleInsert, type BeerStyleUpdate } from "../interfaces/IBeerStyle";
-import z from "zod";
 
 export default class BeerStyleRepository implements IBeerStyle {
   constructor(private prisma: PrismaClient) {}
@@ -10,10 +9,6 @@ export default class BeerStyleRepository implements IBeerStyle {
   };
 
   getBeerStyle = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_style.findUnique({ where: { id } });
   };
 
@@ -22,18 +17,10 @@ export default class BeerStyleRepository implements IBeerStyle {
   };
 
   updateBeerStyle = async (id: string, payload: BeerStyleUpdate) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_style.update({ where: { id }, data: payload });
   };
 
   deleteBeerStyle = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_style.delete({ where: { id } });
   };
 }
