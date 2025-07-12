@@ -9,6 +9,7 @@ describe("Brewery Controller", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+
   it("should retrieve all breweries", async () => {
     const testBreweries: brewery[] = [
       {
@@ -22,7 +23,6 @@ describe("Brewery Controller", () => {
         owner_id: "user-1",
       },
     ];
-
     mockedPrisma.brewery.findMany.mockResolvedValue(testBreweries);
 
     const request = mockRequest();
