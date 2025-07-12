@@ -1,6 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import { IAddress, type AddressInsert, type AddressUpdate } from "../interfaces/IAddress";
-import z from "zod";
 
 export default class AddressRepository implements IAddress {
   constructor(private prisma: PrismaClient) {}
@@ -10,10 +9,6 @@ export default class AddressRepository implements IAddress {
   };
 
   getAddress = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.address.findUnique({ where: { id } });
   };
 
@@ -22,18 +17,10 @@ export default class AddressRepository implements IAddress {
   };
 
   updateAddress = async (id: string, payload: AddressUpdate) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.address.update({ where: { id }, data: payload });
   };
 
   deleteAddress = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.address.delete({ where: { id } });
   };
 }

@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { AddressInsert, AddressUpdate } from "../interfaces/IAddress";
 import AddressRepository from "../repository/address.repository";
+import { validateUUID } from "../../utils";
 
 export default class AddressController {
   static async getAddresses(request: FastifyRequest, reply: FastifyReply) {
@@ -24,6 +25,9 @@ export default class AddressController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const addressRepository = new AddressRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const address = await addressRepository.getAddress(id);
       if (!address) {
@@ -63,6 +67,9 @@ export default class AddressController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const addressRepository = new AddressRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const address = await addressRepository.getAddress(id);
       if (!address) {
@@ -86,6 +93,9 @@ export default class AddressController {
     const prisma = request.server.prisma;
     const { id } = request.params;
     const addressRepository = new AddressRepository(prisma);
+
+    validateUUID(id, reply);
+
     try {
       const address = await addressRepository.getAddress(id);
       if (!address) {
