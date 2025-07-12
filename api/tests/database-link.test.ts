@@ -1,7 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import prisma from "../libs/__mocks__/prisma";
-
-vi.mock("../libs/prisma");
 
 describe("Integration tests", () => {
   it("should retrieve default test data", async () => {

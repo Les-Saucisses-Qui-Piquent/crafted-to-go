@@ -1,9 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type FavoriteBreweryInsert = Prisma.favorite_breweryCreateInput;
-type FavoriteBreweryUpdate = Prisma.favorite_breweryUpdateInput;
+import type { FavoriteBreweryInsert, FavoriteBreweryUpdate } from "../interfaces/IFavoriteBrewery";
+import FavoriteBreweryRepository from "../repository/favorite-brewery.repository";
 
 export default class FavoriteBreweryController {
   static async getFavoriteBreweries(
@@ -12,26 +9,17 @@ export default class FavoriteBreweryController {
   ) {
     const prisma = request.server.prisma;
     const { userId } = request.params;
+    const favoriteBreweryRepository = new FavoriteBreweryRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(userId);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-
-      const favoriteBreweries = await prisma.favorite_brewery.findMany({
-        where: { user_id: userId },
-      });
-
+      const favoriteBreweries = await favoriteBreweryRepository.getFavoriteBreweries(userId);
       if (!favoriteBreweries) {
-        reply.status(404).send({ message: "FavoriteBrewery not found" });
+        reply.status(404).send({ clientMessage: "FavoriteBrewery not found" });
         return;
       }
-
       reply.send(favoriteBreweries);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -42,14 +30,13 @@ export default class FavoriteBreweryController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const favoriteBreweryRepository = new FavoriteBreweryRepository(prisma);
     try {
-      const favoriteBrewery = await prisma.favorite_brewery.create({
-        data: request.body,
-      });
+      const favoriteBrewery = await favoriteBreweryRepository.createFavoriteBrewery(request.body);
       reply.send(favoriteBrewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -61,24 +48,16 @@ export default class FavoriteBreweryController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const favoriteBreweryRepository = new FavoriteBreweryRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      const favoriteBrewery = await prisma.favorite_brewery.update({
-        where: { id },
-        data: request.body,
-      });
-      if (!favoriteBrewery) {
-        reply.status(404).send({ message: "FavoriteBrewery not found" });
-        return;
-      }
+      const favoriteBrewery = await favoriteBreweryRepository.updateFavoriteBrewery(
+        id,
+        request.body,
+      );
       reply.send(favoriteBrewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -90,17 +69,13 @@ export default class FavoriteBreweryController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const favoriteBreweryRepository = new FavoriteBreweryRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      await prisma.favorite_brewery.delete({ where: { id } });
-      reply.send({ message: "FavoriteBrewery deleted" });
+      const deletedFavoriteBrewery = await favoriteBreweryRepository.deleteFavoriteBrewery(id);
+      reply.send(deletedFavoriteBrewery);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

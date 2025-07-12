@@ -1,19 +1,17 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type UserInsert = Prisma.userCreateInput;
-type UserUpdate = Prisma.userUpdateInput;
+import type { UserInsert, UserUpdate } from "../interfaces/IUser";
+import UserRepository from "../repository/user.repository";
 
 export default class UserController {
   static async getUsers(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const userRepository = new UserRepository(prisma);
     try {
-      const users = await prisma.user.findMany();
+      const users = await userRepository.getUsers();
       reply.send(users);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -22,23 +20,17 @@ export default class UserController {
   static async getUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const userRepository = new UserRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-
-      const user = await prisma.user.findUnique({ where: { id } });
+      const user = await userRepository.getUser(id);
       if (!user) {
-        reply.status(404).send({ message: "User not found" });
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
-
       reply.send(user);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -46,12 +38,13 @@ export default class UserController {
 
   static async createUser(request: FastifyRequest<{ Body: UserInsert }>, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const userRepository = new UserRepository(prisma);
     try {
-      const user = await prisma.user.create({ data: request.body });
+      const user = await userRepository.createUser(request.body);
       reply.send(user);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -63,25 +56,18 @@ export default class UserController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const userRepository = new UserRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-
-      const user = await prisma.user.update({
-        where: { id },
-        data: request.body,
-      });
+      const user = await userRepository.getUser(id);
       if (!user) {
-        reply.status(404).send({ message: "User not found" });
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
-      reply.send(user);
+      const userUpdated = await userRepository.updateUser(id, request.body);
+      reply.send(userUpdated);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -93,18 +79,18 @@ export default class UserController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const userRepository = new UserRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(404).send({ message: "User not found" });
+      const user = await userRepository.getUser(id);
+      if (!user) {
+        reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
-
-      await prisma.user.delete({ where: { id } });
-      reply.send({ message: "User deleted" });
+      const deletedUser = await userRepository.deleteUser(id);
+      reply.send(deletedUser);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

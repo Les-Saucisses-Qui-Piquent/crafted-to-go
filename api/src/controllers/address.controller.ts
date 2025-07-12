@@ -1,19 +1,17 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type AddressInsert = Prisma.addressCreateInput;
-type AddressUpdate = Prisma.addressUpdateInput;
+import type { AddressInsert, AddressUpdate } from "../interfaces/IAddress";
+import AddressRepository from "../repository/address.repository";
 
 export default class AddressController {
   static async getAddresses(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const addressRepository = new AddressRepository(prisma);
     try {
-      const addresses = await prisma.address.findMany();
+      const addresses = await addressRepository.getAddresses();
       reply.send(addresses);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -25,24 +23,17 @@ export default class AddressController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const addressRepository = new AddressRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-      }
-      const address = await prisma.address.findUnique({
-        where: { id: id },
-      });
+      const address = await addressRepository.getAddress(id);
       if (!address) {
-        console.warn({ id }, "Address not found");
-        reply.status(404).send({ message: "Address not found" });
+        reply.status(404).send({ clientMessage: "Address not found" });
         return;
       }
       reply.send(address);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -53,13 +44,13 @@ export default class AddressController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const addressRepository = new AddressRepository(prisma);
     try {
-      const input = request.body;
-      const address = await prisma.address.create({ data: input });
+      const address = await addressRepository.createAddress(request.body);
       reply.send(address);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -71,25 +62,18 @@ export default class AddressController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
-    const data = request.body;
+    const addressRepository = new AddressRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-      }
-      const address = await prisma.address.update({
-        where: { id: id },
-        data: data,
-      });
+      const address = await addressRepository.getAddress(id);
       if (!address) {
-        reply.status(404).send({ message: "Address not found" });
+        reply.status(404).send({ clientMessage: "Address not found" });
         return;
       }
-      reply.send(address);
+      const addressUpdated = await addressRepository.updateAddress(id, request.body);
+      reply.send(addressUpdated);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -101,20 +85,18 @@ export default class AddressController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const addressRepository = new AddressRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+      const address = await addressRepository.getAddress(id);
+      if (!address) {
+        reply.status(404).send({ clientMessage: "Address not found" });
+        return;
       }
-      await prisma.address.delete({
-        where: { id: id },
-      });
-      console.warn({ id }, "Deleted address");
-      reply.send({ message: "Address deleted" });
+      const deletedAddress = await addressRepository.deleteAddress(id);
+      reply.send(deletedAddress);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }

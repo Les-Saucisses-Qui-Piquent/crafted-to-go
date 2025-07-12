@@ -1,19 +1,17 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { Prisma } from "@prisma/client";
-import { z } from "zod";
-
-type BeerStyleInsert = Prisma.beer_styleCreateInput;
-type BeerStyleUpdate = Prisma.beer_styleUpdateInput;
+import type { BeerStyleInsert, BeerStyleUpdate } from "../interfaces/IBeerStyle";
+import BeerStyleRepository from "../repository/beer-style.repository";
 
 export default class BeerStyleController {
   static async getBeerStyles(request: FastifyRequest, reply: FastifyReply) {
     const prisma = request.server.prisma;
+    const beerStyleRepository = new BeerStyleRepository(prisma);
     try {
-      const beerStyles = await prisma.beer_style.findMany();
+      const beerStyles = await beerStyleRepository.getBeerStyles();
       reply.send(beerStyles);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -25,21 +23,17 @@ export default class BeerStyleController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerStyleRepository = new BeerStyleRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      const beerStyle = await prisma.beer_style.findUnique({ where: { id } });
+      const beerStyle = await beerStyleRepository.getBeerStyle(id);
       if (!beerStyle) {
-        reply.status(404).send({ message: "BeerStyle not found" });
+        reply.status(404).send({ clientMessage: "BeerStyle not found" });
         return;
       }
       reply.send(beerStyle);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -50,14 +44,13 @@ export default class BeerStyleController {
     reply: FastifyReply,
   ) {
     const prisma = request.server.prisma;
+    const beerStyleRepository = new BeerStyleRepository(prisma);
     try {
-      const beerStyle = await prisma.beer_style.create({
-        data: request.body,
-      });
+      const beerStyle = await beerStyleRepository.createBeerStyle(request.body);
       reply.send(beerStyle);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error" });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error" });
     } finally {
       await prisma.$disconnect();
     }
@@ -69,24 +62,18 @@ export default class BeerStyleController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerStyleRepository = new BeerStyleRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
-        return;
-      }
-      const beerStyle = await prisma.beer_style.update({
-        where: { id },
-        data: request.body,
-      });
+      const beerStyle = await beerStyleRepository.getBeerStyle(id);
       if (!beerStyle) {
-        reply.status(404).send({ message: "BeerStyle not found" });
+        reply.status(404).send({ clientMessage: "BeerStyle not found" });
         return;
       }
-      reply.send(beerStyle);
+      const beerStyleUpdated = await beerStyleRepository.updateBeerStyle(id, request.body);
+      reply.send(beerStyleUpdated);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
@@ -98,17 +85,18 @@ export default class BeerStyleController {
   ) {
     const prisma = request.server.prisma;
     const { id } = request.params;
+    const beerStyleRepository = new BeerStyleRepository(prisma);
     try {
-      const { success } = z.string().uuid().safeParse(id);
-      if (!success) {
-        reply.status(400).send({ message: "Invalid uuid" });
+      const beerStyle = await beerStyleRepository.getBeerStyle(id);
+      if (!beerStyle) {
+        reply.status(404).send({ clientMessage: "BeerStyle not found" });
         return;
       }
-      await prisma.beer_style.delete({ where: { id } });
-      reply.send({ message: "BeerStyle deleted" });
+      const deletedBeerStyle = await beerStyleRepository.deleteBeerStyle(id);
+      reply.send(deletedBeerStyle);
     } catch (error) {
-      console.error(error);
-      reply.status(500).send({ message: "Server Error", error });
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
     } finally {
       await prisma.$disconnect();
     }
