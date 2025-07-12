@@ -1,6 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
 import { IBeerColor, type BeerColorInsert, type BeerColorUpdate } from "../interfaces/IBeerColor";
-import z from "zod";
 
 export default class BeerColorRepository implements IBeerColor {
   constructor(private prisma: PrismaClient) {}
@@ -10,10 +9,6 @@ export default class BeerColorRepository implements IBeerColor {
   };
 
   getBeerColor = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_color.findUnique({ where: { id } });
   };
 
@@ -22,18 +17,10 @@ export default class BeerColorRepository implements IBeerColor {
   };
 
   updateBeerColor = async (id: string, payload: BeerColorUpdate) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_color.update({ where: { id }, data: payload });
   };
 
   deleteBeerColor = async (id: string) => {
-    const { success, error } = z.string().uuid().safeParse(id);
-    if (!success) {
-      throw new Error(error.message);
-    }
     return await this.prisma.beer_color.delete({ where: { id } });
   };
 }
