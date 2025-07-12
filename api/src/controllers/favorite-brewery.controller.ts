@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import type { FavoriteBreweryInsert, FavoriteBreweryUpdate } from "../interfaces/IFavoriteBrewery";
 import FavoriteBreweryRepository from "../repository/favorite-brewery.repository";
+import { validateUUID } from "../../utils";
 
 export default class FavoriteBreweryController {
   static async getFavoriteBreweries(
@@ -10,9 +11,12 @@ export default class FavoriteBreweryController {
     const prisma = request.server.prisma;
     const { userId } = request.params;
     const favoriteBreweryRepository = new FavoriteBreweryRepository(prisma);
+
+    validateUUID(userId, reply);
+
     try {
       const favoriteBreweries = await favoriteBreweryRepository.getFavoriteBreweries(userId);
-      if (!favoriteBreweries) {
+      if (!favoriteBreweries.length) {
         reply.status(404).send({ clientMessage: "FavoriteBrewery not found" });
         return;
       }
