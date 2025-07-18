@@ -6,19 +6,19 @@ interface CommandCardProps {
   title?: string;
   number?: number;
   total?: string;
-  imgPath?: string;
+  image?: string;
 }
 
-export default function CommandCard({ title, number, total, imgPath }: CommandCardProps) {
+export default function CommandCard({ title, number, total, image }: CommandCardProps) {
   return (
     <View style={styles.commandCardContainer}>
       <Text style={styles.title}>{title ?? ""}</Text>
       <Text style={styles._title}>{number ?? ""}</Text>
       <Text style={styles.__title}>Total</Text>
-      {imgPath ? (
+      {image ? (
         <Image
           style={styles.image}
-          source={{ uri: imgPath }}
+          source={{ uri: image }}
           accessibilityLabel={title ? `${title} image` : "Command image"}
         />
       ) : null}

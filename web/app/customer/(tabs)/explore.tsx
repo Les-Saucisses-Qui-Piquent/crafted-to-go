@@ -9,7 +9,7 @@ const isTabletDevice = () => width >= 600;
 // Interface pour une bière
 interface Beer {
   id: number | string;
-  imgPath: string;
+  image: string;
   name: string;
   description: string;
   style: string;
@@ -68,7 +68,7 @@ export default function Explore({
           {filteredBeers.map((beer) => (
             <View key={beer.id} style={styles.beerCardContainer}>
               <BeerCardLarge
-                imgPath={beer.imgPath}
+                image={beer.image}
                 name={beer.name}
                 description={beer.description}
                 style={beer.style}

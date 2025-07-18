@@ -11,7 +11,7 @@ interface BeerCarousselProps {
     price: string;
     stock: number;
     description: string;
-    imgPath: string;
+    image: string;
   }[];
 }
 
@@ -43,7 +43,7 @@ export default function BeerCaroussel({ beers }: BeerCarousselProps) {
                 price={beer.price}
                 stock={beer.stock}
                 description={beer.description}
-                imgPath={beer.imgPath}
+                image={beer.image}
               />
             )}
           </View>

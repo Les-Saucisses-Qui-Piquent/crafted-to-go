@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from "react-nati
 import BreweryCardSmall from "../brewery/BreweryCardSmall";
 
 interface BreweryCarousselProps {
-  breweries: { imgPath: string; title: string }[];
+  breweries: { image: string; title: string }[];
 }
 
 const BreweryCaroussel: React.FC<BreweryCarousselProps> = ({ breweries }) => {
@@ -26,7 +26,7 @@ const BreweryCaroussel: React.FC<BreweryCarousselProps> = ({ breweries }) => {
         {breweries.map((brewery, index) => (
           <View key={index} style={styles.cardContainer}>
             {index === currentIndex && (
-              <BreweryCardSmall imgPath={brewery.imgPath} title={brewery.title} />
+              <BreweryCardSmall image={brewery.image} title={brewery.title} />
             )}
           </View>
         ))}

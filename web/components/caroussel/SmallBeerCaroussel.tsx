@@ -5,7 +5,7 @@ import BeerCardSmall from "../beerCard/BeerCardSmall";
 interface SmallBeerCarousselProps {
   beers: {
     title: string;
-    imgPath: string;
+    image: string;
     style?: string;
     abv?: string;
     price?: string;
@@ -21,7 +21,7 @@ const SmallBeerCaroussel: React.FC<SmallBeerCarousselProps> = ({ beers }) => {
           <BeerCardSmall
             key={index}
             title={beer.title}
-            imgPath={beer.imgPath}
+            image={beer.image}
             style={beer.style}
             abv={beer.abv}
             price={beer.price}

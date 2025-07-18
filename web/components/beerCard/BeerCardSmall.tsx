@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 
 interface BeerCardSmallProps {
   title?: string;
-  imgPath?: string;
+  image?: string;
   style?: string;
   abv?: string;
   price?: string;
@@ -13,7 +13,7 @@ interface BeerCardSmallProps {
 
 export default function BeerCardSmall({
   title,
-  imgPath,
+  image,
   style,
   price,
   stock,
@@ -21,7 +21,7 @@ export default function BeerCardSmall({
 }: BeerCardSmallProps) {
   return (
     <View style={styles.beerCardSmallContainer}>
-      <Image style={styles.image} source={imgPath} />
+      <Image style={styles.image} source={image} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.style}>{style}</Text>
       <Text style={styles.enstock}>{`En stock : \n`}</Text>

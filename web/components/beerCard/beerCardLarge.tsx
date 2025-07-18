@@ -7,7 +7,7 @@ const isTabletDevice = () => {
 };
 
 interface BeerCardLargeProps {
-  imgPath: string;
+  image: string;
   name?: string;
   description?: string;
   style?: string;
@@ -19,7 +19,7 @@ interface BeerCardLargeProps {
 }
 
 export default function BeerCardLarge({
-  imgPath,
+  image,
   name,
   description,
   style: beerStyle,
@@ -33,7 +33,7 @@ export default function BeerCardLarge({
 
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={{ uri: imgPath }} />
+      <Image style={styles.image} source={{ uri: image }} />
       <Text style={styles.title}>{name}</Text>
       <Text style={styles.description}>{description}</Text>
       <View

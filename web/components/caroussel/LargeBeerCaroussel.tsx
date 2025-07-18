@@ -37,7 +37,7 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
       >
         {beers.map((beer, index) => (
           <View key={index} style={styles.cardContainer}>
-            <BeerCardLarge {...beer} imgPath={beer.imgPath ?? ""} />
+            <BeerCardLarge {...beer} image={beer.image ?? ""} />
           </View>
         ))}
       </ScrollView>
