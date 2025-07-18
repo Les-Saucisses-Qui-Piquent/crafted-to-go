@@ -19,7 +19,7 @@ export default function MainButton({
   else if (isSecondary) backgroundColor = "#FDFFD0";
 
   // Determine text color
-  let textColor = isBlack ? "#FFF" : "#000";
+  const textColor = isBlack ? "#FFF" : "#000";
 
   return (
     <TouchableOpacity style={styles.mainButtonContainer} onPress={onPress}>
