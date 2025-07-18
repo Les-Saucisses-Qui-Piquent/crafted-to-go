@@ -29,7 +29,7 @@ interface ExploreScreenProps {
 }
 
 export default function Explore({
-  beers,
+  beers = [],
   filterCategories = ["Toutes"],
   title = "Explorer",
   subtitle = "Découvrez notre sélection de bières artisanales",
