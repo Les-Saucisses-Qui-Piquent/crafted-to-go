@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { NotificationProvider } from "@/contexts/NotificationContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { OrderProvider } from "@/contexts/OrderContext";
 import { Stack } from "expo-router";

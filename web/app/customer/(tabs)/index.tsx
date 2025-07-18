@@ -16,15 +16,12 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Appel API pour les bières
         const beersRes = await apiClient("/beers", { method: "GET" });
         const beersData = await beersRes.json();
 
-        // Appel API pour les brasseries
         const breweriesRes = await apiClient("/breweries", { method: "GET" });
         const breweriesData = await breweriesRes.json();
 
-        // Adapter les données pour les carrousels si besoin
         setBeers(beersData);
         setBreweries(breweriesData);
       } catch (error) {
