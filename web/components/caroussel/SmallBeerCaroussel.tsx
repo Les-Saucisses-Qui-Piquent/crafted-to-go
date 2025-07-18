@@ -1,11 +1,11 @@
 import React from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import BeerCardSmall from "../beerCard/BeerCardSmall";
 
 interface SmallBeerCarousselProps {
   beers: {
     title: string;
-    imgPath: string;
+    image: string;
     style?: string;
     abv?: string;
     price?: string;
@@ -18,15 +18,17 @@ const SmallBeerCaroussel: React.FC<SmallBeerCarousselProps> = ({ beers }) => {
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {beers.map((beer, index) => (
-          <BeerCardSmall
-            key={index}
-            title={beer.title}
-            imgPath={beer.imgPath}
-            style={beer.style}
-            abv={beer.abv}
-            price={beer.price}
-            stock={beer.stock}
-          />
+          <TouchableOpacity>
+            <BeerCardSmall
+              key={index}
+              title={beer.title}
+              image={beer.image}
+              style={beer.style}
+              abv={beer.abv}
+              price={beer.price}
+              stock={beer.stock}
+            />
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>

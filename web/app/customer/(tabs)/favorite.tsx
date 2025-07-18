@@ -67,7 +67,7 @@ const Favorites: React.FC = () => {
             <BeerCardSmall
               key={fav.id || idx}
               title={fav.title}
-              imgPath={fav.imgPath || ""}
+              image={fav.image || ""}
               style={fav.style || ""}
               abv={fav.abv?.toString() || ""}
               price={fav.price?.toString() + "€" || ""}
@@ -86,7 +86,7 @@ const Favorites: React.FC = () => {
             <BreweryCardSmall
               key={fav.brewery.id || idx}
               title={fav.brewery.name}
-              imgPath={fav.brewery.logo || fav.brewery.image || ""}
+              image={fav.brewery.logo || fav.brewery.image || ""}
             />
           ) : null,
         )

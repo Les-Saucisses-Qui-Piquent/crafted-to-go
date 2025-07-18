@@ -11,7 +11,7 @@ interface BeerCarousselProps {
     price: string;
     stock: number;
     description: string;
-    imgPath: string;
+    image: string;
   }[];
 }
 
@@ -33,7 +33,7 @@ export default function BeerCaroussel({ beers }: BeerCarousselProps) {
       </TouchableOpacity>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {beers.map((beer, index) => (
-          <View key={index} style={styles.cardContainer}>
+          <TouchableOpacity key={index} style={styles.cardContainer}>
             {index === currentIndex && (
               <BeerCard
                 title={beer.title}
@@ -43,10 +43,10 @@ export default function BeerCaroussel({ beers }: BeerCarousselProps) {
                 price={beer.price}
                 stock={beer.stock}
                 description={beer.description}
-                imgPath={beer.imgPath}
+                image={beer.image}
               />
             )}
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
       <TouchableOpacity onPress={handleNext} style={styles.button}>

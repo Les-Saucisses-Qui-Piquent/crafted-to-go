@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Dimensions, Button } from "react-native";
+import { View, ScrollView, StyleSheet, Dimensions, Button, TouchableOpacity } from "react-native";
 import BeerCardLarge from "../beerCard/beerCardLarge";
 import { BeerCardProps } from "../beerCard/BeerCard";
 
@@ -36,9 +36,9 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
         }}
       >
         {beers.map((beer, index) => (
-          <View key={index} style={styles.cardContainer}>
-            <BeerCardLarge {...beer} imgPath={beer.imgPath ?? ""} />
-          </View>
+          <TouchableOpacity key={index} style={styles.cardContainer}>
+            <BeerCardLarge {...beer} image={beer.image ?? ""} />
+          </TouchableOpacity>
         ))}
       </ScrollView>
       <View style={styles.navigation}>

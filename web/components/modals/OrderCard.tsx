@@ -9,7 +9,7 @@ interface OrderItem {
   title: string;
   number: number;
   total: string;
-  imgPath?: string;
+  image?: string;
 }
 
 interface OrderCardProps {
@@ -63,12 +63,7 @@ function OrderCard({
   const variantStyle = VARIANT_STYLES[variant];
 
   const renderOrderItem: ListRenderItem<OrderItem> = ({ item }) => (
-    <CommandCard
-      title={item.title}
-      number={item.number}
-      total={item.total}
-      imgPath={item.imgPath}
-    />
+    <CommandCard title={item.title} number={item.number} total={item.total} image={item.image} />
   );
 
   return (

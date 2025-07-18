@@ -3,14 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 interface BreweryCardSmallProps {
-  imgPath?: string;
+  image?: string;
   title?: string;
 }
 
-export default function BreweryCardSmall({ imgPath, title }: BreweryCardSmallProps) {
+export default function BreweryCardSmall({ image, title }: BreweryCardSmallProps) {
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={imgPath} />
+      <Image style={styles.image} source={image} />
       <Text style={styles.breweryName}>{title}</Text>
     </View>
   );

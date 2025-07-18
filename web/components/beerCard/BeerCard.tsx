@@ -11,7 +11,7 @@ export interface BeerCardProps {
   abv?: string;
   price?: string;
   stock?: number;
-  imgPath?: string;
+  image?: string;
   description?: string;
 }
 
@@ -23,7 +23,7 @@ export default function BeerCard({
   price,
   stock,
   description,
-  imgPath,
+  image,
 }: BeerCardProps) {
   return (
     <View style={styles.container}>
@@ -49,7 +49,7 @@ export default function BeerCard({
       <Text style={styles.description}>{description}</Text>
 
       {/* Decorative Icon/Image */}
-      <Image style={styles.pointsIcon} source={imgPath} />
+      <Image style={styles.pointsIcon} source={image} />
 
       {/* Stock Number */}
       <Text style={styles.stockNumber}>{stock}</Text>
