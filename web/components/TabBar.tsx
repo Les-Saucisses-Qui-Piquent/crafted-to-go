@@ -17,10 +17,12 @@ interface TabItem {
 
 // Define tab configurations
 const clientTabs: TabItem[] = [
-  { name: "home", label: "Accueil", iconName: "home" },
-  { name: "profile", label: "Profil", iconName: "person" },
+  { name: "index", label: "Accueil", iconName: "home" },
+  { name: "explore", label: "Explorer", iconName: "grid" },
+  { name: "favorite", label: "Favoris", iconName: "heart" },
+  { name: "basket", label: "Panier", iconName: "cart" },
   { name: "orders", label: "Commandes", iconName: "receipt" },
-  { name: "catalog", label: "Catalogue", iconName: "grid" },
+  { name: "profile", label: "Profil", iconName: "person" },
 ];
 
 const nonClientTabs: TabItem[] = [
