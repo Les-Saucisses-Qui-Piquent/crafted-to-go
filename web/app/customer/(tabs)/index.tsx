@@ -34,6 +34,7 @@ export default function HomePage() {
           return {
             id: brewery.id,
             title: brewery.name,
+            address: brewery.address, // Conserver l'adresse de la brasserie
             image: details?.image || null,
             logo: details?.logo || null,
             description: details?.description || "",

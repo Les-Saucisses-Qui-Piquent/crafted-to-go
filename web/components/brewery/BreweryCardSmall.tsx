@@ -15,6 +15,13 @@ export interface BreweryProps {
   opening_hours: any; // jsonb
   social_links: string[] | null;
   title: string;
+  address?: {
+    line_1?: string;
+    line_2?: string;
+    city?: string;
+    postal_code?: string;
+    country?: string;
+  };
 }
 
 export default function BreweryCardSmall(brewery: BreweryProps) {
@@ -22,6 +29,11 @@ export default function BreweryCardSmall(brewery: BreweryProps) {
     <View style={styles.container}>
       <Image style={styles.image} source={brewery.image} />
       <Text style={styles.breweryName}>{brewery.title}</Text>
+      {brewery.address && brewery.address.city && (
+        <Text style={styles.address}>
+          {brewery.address.city}
+        </Text>
+      )}
     </View>
   );
 }
@@ -30,7 +42,7 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     flexShrink: 0,
-    height: 200,
+    height: 210,
     width: 250,
     backgroundColor: "#fff",
     overflow: "hidden",
@@ -47,7 +59,6 @@ const styles = StyleSheet.create({
   },
   breweryName: {
     marginTop: 10,
-    marginBottom: 10,
     color: "#000",
     fontFamily: "HankenGrotesk",
     textTransform: "capitalize",
@@ -56,5 +67,15 @@ const styles = StyleSheet.create({
     textAlign: "left",
     width: "100%",
     //paddingHorizontal: 8,
+  },
+  address: {
+    color: "#666",
+    fontFamily: "HankenGrotesk",
+    fontSize: 12,
+    fontWeight: "300",
+    textAlign: "left",
+    width: "100%",
+    textTransform: "uppercase",
+    marginBottom: 10,
   },
 });
