@@ -37,15 +37,35 @@ export default function BreweryDetails() {
     );
   }
 
-  // Fonction simple pour afficher les horaires sous forme texte
-  const renderHours = (hoursObj?: Record<string, string>) => {
+  const renderHours = (
+    hoursObj?: Record<string, string | { isOpen: boolean; openTime: string; closeTime: string }>,
+  ) => {
     if (!hoursObj) return null;
-    return Object.entries(hoursObj).map(([day, hours]) => (
-      <Text key={day} style={styles.text}>
-        {day}: {hours}
-      </Text>
-    ));
+
+    return Object.entries(hoursObj).map(([day, hours]) => {
+      if (typeof hours === "string") {
+        return (
+          <Text key={day} style={styles.text}>
+            {capitalize(day)} : {hours}
+          </Text>
+        );
+      }
+
+      if (typeof hours === "object" && hours !== null) {
+        const { isOpen, openTime, closeTime } = hours;
+        return (
+          <Text key={day} style={styles.text}>
+            {capitalize(day)} : {isOpen ? `${openTime} - ${closeTime}` : "Fermé"}
+          </Text>
+        );
+      }
+
+      return null;
+    });
   };
+
+  // Fonction utilitaire pour mettre la première lettre en majuscule (pour affichage FR)
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   // Affichage des liens sociaux
   const renderSocialLinks = () => {
