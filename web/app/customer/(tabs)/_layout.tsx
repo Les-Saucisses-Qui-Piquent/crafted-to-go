@@ -39,18 +39,21 @@ export default function CustomerTabsLayout() {
           name="favorite"
           options={{
             title: "Favorites",
+            headerShown: false,
           }}
         />
         <Tabs.Screen
           name="basket"
           options={{
             title: "Basket",
+            headerShown: false,
           }}
         />
         <Tabs.Screen
           name="orders"
           options={{
             title: "Orders",
+            headerShown: false,
           }}
         />
         <Tabs.Screen
@@ -61,11 +64,12 @@ export default function CustomerTabsLayout() {
         />
         {/* Hidden screens */}
         <Tabs.Screen
-          name="order-details"
+          name="orderDetails"
           options={{
             href: null,
           }}
         />
+
         <Tabs.Screen
           name="payment"
           options={{

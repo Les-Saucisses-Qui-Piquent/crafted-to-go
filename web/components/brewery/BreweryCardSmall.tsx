@@ -2,16 +2,26 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
-interface BreweryCardSmallProps {
-  image?: string;
-  title?: string;
+export interface BreweryProps {
+  id: string;
+  brewery_id: string;
+  has_taproom: boolean;
+  image: string | null;
+  logo: string | null;
+  description: string;
+  phone_number: string;
+  email: string;
+  taproom_hours: any; // jsonb
+  opening_hours: any; // jsonb
+  social_links: string[] | null;
+  title: string;
 }
 
-export default function BreweryCardSmall({ image, title }: BreweryCardSmallProps) {
+export default function BreweryCardSmall(brewery: BreweryProps) {
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={image} />
-      <Text style={styles.breweryName}>{title}</Text>
+      <Image style={styles.image} source={brewery.image} />
+      <Text style={styles.breweryName}>{brewery.title}</Text>
     </View>
   );
 }

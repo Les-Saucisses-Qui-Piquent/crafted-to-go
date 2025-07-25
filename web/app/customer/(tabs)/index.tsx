@@ -22,8 +22,27 @@ export default function HomePage() {
         const breweriesRes = await apiClient("/breweries", { method: "GET" });
         const breweriesData = await breweriesRes.json();
 
+        const breweryDetailsRes = await apiClient("/brewery_details", { method: "GET" });
+        const breweryDetailsData = await breweryDetailsRes.json();
+
+        // Fusionne les données brewery + brewery_details (par id commun)
+        const combinedBreweries = breweriesData.map((brewery: any) => {
+          const details = breweryDetailsData.find(
+            (detail: any) => detail.brewery_id === brewery.id,
+          );
+
+          return {
+            id: brewery.id,
+            title: brewery.name,
+            image: details?.image || null,
+            logo: details?.logo || null,
+            description: details?.description || "",
+            ...details,
+          };
+        });
+
         setBeers(beersData);
-        setBreweries(breweriesData);
+        setBreweries(combinedBreweries);
       } catch (error) {
         console.error("Erreur API :", error);
       } finally {

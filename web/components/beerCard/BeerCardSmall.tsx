@@ -1,36 +1,25 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import { BeerCardProps } from "./BeerCard";
 
 interface BeerCardSmallProps {
-  name?: string;
-  image?: string;
-  beer_style?: string;
-  abv_rate?: number;
-  price?: number;
-  quantity?: number;
+  beer: BeerCardProps;
 }
 
-export default function BeerCardSmall({
-  name,
-  image,
-  beer_style,
-  price,
-  quantity,
-  abv_rate,
-}: BeerCardSmallProps) {
+export default function BeerCardSmall({ beer }: BeerCardSmallProps) {
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={image} />
+      <Image style={styles.image} source={beer.image} />
       <View style={styles.infoContainer}>
-        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.name}>{beer.name}</Text>
         <View style={styles.bottomInfo}>
           <View style={styles.abvStyleRow}>
-            {beer_style && <Text style={styles.beerStyle}>{beer_style}</Text>}
-            <Text style={styles.abv}>{abv_rate}%</Text>
+            {beer.beer_style && <Text style={styles.beerStyle}>{beer_style}</Text>}
+            <Text style={styles.abv}>{beer.abv_rate}%</Text>
           </View>
-          <Text style={styles.stock}>En stock : {quantity}</Text>
-          <Text style={styles.price}>Prix : {price}€</Text>
+          <Text style={styles.stock}>En stock : {beer.quantity}</Text>
+          <Text style={styles.price}>Prix : {beer.price}€</Text>
         </View>
       </View>
     </View>

@@ -13,6 +13,7 @@ import {
 import { useCart } from "@/contexts/CartContext";
 import SelectInput from "@/components/form/SelectInput";
 import MainButton from "@/components/Buttons/MainButton";
+import { RelativePathString, useRouter } from "expo-router";
 
 // Types pour les données de brasserie
 interface BreweryHours {
@@ -67,6 +68,7 @@ const CheckoutConfirmationScreen = () => {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [brewery, setBrewery] = useState<Brewery | null>(null);
+  const router = useRouter();
 
   // Données d'exemple pour la brasserie (remplacez par votre API)
   const mockBrewery: Brewery = {
@@ -192,9 +194,11 @@ const CheckoutConfirmationScreen = () => {
         {
           text: "Confirmer",
           onPress: () => {
-            // Ici vous traiterez la commande
             console.log("Commande confirmée");
-            // Navigation vers l'écran de paiement ou confirmation finale
+
+            router.push({
+              pathname: "customer/payment/CheckoutConfirmation" as unknown as RelativePathString,
+            });
           },
         },
       ],

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, Dimensions, Button, TouchableOpacity } from "react-native";
 import BeerCardLarge from "../beerCard/beerCardLarge";
 import { BeerCardProps } from "../beerCard/BeerCard";
+import { RelativePathString, useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -11,6 +12,7 @@ interface LargeBeerCarousselProps {
 
 const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const router = useRouter();
 
   const handleNext = () => {
     if (currentIndex < beers.length - 1) {
@@ -22,6 +24,13 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
+  };
+
+  const onPress = (beer: BeerCardProps) => {
+    router.push({
+      pathname: "/BeerDetails/[id]" as RelativePathString,
+      params: { ...beer, id: beer.id },
+    });
   };
 
   return (
@@ -36,8 +45,12 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
         }}
       >
         {beers.map((beer, index) => (
-          <TouchableOpacity key={index} style={styles.cardContainer}>
-            <BeerCardLarge {...beer} image={beer.image ?? ""} />
+          <TouchableOpacity
+            key={beer.id}
+            style={styles.cardContainer}
+            onPress={() => onPress(beer)} // ✅ Ajout du clic
+          >
+            <BeerCardLarge beer={beer} />
           </TouchableOpacity>
         ))}
       </ScrollView>

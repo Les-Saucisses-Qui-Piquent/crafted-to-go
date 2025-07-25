@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
-import CommandCard from "../beerCard/CommandCard";
+import CommandCard from "../beerCard/OrderCard";
 
 type OrderCardVariant = "onProgress" | "urgent" | "readyToPick";
 
-interface OrderItem {
+export interface OrderItem {
   id: string;
   title: string;
   number: number;
@@ -12,7 +12,7 @@ interface OrderItem {
   image?: string;
 }
 
-interface OrderCardProps {
+export interface OrderCardProps {
   orderNumber: string;
   pickupDate: string;
   pickupTime: string;
@@ -24,11 +24,11 @@ interface OrderCardProps {
 }
 
 // Enhanced interface for order lists
-interface Order extends OrderCardProps {
+export interface Order extends OrderCardProps {
   id: string;
 }
 
-interface OrderListProps {
+export interface OrderListProps {
   orders: Order[];
   horizontal?: boolean;
   showsScrollIndicator?: boolean;

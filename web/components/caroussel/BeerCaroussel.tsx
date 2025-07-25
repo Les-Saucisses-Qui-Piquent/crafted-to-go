@@ -1,22 +1,15 @@
 import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from "react-native";
-import BeerCard from "../beerCard/BeerCard";
+import BeerCard, { BeerCardProps } from "../beerCard/BeerCard";
+import { RelativePathString, useRouter } from "expo-router";
 
 interface BeerCarousselProps {
-  beers: {
-    title: string;
-    style: string;
-    color: string;
-    abv: string;
-    price: string;
-    stock: number;
-    description: string;
-    image: string;
-  }[];
+  beers: BeerCardProps[];
 }
 
 export default function BeerCaroussel({ beers }: BeerCarousselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const router = useRouter();
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % beers.length);
@@ -26,6 +19,13 @@ export default function BeerCaroussel({ beers }: BeerCarousselProps) {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + beers.length) % beers.length);
   };
 
+  const onPress = (beer: BeerCardProps) => {
+    router.push({
+      pathname: "/BeerDetails/[id]" as RelativePathString,
+      params: { ...beer, id: beer.id },
+    });
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePrev} style={styles.button}>
@@ -33,19 +33,12 @@ export default function BeerCaroussel({ beers }: BeerCarousselProps) {
       </TouchableOpacity>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {beers.map((beer, index) => (
-          <TouchableOpacity key={index} style={styles.cardContainer}>
-            {index === currentIndex && (
-              <BeerCard
-                title={beer.title}
-                style={beer.style}
-                color={beer.color}
-                abv={beer.abv}
-                price={beer.price}
-                stock={beer.stock}
-                description={beer.description}
-                image={beer.image}
-              />
-            )}
+          <TouchableOpacity
+            key={beer.id}
+            onPress={() => onPress(beer)}
+            style={styles.cardContainer}
+          >
+            {index === currentIndex && <BeerCard {...beer} />}
           </TouchableOpacity>
         ))}
       </ScrollView>

@@ -1,41 +1,25 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Image } from "expo-image";
+import { BeerCardProps } from "./BeerCard";
 const isTabletDevice = () => {
   const { width } = Dimensions.get("window");
   return width >= 600;
 };
 
 interface BeerCardLargeProps {
-  image: string;
-  name?: string;
-  description?: string;
-  style?: string;
-  color?: string;
-  abv?: string;
-  price?: string;
-  stock?: string | number;
+  beer: BeerCardProps;
   isTablet?: boolean;
 }
 
-export default function BeerCardLarge({
-  image,
-  name,
-  description,
-  style: beerStyle,
-  color,
-  abv,
-  price,
-  stock,
-  isTablet = isTabletDevice(),
-}: BeerCardLargeProps) {
+export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: BeerCardLargeProps) {
   const styles = isTablet ? tabletStyles : mobileStyles;
 
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={{ uri: image }} />
-      <Text style={styles.title}>{name}</Text>
-      <Text style={styles.description}>{description}</Text>
+      <Image style={styles.image} source={{ uri: beer.image }} />
+      <Text style={styles.title}>{beer.title}</Text>
+      <Text style={styles.description}>{beer.description}</Text>
       <View
         style={{
           height: 1,
@@ -47,23 +31,23 @@ export default function BeerCardLarge({
       {/* Attributes */}
       <View style={styles.attributeBlock1}>
         <Text style={styles.attributeLabel}>Style</Text>
-        <Text style={styles.attributeValue}>{beerStyle}</Text>
+        <Text style={styles.attributeValue}>{beer.style}</Text>
       </View>
       <View style={styles.attributeBlock2}>
         <Text style={styles.attributeLabel}>Couleur</Text>
-        <Text style={styles.attributeValue}>{color}</Text>
+        <Text style={styles.attributeValue}>{beer.color}</Text>
       </View>
       <View style={styles.attributeBlock3}>
         <Text style={styles.attributeLabel}>Taux</Text>
-        <Text style={styles.attributeValue}>{abv}</Text>
+        <Text style={styles.attributeValue}>{beer.abv}</Text>
       </View>
       <View style={styles.attributeBlock4}>
         <Text style={styles.attributeLabel}>Prix</Text>
-        <Text style={styles.attributeValue}>{price}</Text>
+        <Text style={styles.attributeValue}>{beer.price}</Text>
       </View>
       <View style={styles.attributeBlock5}>
         <Text style={styles.attributeLabel}>Stock</Text>
-        <Text style={styles.attributeValue}>{stock}</Text>
+        <Text style={styles.attributeValue}>{beer.stock}</Text>
       </View>
     </View>
   );

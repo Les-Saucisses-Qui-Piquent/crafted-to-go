@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from "react-native";
-import BreweryCardSmall from "../brewery/BreweryCardSmall";
+import BreweryCardSmall, { BreweryProps } from "../brewery/BreweryCardSmall";
+import { RelativePathString, useRouter } from "expo-router";
 
 interface BreweryCarousselProps {
-  breweries: { image: string; title: string }[];
+  breweries: BreweryProps[];
 }
+const BreweryCaroussel = ({ breweries }: BreweryCarousselProps) => {
+  const router = useRouter();
 
-const BreweryCaroussel: React.FC<BreweryCarousselProps> = ({ breweries }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {
@@ -17,6 +19,16 @@ const BreweryCaroussel: React.FC<BreweryCarousselProps> = ({ breweries }) => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + breweries.length) % breweries.length);
   };
 
+  const handleNavigate = (brewery: BreweryProps) => {
+    router.push({
+      pathname: "/BreweryDetails/[id]" as RelativePathString,
+      params: {
+        id: brewery.id,
+        brewery: JSON.stringify(brewery),
+      },
+    });
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePrev} style={styles.button}>
@@ -24,10 +36,12 @@ const BreweryCaroussel: React.FC<BreweryCarousselProps> = ({ breweries }) => {
       </TouchableOpacity>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {breweries.map((brewery, index) => (
-          <TouchableOpacity key={index} style={styles.cardContainer}>
-            {index === currentIndex && (
-              <BreweryCardSmall image={brewery.image} title={brewery.title} />
-            )}
+          <TouchableOpacity
+            key={brewery.id}
+            style={styles.cardContainer}
+            onPress={() => handleNavigate(brewery)}
+          >
+            {index === currentIndex && <BreweryCardSmall {...brewery} />}
           </TouchableOpacity>
         ))}
       </ScrollView>
