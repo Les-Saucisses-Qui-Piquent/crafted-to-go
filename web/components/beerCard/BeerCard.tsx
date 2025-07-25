@@ -4,15 +4,17 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
 export interface BeerCardProps {
-  id?: string;
-  title?: string;
-  style?: string;
-  color?: string;
-  abv?: string;
-  price?: string;
-  stock?: number;
-  image?: string;
-  description?: string;
+  id: string;
+  title: string;
+  style: string;
+  color: string;
+  abv: string;
+  price: number;
+  stock: number;
+  image: string;
+  description: string;
+  breweryId: string;
+  breweryName: string;
 }
 
 export default function BeerCard({
