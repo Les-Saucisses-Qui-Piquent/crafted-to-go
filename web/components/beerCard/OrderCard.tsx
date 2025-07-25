@@ -2,14 +2,14 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
-interface CommandCardProps {
+export interface OrderCardProps {
   title?: string;
   number?: number;
   total?: string;
   image?: string;
 }
 
-export default function CommandCard({ title, number, total, image }: CommandCardProps) {
+export default function CommandCard({ title, number, total, image }: OrderCardProps) {
   return (
     <View style={styles.commandCardContainer}>
       <Text style={styles.title}>{title ?? ""}</Text>

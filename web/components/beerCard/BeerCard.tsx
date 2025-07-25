@@ -4,27 +4,20 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
 export interface BeerCardProps {
-  id?: string;
-  title?: string;
-  style?: string;
-  color?: string;
-  abv?: string;
-  price?: string;
-  stock?: number;
-  image?: string;
-  description?: string;
+  id: string;
+  title: string;
+  style: string;
+  color: string;
+  abv: string;
+  price: number;
+  stock: number;
+  image: string;
+  description: string;
+  breweryId: string;
+  breweryName: string;
 }
 
-export default function BeerCard({
-  title,
-  style,
-  color,
-  abv,
-  price,
-  stock,
-  description,
-  image,
-}: BeerCardProps) {
+export default function BeerCard(beer: BeerCardProps) {
   return (
     <View style={styles.container}>
       {/* Menu Icon */}
@@ -34,25 +27,25 @@ export default function BeerCard({
 
       {/* Beer Info */}
       <Text style={styles.stockLabel}>Stock en ligne</Text>
-      <Text style={styles.productName}>{title}</Text>
+      <Text style={styles.productName}>{beer.title}</Text>
 
       {/* Beer Attributes */}
       <Text style={styles.attributeLabel}>Style</Text>
-      <Text style={styles.attributeValue}>{style}</Text>
+      <Text style={styles.attributeValue}>{beer.style}</Text>
       <Text style={styles.attributeLabel2}>Couleur</Text>
-      <Text style={styles.attributeValue2}>{color}</Text>
+      <Text style={styles.attributeValue2}>{beer.color}</Text>
       <Text style={styles.attributeLabel3}>Taux</Text>
-      <Text style={styles.attributeValue3}>{abv}</Text>
+      <Text style={styles.attributeValue3}>{beer.abv}</Text>
       <Text style={styles.attributeLabel4}>PDV</Text>
-      <Text style={styles.price}>{price}</Text>
+      <Text style={styles.price}>{beer.price}</Text>
 
-      <Text style={styles.description}>{description}</Text>
+      <Text style={styles.description}>{beer.description}</Text>
 
       {/* Decorative Icon/Image */}
-      <Image style={styles.pointsIcon} source={image} />
+      <Image style={styles.pointsIcon} source={beer.image} />
 
       {/* Stock Number */}
-      <Text style={styles.stockNumber}>{stock}</Text>
+      <Text style={styles.stockNumber}>{beer.stock}</Text>
     </View>
   );
 }
