@@ -24,7 +24,10 @@ export default function BeerCardSmall({
       <Image style={styles.image} source={image} />
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{name}</Text>
-        <Text style={styles.abv}>{abv_rate}%</Text>
+        <View style={styles.abvStyleRow}>
+          {beer_style && <Text style={styles.beerStyle}>{beer_style}</Text>}
+          <Text style={styles.abv}>{abv_rate}%</Text>
+        </View>
         <Text style={styles.stock}>En stock : {quantity}</Text>
         <Text style={styles.price}> Prix : {price}€</Text>
       </View>
@@ -35,7 +38,9 @@ export default function BeerCardSmall({
 const styles = StyleSheet.create({
   container: {
     width: 150,
+    height: 220,
     backgroundColor: "#fff",
+    borderWidth: 1,
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -58,15 +63,19 @@ const styles = StyleSheet.create({
     color: "#000",
     marginBottom: 4,
   },
+  abvStyleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   beerStyle: {
     fontSize: 10,
     color: "#666",
-    marginBottom: 4,
+    marginRight: 6,
   },
   abv: {
     fontSize: 10,
     color: "#000",
-    marginBottom: 4,
   },
   stock: {
     fontSize: 9,

@@ -5,11 +5,28 @@ export default class BeerRepository implements IBeer {
   constructor(private prisma: PrismaClient) {}
 
   getBeers = async () => {
-    return await this.prisma.beer.findMany();
+    return await this.prisma.beer.findMany({
+      include: {
+        beer_style: {
+          select: {
+            label: true
+          }
+        }
+      }
+    });
   };
 
   getBeer = async (id: string) => {
-    return await this.prisma.beer.findUnique({ where: { id } });
+    return await this.prisma.beer.findUnique({ 
+      where: { id },
+      include: {
+        beer_style: {
+          select: {
+            label: true
+          }
+        }
+      }
+    });
   };
 
   createBeer = async (payload: BeerInsert) => {
