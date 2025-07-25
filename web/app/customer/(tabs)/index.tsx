@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   bannerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.4)" },
   bannerTitle: { color: "#fff", fontSize: 28, fontWeight: "bold", marginBottom: 10, zIndex: 2 },
   bannerSubtitle: { color: "#fff", fontSize: 16, zIndex: 2 },
-  sectionTitle: { fontSize: 22, fontWeight: "600", marginVertical: 15, marginLeft: 10 },
+  sectionTitle: { fontSize: 22, fontWeight: "600", marginTop: 15, marginBottom: 10, marginLeft: 10 },
   footer: { marginTop: 30, padding: 15, backgroundColor: "#f2f2f2", alignItems: "center" },
   footerText: { color: "#888", fontSize: 14 },
 });

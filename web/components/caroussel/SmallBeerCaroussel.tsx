@@ -37,11 +37,11 @@ const SmallBeerCaroussel = ({ beers }: SmallBeerCarousselProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   cardContainer: {
     marginRight: 15,
-    marginLeft: 5,
+    marginLeft: 10,
   },
 });
 
