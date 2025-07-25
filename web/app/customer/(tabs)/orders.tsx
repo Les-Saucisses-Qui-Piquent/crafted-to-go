@@ -1,17 +1,35 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { OrderFlatList } from "@/components/modals/OrderCard";
-import type { Order } from "@/components/modals/OrderCard"; // 🔁 Le bon type
+import { View, Text, StyleSheet, FlatList, ListRenderItem } from "react-native";
+import CommandCard from "@/components/beerCard/OrderCard";
 
-export interface OrderProps {
-  orders: Order[]; // ✅ Ceci doit être un tableau
+interface OrderItem {
+  id: string;
+  title: string;
+  number: number;
+  total: string;
+  image?: string;
 }
 
-const OrdersScreen = ({ orders }: OrderProps) => {
+interface OrdersScreenProps {
+  orders: OrderItem[];
+}
+
+const OrdersScreen = ({ orders }: OrdersScreenProps) => {
+  const renderItem: ListRenderItem<OrderItem> = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <CommandCard title={item.title} number={item.number} total={item.total} image={item.image} />
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mes Commandes</Text>
-      <OrderFlatList orders={orders} horizontal />
+      <FlatList
+        data={orders}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
     </View>
   );
 };
@@ -28,6 +46,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
     fontFamily: "Hanken Grotesk",
+  },
+  itemContainer: {
+    paddingVertical: 4,
+  },
+  separator: {
+    height: 12,
   },
 });
 
