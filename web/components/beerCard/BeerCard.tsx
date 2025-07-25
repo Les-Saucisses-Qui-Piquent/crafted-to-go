@@ -5,12 +5,14 @@ import { Image } from "expo-image";
 
 export interface BeerCardProps {
   id: string;
-  title: string;
-  style: string;
+  name: string;
+  beer_style: {
+    label: string;
+  };
   color: string;
-  abv: string;
+  abv_rate: string;
   price: number;
-  stock: number;
+  quantity: number;
   image: string;
   description: string;
   breweryId: string;
@@ -27,15 +29,15 @@ export default function BeerCard(beer: BeerCardProps) {
 
       {/* Beer Info */}
       <Text style={styles.stockLabel}>Stock en ligne</Text>
-      <Text style={styles.productName}>{beer.title}</Text>
+      <Text style={styles.productName}>{beer.name}</Text>
 
       {/* Beer Attributes */}
       <Text style={styles.attributeLabel}>Style</Text>
-      <Text style={styles.attributeValue}>{beer.style}</Text>
+      <Text style={styles.attributeValue}>{beer.beer_style.label}</Text>
       <Text style={styles.attributeLabel2}>Couleur</Text>
       <Text style={styles.attributeValue2}>{beer.color}</Text>
       <Text style={styles.attributeLabel3}>Taux</Text>
-      <Text style={styles.attributeValue3}>{beer.abv}</Text>
+      <Text style={styles.attributeValue3}>{beer.abv_rate}</Text>
       <Text style={styles.attributeLabel4}>PDV</Text>
       <Text style={styles.price}>{beer.price}</Text>
 
@@ -45,7 +47,7 @@ export default function BeerCard(beer: BeerCardProps) {
       <Image style={styles.pointsIcon} source={beer.image} />
 
       {/* Stock Number */}
-      <Text style={styles.stockNumber}>{beer.stock}</Text>
+      <Text style={styles.stockNumber}>{beer.quantity}</Text>
     </View>
   );
 }
