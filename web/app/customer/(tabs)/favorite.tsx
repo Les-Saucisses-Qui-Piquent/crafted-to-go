@@ -22,7 +22,7 @@ type FavoriteBrewery = {
   } | null;
 };
 
-const Favorites: React.FC = () => {
+const Favorites = () => {
   const { apiClient } = useApiClient();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
