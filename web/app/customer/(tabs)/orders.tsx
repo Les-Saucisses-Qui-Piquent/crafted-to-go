@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, ListRenderItem } from "react-native";
+import { View, Text, StyleSheet, FlatList, ListRenderItem, TouchableOpacity } from "react-native";
 import CommandCard from "@/components/beerCard/OrderCard";
+import { RelativePathString, useRouter } from "expo-router";
 
 interface OrderItem {
   id: string;
@@ -15,10 +16,26 @@ interface OrdersScreenProps {
 }
 
 const OrdersScreen = ({ orders }: OrdersScreenProps) => {
+  const router = useRouter();
+
+  const handlePress = (orderId: string) => {
+    router.push({
+      pathname: "/customer/orderDetails" as unknown as RelativePathString,
+      params: { id: orderId },
+    });
+  };
+
   const renderItem: ListRenderItem<OrderItem> = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <CommandCard title={item.title} number={item.number} total={item.total} image={item.image} />
-    </View>
+    <TouchableOpacity onPress={() => handlePress(item.id)}>
+      <View style={styles.itemContainer}>
+        <CommandCard
+          title={item.title}
+          number={item.number}
+          total={item.total}
+          image={item.image}
+        />
+      </View>
+    </TouchableOpacity>
   );
 
   return (
