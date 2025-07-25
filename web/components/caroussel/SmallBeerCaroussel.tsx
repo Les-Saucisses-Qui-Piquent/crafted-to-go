@@ -4,12 +4,12 @@ import BeerCardSmall from "../beerCard/BeerCardSmall";
 
 interface SmallBeerCarousselProps {
   beers: {
-    title: string;
-    image: string;
-    style?: string;
-    abv?: string;
-    price?: string;
-    stock?: number;
+    name: string;
+    image?: string;
+    beer_style?: string;
+    abv_rate?: number;
+    price?: number;
+    quantity?: number;
   }[];
 }
 
@@ -18,15 +18,14 @@ const SmallBeerCaroussel: React.FC<SmallBeerCarousselProps> = ({ beers }) => {
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {beers.map((beer, index) => (
-          <TouchableOpacity>
+          <TouchableOpacity key={index} style={styles.cardContainer}>
             <BeerCardSmall
-              key={index}
-              title={beer.title}
+              name={beer.name}
               image={beer.image}
-              style={beer.style}
-              abv={beer.abv}
+              beer_style={beer.beer_style}
+              abv_rate={beer.abv_rate}
               price={beer.price}
-              stock={beer.stock}
+              quantity={beer.quantity}
             />
           </TouchableOpacity>
         ))}
@@ -38,6 +37,10 @@ const SmallBeerCaroussel: React.FC<SmallBeerCarousselProps> = ({ beers }) => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
+  },
+  cardContainer: {
+    marginRight: 15,
+    marginLeft: 5,
   },
 });
 

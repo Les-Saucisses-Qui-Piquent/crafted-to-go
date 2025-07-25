@@ -3,130 +3,79 @@ import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 interface BeerCardSmallProps {
-  title?: string;
+  name?: string;
   image?: string;
-  style?: string;
-  abv?: string;
-  price?: string;
-  stock?: number;
+  beer_style?: string;
+  abv_rate?: number;
+  price?: number;
+  quantity?: number;
 }
 
 export default function BeerCardSmall({
-  title,
+  name,
   image,
-  style,
+  beer_style,
   price,
-  stock,
-  abv,
+  quantity,
+  abv_rate,
 }: BeerCardSmallProps) {
   return (
-    <View style={styles.beerCardSmallContainer}>
+    <View style={styles.container}>
       <Image style={styles.image} source={image} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.style}>{style}</Text>
-      <Text style={styles.enstock}>{`En stock : \n`}</Text>
-      <Text style={styles.price}>{price}</Text>
-      <Text style={styles.myVar}>{stock}</Text>
-      <Text style={styles.abv}>{abv}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.abv}>{abv_rate}%</Text>
+        <Text style={styles.stock}>En stock : {quantity}</Text>
+        <Text style={styles.price}> Prix : {price}€</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  beerCardSmallContainer: {
-    position: "relative",
-    flexShrink: 0,
-    height: 197,
+  container: {
     width: 150,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    rowGap: 0,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   image: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 0,
-    right: 0,
-    bottom: 47,
-    left: 0,
+    width: "100%",
+    height: 120,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
-  title: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 152,
-    right: 52,
-    bottom: 31,
-    left: 0,
-    textAlign: "left",
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
+  infoContainer: {
+    padding: 10,
+  },
+  name: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 4,
+  },
+  beerStyle: {
     fontSize: 10,
-    fontWeight: 700,
-  },
-  style: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 162,
-    right: 114,
-    bottom: 18,
-    left: 0,
-    textAlign: "left",
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 10,
-    fontWeight: 400,
-  },
-  enstock: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 176,
-    right: 110,
-    bottom: 11,
-    left: 0,
-    textAlign: "justify",
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 8,
-    fontWeight: 400,
-  },
-  price: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 187,
-    right: 126,
-    bottom: 0,
-    left: 0,
-    textAlign: "justify",
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 8,
-    fontWeight: 400,
-  },
-  myVar: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 176,
-    right: 101,
-    bottom: 11,
-    left: 40,
-    textAlign: "justify",
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 8,
-    fontWeight: 400,
+    color: "#666",
+    marginBottom: 4,
   },
   abv: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 162,
-    right: 88,
-    bottom: 18,
-    left: 43,
-    textAlign: "left",
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
     fontSize: 10,
-    fontWeight: 400,
+    color: "#000",
+    marginBottom: 4,
+  },
+  stock: {
+    fontSize: 9,
+    color: "#888",
+    marginBottom: 4,
+  },
+  price: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#000",
   },
 });
