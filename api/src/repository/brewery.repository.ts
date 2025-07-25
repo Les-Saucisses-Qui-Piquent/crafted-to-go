@@ -5,12 +5,37 @@ export default class BreweryRepository implements IBrewery {
   constructor(private prisma: PrismaClient) {}
 
   async getBreweries() {
-    const breweries = await this.prisma.brewery.findMany();
+    const breweries = await this.prisma.brewery.findMany({
+      include: {
+        address: {
+          select: {
+            line_1: true,
+            line_2: true,
+            city: true,
+            postal_code: true,
+            country: true
+          }
+        }
+      }
+    });
     return breweries;
   }
 
   async getBrewery(id: string) {
-    const brewery = await this.prisma.brewery.findUnique({ where: { id } });
+    const brewery = await this.prisma.brewery.findUnique({ 
+      where: { id },
+      include: {
+        address: {
+          select: {
+            line_1: true,
+            line_2: true,
+            city: true,
+            postal_code: true,
+            country: true
+          }
+        }
+      }
+    });
 
     return brewery;
   }
