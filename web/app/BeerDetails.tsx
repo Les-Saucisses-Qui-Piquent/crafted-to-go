@@ -42,16 +42,7 @@ const BeerDetails = (beer: BeerCardProps) => {
 
   return (
     <View style={styles.container}>
-      <BeerCardLarge
-        image={beer.image}
-        name={beer.title}
-        description={beer.description}
-        style={beer.style}
-        color={beer.color}
-        abv={beer.abv}
-        price={`${beer.price} €`}
-        stock={beer.stock?.toString()}
-      />
+      <BeerCardLarge beer={beer} />
 
       <View style={styles.actionContainer}>
         <SelectInput
