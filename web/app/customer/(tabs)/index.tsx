@@ -22,7 +22,7 @@ export default function HomePage() {
         const breweriesRes = await apiClient("/breweries", { method: "GET" });
         const breweriesData = await breweriesRes.json();
 
-        const breweryDetailsRes = await apiClient("/brewery_details", { method: "GET" });
+        const breweryDetailsRes = await apiClient("/brewery-details", { method: "GET" });
         const breweryDetailsData = await breweryDetailsRes.json();
 
         // Fusionne les données brewery + brewery_details (par id commun)

@@ -15,7 +15,7 @@ export default function BeerCardSmall({ beer }: BeerCardSmallProps) {
         <Text style={styles.name}>{beer.name}</Text>
         <View style={styles.bottomInfo}>
           <View style={styles.abvStyleRow}>
-            {beer.beer_style && <Text style={styles.beerStyle}>{beer_style}</Text>}
+            {beer.beer_style && <Text style={styles.beerStyle}>{beer.beer_style.label}</Text>}
             <Text style={styles.abv}>{beer.abv_rate}%</Text>
           </View>
           <Text style={styles.stock}>En stock : {beer.quantity}</Text>
