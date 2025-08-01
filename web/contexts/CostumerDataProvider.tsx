@@ -24,12 +24,23 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [favoriteBreweries, setFavoriteBreweries] = useState<BreweryProps[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fonction utilitaire pour fetch avec auth token
-  const apiClient = async (url: string, options: RequestInit = {}) => {
-    const headers = options.headers ? new Headers(options.headers) : new Headers();
-    if (token) headers.set("Authorization", `Bearer ${token}`);
+  const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-    const res = await fetch(url, { ...options, headers });
+  const apiClient = async (url: string, options: RequestInit = {}) => {
+    if (!API_BASE_URL) {
+      throw new Error("API_BASE_URL is not defined");
+    }
+
+    const headers = options.headers ? new Headers(options.headers) : new Headers();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+    headers.set("Content-Type", "application/json");
+
+    const fullUrl = url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
+
+    const res = await fetch(fullUrl, { ...options, headers });
+
     if (!res.ok) {
       throw new Error(`API error: ${res.status} ${res.statusText}`);
     }
@@ -38,7 +49,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   useEffect(() => {
     if (!user?.id) {
-      // Si pas connecté, on vide tout
       setBeers([]);
       setBreweries([]);
       setFavoriteBeers([]);
@@ -51,13 +61,10 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         setLoading(true);
 
-        // On récupère tout ce dont on a besoin en parallèle
-        const [beersData, breweriesData, favBeersData, favBreweriesData] = await Promise.all([
-          apiClient("/beers"),
-          apiClient("/breweries"),
-          apiClient(`/users/${user.id}/favorite_beers`),
-          apiClient(`/users/${user.id}/favorite_breweries`),
-        ]);
+        const beersData = await apiClient("/beers");
+        const breweriesData = await apiClient("/breweries");
+        const favBeersData = await apiClient(`/favorite-beers/${user.id}`);
+        const favBreweriesData = await apiClient(`/favorite-breweries/${user.id}`);
 
         setBeers(beersData);
         setBreweries(breweriesData);
@@ -73,21 +80,17 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     fetchData();
   }, [user, token]);
 
-  // Fonction pour toggle favoris bière
   const toggleFavoriteBeer = async (beerId: string) => {
     if (!user) return;
 
     const isFavorited = favoriteBeers.some((b) => b.id === beerId);
     try {
       if (isFavorited) {
-        // Supprimer des favoris
         await apiClient(`/users/${user.id}/favorite_beers/${beerId}`, { method: "DELETE" });
         setFavoriteBeers((prev) => prev.filter((b) => b.id !== beerId));
       } else {
-        // Ajouter aux favoris
         const newFav = await apiClient(`/users/${user.id}/favorite_beers`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ beer_id: beerId }),
         });
         setFavoriteBeers((prev) => [...prev, newFav]);
@@ -97,7 +100,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  // Fonction pour toggle favoris brasserie
   const toggleFavoriteBrewery = async (breweryId: string) => {
     if (!user) return;
 
@@ -107,9 +109,8 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         await apiClient(`/users/${user.id}/favorite_breweries/${breweryId}`, { method: "DELETE" });
         setFavoriteBreweries((prev) => prev.filter((b) => b.id !== breweryId));
       } else {
-        const newFav = await apiClient(`/users/${user.id}/favorite_brewery`, {
+        const newFav = await apiClient(`/users/${user.id}/favorite_breweries`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ brewery_id: breweryId }),
         });
         setFavoriteBreweries((prev) => [...prev, newFav]);
