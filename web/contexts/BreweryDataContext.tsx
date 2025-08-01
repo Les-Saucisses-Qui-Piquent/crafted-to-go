@@ -3,6 +3,7 @@ import { useApiClient } from "@/utils/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { OrderCardProps } from "@/components/beerCard/OrderCard";
+import { OrderItem } from "@/components/modals/OrderModal";
 
 // --- Interfaces
 export interface Brewery {
@@ -21,6 +22,7 @@ interface BreweryDataContextType {
   brewery: Brewery | null;
   beers: BeerCardProps[];
   orders: OrderCardProps[];
+  orderDetails: Record<string, OrderItem[]>;
   loading: boolean;
 }
 
@@ -29,6 +31,7 @@ const BreweryDataContext = createContext<BreweryDataContextType>({
   brewery: null,
   beers: [],
   orders: [],
+  orderDetails: {},
   loading: true,
 });
 
@@ -42,6 +45,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
   const [brewery, setBrewery] = useState<Brewery | null>(null);
   const [beers, setBeers] = useState<BeerCardProps[]>([]);
   const [orders, setOrders] = useState<OrderCardProps[]>([]);
+  const [orderDetails, setOrderDetails] = useState<Record<string, OrderItem[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,15 +61,17 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
 
         if (!breweries.length) {
           console.warn("Aucune brasserie trouvée.");
+          setLoading(false);
           return;
         }
 
         const userBrewery = breweries[0];
 
-        const [detailsData, ordersData, beersData] = await Promise.all([
+        const [detailsData, ordersData, beersData, orderDetailsData] = await Promise.all([
           apiClient("/brewery-details", { method: "GET" }),
           apiClient(`/orders?brewery_id=${userBrewery.id}`, { method: "GET" }),
           apiClient(`/beers?brewery_id=${userBrewery.id}`, { method: "GET" }),
+          apiClient(`/order-items?brewery_id=${userBrewery.id}`, { method: "GET" }),
         ]);
 
         const detail = detailsData.find((d: Brewery) => d.brewery_id === userBrewery.id);
@@ -77,8 +83,36 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
           description: detail?.description || "",
         });
 
-        setOrders(ordersData);
         setBeers(beersData);
+        setOrders(ordersData);
+
+        // Mapping des détails de commande
+        const detailsMap = orderDetailsData.reduce(
+          (acc: Record<string, OrderItem[]>, od: OrderItem) => {
+            const beer = beersData.find((b: BeerCardProps) => b.id === od.beer_id);
+
+            const formattedItem: OrderItem = {
+              id: od.id,
+              title: beer?.name || "Bière inconnue",
+              quantity: od.quantity,
+              total: (od.quantity * od.price).toFixed(2),
+              is_ready: od.is_ready,
+              beer_id: od.beer_id,
+              price: od.price,
+              order_id: od.order_id,
+            };
+
+            if (!acc[od.order_id]) {
+              acc[od.order_id] = [];
+            }
+
+            acc[od.order_id].push(formattedItem);
+            return acc;
+          },
+          {},
+        );
+
+        setOrderDetails(detailsMap);
       } catch (error) {
         console.error("Erreur de chargement des données de brasserie :", error);
       } finally {
@@ -90,7 +124,15 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
   }, []);
 
   return (
-    <BreweryDataContext.Provider value={{ brewery, beers, orders, loading }}>
+    <BreweryDataContext.Provider
+      value={{
+        brewery,
+        beers,
+        orders,
+        orderDetails,
+        loading,
+      }}
+    >
       {children}
     </BreweryDataContext.Provider>
   );

@@ -1,37 +1,27 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
-import CommandCard from "../beerCard/OrderCard";
-
-type OrderCardVariant = "onProgress" | "urgent" | "readyToPick";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import MainButton from "@/components/Buttons/MainButton";
 
 export interface OrderItem {
   id: string;
   title: string;
-  number: number;
+  quantity: number;
   total: string;
-  image?: string;
+  is_ready?: boolean;
+  beer_id: string;
+  price: number;
+  order_id: string;
 }
 
-export interface OrderCardProps {
-  orderNumber: string;
-  pickupDate: string;
-  pickupTime: string;
-  totalPrice: string;
-  items: OrderItem[];
-  variant?: OrderCardVariant;
-  onValidate?: () => void;
-  onClose?: () => void;
-}
-
-// Enhanced interface for order lists
-export interface Order extends OrderCardProps {
+export interface OrderModalCardProps {
   id: string;
-}
-
-export interface OrderListProps {
-  orders: Order[];
-  horizontal?: boolean;
-  showsScrollIndicator?: boolean;
+  pickup_day: string;
+  pickup_time: string;
+  final_price: number;
+  items: OrderItem[];
+  variant?: "onProgress" | "urgent" | "readyToPick";
+  onClose: () => void;
+  onValidate: (updatedItems: OrderItem[]) => void;
 }
 
 const VARIANT_STYLES = {
@@ -49,168 +39,102 @@ const VARIANT_STYLES = {
   },
 };
 
-// Main OrderCard Component
-function OrderCard({
-  orderNumber,
-  pickupDate,
-  pickupTime,
-  totalPrice,
+export default function OrderModalCard({
+  id,
+  pickup_day,
+  pickup_time,
+  final_price,
   items,
   variant = "onProgress",
-  onValidate,
   onClose,
-}: OrderCardProps) {
-  const variantStyle = VARIANT_STYLES[variant];
-
-  const renderOrderItem: ListRenderItem<OrderItem> = ({ item }) => (
-    <CommandCard title={item.title} number={item.number} total={item.total} image={item.image} />
+  onValidate,
+}: OrderModalCardProps) {
+  const [localItems, setLocalItems] = useState<OrderItem[]>(
+    items.map((it) => ({ ...it, is_ready: it.is_ready || false })),
   );
+
+  const toggleReady = (itemId: string) => {
+    setLocalItems((prev) =>
+      prev.map((it) => (it.id === itemId ? { ...it, is_ready: !it.is_ready } : it)),
+    );
+  };
+
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("fr-FR");
+
+  const variantStyle = VARIANT_STYLES[variant];
 
   return (
     <View style={[styles.orderCard, { backgroundColor: variantStyle.container.backgroundColor }]}>
-      {/* Close button */}
-      {onClose && (
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>×</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.closeButtonText}>×</Text>
+      </TouchableOpacity>
 
-      {/* Order Header */}
       <View style={styles.orderHeader}>
-        <Text style={styles.orderTitle}>Order #{orderNumber}</Text>
-
+        <Text style={styles.orderTitle}>Commande #{id}</Text>
         <View style={styles.orderInfo}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Pick up date</Text>
-            <Text style={styles.infoLabel}>Total payment</Text>
+            <Text style={styles.infoLabel}>Date de retrait</Text>
+            <Text style={styles.infoLabel}>Montant total</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoValue}>
-              {pickupDate} - {pickupTime}
+              {formatDate(pickup_day)} • {pickup_time}
             </Text>
-            <Text style={styles.infoValue}>{totalPrice} TTC</Text>
+            <Text style={styles.infoValue}>{final_price.toFixed(2)} € TTC</Text>
           </View>
         </View>
       </View>
 
-      {/* Order Items */}
       <View style={styles.itemsContainer}>
         <FlatList
-          data={items}
-          renderItem={renderOrderItem}
+          data={localItems}
           keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <Text style={styles.itemText}>
+                {item.title} x {item.quantity} — {item.total} €
+              </Text>
+              <TouchableOpacity style={styles.checkbox} onPress={() => toggleReady(item.id)}>
+                <Text style={styles.checkboxText}>{item.is_ready ? "✅" : "⬜️"}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
       </View>
 
-      {/* Validate Button */}
-      {onValidate && (
-        <TouchableOpacity
-          style={[styles.validateButton, { backgroundColor: variantStyle.button.backgroundColor }]}
-          onPress={onValidate}
-        >
-          <Text style={styles.validateButtonText}>Valider</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-}
-
-// FlatList Implementation for multiple OrderCards
-export function OrderFlatList({
-  orders,
-  horizontal = false,
-  showsScrollIndicator = true,
-}: OrderListProps) {
-  const renderOrderCard: ListRenderItem<Order> = ({ item }) => (
-    <OrderCard
-      orderNumber={item.orderNumber}
-      pickupDate={item.pickupDate}
-      pickupTime={item.pickupTime}
-      totalPrice={item.totalPrice}
-      items={item.items}
-      variant={item.variant}
-      onValidate={item.onValidate}
-      onClose={item.onClose}
-    />
-  );
-
-  return (
-    <FlatList
-      data={orders}
-      renderItem={renderOrderCard}
-      keyExtractor={(item) => item.id}
-      horizontal={horizontal}
-      showsHorizontalScrollIndicator={showsScrollIndicator}
-      showsVerticalScrollIndicator={showsScrollIndicator}
-      contentContainerStyle={horizontal ? styles.horizontalList : styles.verticalList}
-      ItemSeparatorComponent={() => <View style={styles.orderSeparator} />}
-    />
-  );
-}
-
-// Map Implementation for multiple OrderCards
-export function OrderMapList({ orders }: Pick<OrderListProps, "orders">) {
-  return (
-    <View style={styles.mapContainer}>
-      {orders.map((order) => (
-        <View key={order.id} style={styles.mappedOrderWrapper}>
-          <OrderCard
-            orderNumber={order.orderNumber}
-            pickupDate={order.pickupDate}
-            pickupTime={order.pickupTime}
-            totalPrice={order.totalPrice}
-            items={order.items}
-            variant={order.variant}
-            onValidate={order.onValidate}
-            onClose={order.onClose}
-          />
-        </View>
-      ))}
+      <MainButton title="Mettre à jour & passer Ready" onPress={() => onValidate(localItems)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   orderCard: {
-    width: 343,
-    minHeight: 340,
-    borderRadius: 7,
-    borderWidth: 0.1,
-    borderColor: "rgba(0, 0, 0, 1)",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: { width: 5, height: 4 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
-    elevation: 5,
+    width: "100%",
     padding: 20,
-    marginVertical: 8,
+    borderRadius: 8,
+    borderWidth: 0.1,
+    borderColor: "#000",
+    shadowColor: "rgba(0,0,0,0.25)",
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   closeButton: {
     position: "absolute",
-    top: 11,
-    right: 15,
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
+    top: 12,
+    right: 16,
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "rgba(0, 0, 0, 1)",
   },
   orderHeader: {
     marginBottom: 20,
   },
   orderTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: "700",
-    letterSpacing: -0.57,
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
     marginBottom: 8,
   },
   orderInfo: {
@@ -221,61 +145,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   infoLabel: {
-    fontSize: 10,
-    fontWeight: "300",
-    letterSpacing: -0.3,
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
+    fontSize: 12,
+    color: "#555",
   },
   infoValue: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "700",
-    letterSpacing: -0.3,
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
   },
   itemsContainer: {
-    flex: 1,
+    maxHeight: 200,
     marginBottom: 20,
   },
-  commandCardItem: {
-    marginVertical: 4,
-  },
-  itemSeparator: {
-    height: 8,
-  },
-  validateButton: {
-    height: 24,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
-    elevation: 2,
-  },
-  validateButtonText: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
-  },
-  horizontalList: {
-    paddingHorizontal: 16,
-  },
-  verticalList: {
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 8,
   },
-  orderSeparator: {
-    width: 16,
+  itemText: {
+    fontSize: 14,
+    flex: 1,
   },
-  mapContainer: {
-    gap: 16,
+  checkbox: {
+    marginLeft: 10,
   },
-  mappedOrderWrapper: {
-    alignItems: "center",
+  checkboxText: {
+    fontSize: 16,
   },
 });
-
-export default OrderCard;

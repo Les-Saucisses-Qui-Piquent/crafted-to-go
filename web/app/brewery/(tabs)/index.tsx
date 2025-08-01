@@ -4,9 +4,15 @@ import TextCTA from "@/components/Buttons/TextCTA";
 import { COLORS } from "@/constants";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
+import CommandCard, { OrderCardProps } from "@/components/beerCard/OrderCard";
 
 export default function Dashboard() {
-  const { brewery, beers, loading } = useBreweryData();
+  const { brewery, beers, loading, orders } = useBreweryData();
+
+  const activeOrders =
+    orders?.filter((order: OrderCardProps) =>
+      ["new", "in_progress", "ready"].includes(order.status),
+    ) || [];
 
   if (loading) {
     return (
@@ -43,7 +49,11 @@ export default function Dashboard() {
       {/* SECTION COMMANDES EN COURS - À faire plus tard si tu veux */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>📦 Commandes en cours</Text>
-        {/* TODO: Liste commandes */}
+        {activeOrders.length > 0 ? (
+          activeOrders.map((order) => <CommandCard key={order.id} {...order} />)
+        ) : (
+          <Text>Aucune commande en cours.</Text>
+        )}
       </View>
 
       {/* SECTION BIÈRES */}
@@ -110,4 +120,20 @@ const styles = StyleSheet.create({
   beerDescription: { fontSize: 12, color: "#777", marginTop: 4 },
   footer: { marginTop: 30, padding: 15, backgroundColor: "#f2f2f2", alignItems: "center" },
   footerText: { color: "#888", fontSize: 14 },
+  orderCard: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    elevation: 1, // Android
+    shadowColor: "#000", // iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  orderTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
 });

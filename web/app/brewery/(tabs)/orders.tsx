@@ -57,7 +57,7 @@ export default function Orders() {
         <StatBlock label="Nouvelles" count={orders.filter((o) => o.status === "new").length} />
         <StatBlock
           label="En cours"
-          count={orders.filter((o) => o.status === "inProgress").length}
+          count={orders.filter((o) => o.status === "in_Progress").length}
         />
         <StatBlock label="Prêtes" count={orders.filter((o) => o.status === "ready").length} />
         <StatBlock label="Annulées" count={orders.filter((o) => o.status === "cancelled").length} />
