@@ -118,12 +118,12 @@ model order {
   user_id        String         @db.Uuid
   brewery_id     String         @db.Uuid
   final_price    Float
-  status         String         @db.VarChar(255)
   pickup_day     DateTime       @db.Date
   pickup_time    String
   created_at     DateTime       @default(now())
   updated_at     DateTime       @default(now())
   payment_method String?
+  status         OrderStatus    @default(new)
   brewery        brewery        @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_brewery_id_foreign")
   user           user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_user_id_foreign")
   order_detail   order_detail[]
@@ -198,4 +198,11 @@ enum UserRole {
   client
   brewer
   admin
+}
+
+enum OrderStatus {
+  new
+  in_progress
+  ready
+  cancelled
 }
