@@ -145,4 +145,34 @@ export default class BreweryDetailController {
       await prisma.$disconnect();
     }
   }
+
+  static async uploadLogo(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
+    const { id } = request.params;
+    validateUUID(id, reply);
+
+    const data = await ImageUploader.upload(request);
+
+    const prisma = request.server.prisma;
+    const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    try {
+      const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
+      if (!breweryDetail) {
+        reply.status(404).send({ clientMessage: "Brewery not found" });
+        return;
+      }
+      const breweryUpdated = await breweryDetailRepository.updateBreweryDetail(id, {
+        logo: data.url,
+      });
+      reply.send(breweryUpdated);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
