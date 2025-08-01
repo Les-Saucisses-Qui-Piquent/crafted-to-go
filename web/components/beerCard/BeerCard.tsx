@@ -9,6 +9,9 @@ export interface BeerCardProps {
   beer_style: {
     label: string;
   };
+  brewery: {
+    name: string;
+  };
   color: string;
   abv_rate: string;
   price: number;
