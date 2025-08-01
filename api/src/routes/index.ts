@@ -10,6 +10,8 @@ import beerStyleRoutes from "./beer-style.routes";
 import userDetailRoutes from "./user-detail.routes";
 import breweryDetailRoutes from "./brewery-detail.routes";
 import orderDetailRoutes from "./order-detail.routes";
+import favoriteBeerRoutes from "./favorite-beer.routes";
+import favoriteBreweryRoutes from "./favorite-brewery.routes";
 
 export default {
   rootRoutes,
@@ -24,4 +26,6 @@ export default {
   userDetailRoutes,
   breweryDetailRoutes,
   orderDetailRoutes,
+  favoriteBeerRoutes,
+  favoriteBreweryRoutes,
 };
