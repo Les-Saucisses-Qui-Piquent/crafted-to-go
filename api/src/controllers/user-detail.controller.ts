@@ -55,10 +55,6 @@ export default class UserDetailController {
 
     try {
       const userDetails = await userDetailRepository.getDetailFromUser(userId);
-      if (!userDetails.length) {
-        reply.status(404).send({ clientMessage: "UserDetail not found" });
-        return;
-      }
       reply.send(userDetails);
     } catch (error) {
       request.server.log.error(error);

@@ -39,7 +39,7 @@ describe("🏭 FavoriteBrewery", () => {
     expect(mockedReply.send).toHaveBeenCalledWith({ clientMessage: "Invalid uuid" });
   });
 
-  it("should return 404 and clientMessage when favorite breweries not found", async () => {
+  it("should return empty array when favorite breweries not found", async () => {
     mockedPrisma.favorite_brewery.findMany.mockResolvedValueOnce([]);
 
     const userId = "123e4567-e89b-12d3-a456-426614174000";
@@ -47,8 +47,7 @@ describe("🏭 FavoriteBrewery", () => {
 
     await FavoriteBreweryController.getFavoriteBreweries(request, mockedReply);
 
-    expect(mockedReply.status).toHaveBeenCalledWith(404);
-    expect(mockedReply.send).toHaveBeenCalledWith({ clientMessage: "FavoriteBrewery not found" });
+    expect(mockedReply.send).toHaveBeenCalledWith([]);
   });
 
   it("should create a favorite brewery", async () => {

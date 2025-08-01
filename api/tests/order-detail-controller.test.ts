@@ -107,7 +107,7 @@ describe("📦 OrderDetail", () => {
     expect(mockedReply.send).toHaveBeenCalledWith(testDetails);
   });
 
-  it("should return 404 and clientMessage when order details from order not found", async () => {
+  it("should return empty array when order details from order not found", async () => {
     mockedPrisma.order_detail.findMany.mockResolvedValueOnce([]);
 
     const orderId = "123e4567-e89b-12d3-a456-426614174000";
@@ -115,8 +115,7 @@ describe("📦 OrderDetail", () => {
 
     await OrderDetailController.getDetailFromOrder(request, mockedReply);
 
-    expect(mockedReply.status).toHaveBeenCalledWith(404);
-    expect(mockedReply.send).toHaveBeenCalledWith({ clientMessage: "OrderDetail not found" });
+    expect(mockedReply.send).toHaveBeenCalledWith([]);
   });
 
   it("should create an order detail", async () => {
