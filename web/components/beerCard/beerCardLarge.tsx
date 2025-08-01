@@ -18,7 +18,7 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={{ uri: beer.image }} />
-      <Text style={styles.title}>{beer.title}</Text>
+      <Text style={styles.title}>{beer.name}</Text>
       <Text style={styles.description}>{beer.description}</Text>
       <View
         style={{
@@ -31,7 +31,7 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
       {/* Attributes */}
       <View style={styles.attributeBlock1}>
         <Text style={styles.attributeLabel}>Style</Text>
-        <Text style={styles.attributeValue}>{beer.style}</Text>
+        <Text style={styles.attributeValue}>{beer.beer_style.label}</Text>
       </View>
       <View style={styles.attributeBlock2}>
         <Text style={styles.attributeLabel}>Couleur</Text>
@@ -39,7 +39,7 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
       </View>
       <View style={styles.attributeBlock3}>
         <Text style={styles.attributeLabel}>Taux</Text>
-        <Text style={styles.attributeValue}>{beer.abv}</Text>
+        <Text style={styles.attributeValue}>{beer.abv_rate}</Text>
       </View>
       <View style={styles.attributeBlock4}>
         <Text style={styles.attributeLabel}>Prix</Text>
@@ -47,7 +47,7 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
       </View>
       <View style={styles.attributeBlock5}>
         <Text style={styles.attributeLabel}>Stock</Text>
-        <Text style={styles.attributeValue}>{beer.stock}</Text>
+        <Text style={styles.attributeValue}>{beer.quantity}</Text>
       </View>
     </View>
   );
