@@ -52,19 +52,20 @@ const mobileStyles = StyleSheet.create({
     //borderTopRightRadius: 12,
   },
   infoContainer: {
-    padding: 15,
+    padding: 10,
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
   title: {
     fontSize: 20,
     fontWeight: "700",
     color: "#000",
     textTransform: "capitalize",
-    marginBottom: 8,
+    //marginBottom: 8,
   },
   bottomInfo: {
-    gap: 6,
+    gap: 2,
+    marginTop: 8,
   },
   abvStyleRow: {
     flexDirection: "row",
@@ -112,19 +113,19 @@ const tabletStyles = StyleSheet.create({
     //borderTopRightRadius: 12,
   },
   infoContainer: {
-    padding: 20,
+    padding: 15,
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: "#000",
     textTransform: "capitalize",
-    marginBottom: 10,
   },
   bottomInfo: {
-    gap: 8,
+    gap: 2,
+    marginTop: 10,
   },
   abvStyleRow: {
     flexDirection: "row",
