@@ -16,10 +16,6 @@ export default class FavoriteBeerController {
 
     try {
       const favoriteBeers = await favoriteBeerRepository.getFavoriteBeers(userId);
-      if (!favoriteBeers.length) {
-        reply.status(404).send({ clientMessage: "FavoriteBeers not found" });
-        return;
-      }
       reply.send(favoriteBeers);
     } catch (error) {
       request.server.log.error(error);
