@@ -147,8 +147,8 @@ export default class UserDetailController {
     const userDetailRepository = new UserDetailRepository(prisma);
 
     try {
-      const userDetail = await userDetailRepository.getUserDetail(id);
-      if (!userDetail) {
+      const userDetails = await userDetailRepository.getDetailFromUser(id);
+      if (!userDetails.length) {
         reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
