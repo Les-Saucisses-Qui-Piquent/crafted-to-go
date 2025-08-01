@@ -1,9 +1,12 @@
 import { FastifyInstance } from "fastify";
-import { uploadImageHandler } from "../controllers/upload.controller";
 import fastifyMultipart from "@fastify/multipart";
+import { ImageUploader } from "../services/upload.service";
 
 export default async function uploadRoutes(fastify: FastifyInstance) {
   fastify.register(fastifyMultipart);
 
-  fastify.post("/upload", uploadImageHandler);
+  fastify.post("/upload", async (req, res) => {
+    const data = await ImageUploader.upload(req);
+    res.send({ url: data.url });
+  });
 }
