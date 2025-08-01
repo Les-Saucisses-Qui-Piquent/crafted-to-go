@@ -55,10 +55,6 @@ export default class OrderDetailController {
 
     try {
       const orderDetails = await orderDetailRepository.getDetailFromOrder(orderId);
-      if (!orderDetails.length) {
-        reply.status(404).send({ clientMessage: "OrderDetail not found" });
-        return;
-      }
       reply.send(orderDetails);
     } catch (error) {
       request.server.log.error(error);

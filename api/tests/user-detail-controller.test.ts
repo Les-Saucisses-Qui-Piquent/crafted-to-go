@@ -109,7 +109,7 @@ describe("🧑‍💼 UserDetail", () => {
     expect(mockedReply.send).toHaveBeenCalledWith(testDetails);
   });
 
-  it("should return 404 and clientMessage when user details from user not found", async () => {
+  it("should return empty array when user details from user not found", async () => {
     const userId = "123e4567-e89b-12d3-a456-426614174000";
     mockedPrisma.user_detail.findMany.mockResolvedValueOnce([]); // Prisma returns [] if not found
 
@@ -117,8 +117,7 @@ describe("🧑‍💼 UserDetail", () => {
 
     await UserDetailController.getDetailFromUser(request, mockedReply);
 
-    expect(mockedReply.status).toHaveBeenCalledWith(404);
-    expect(mockedReply.send).toHaveBeenCalledWith({ clientMessage: "UserDetail not found" });
+    expect(mockedReply.send).toHaveBeenCalledWith([]);
   });
 
   it("should create a user detail", async () => {
