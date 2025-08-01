@@ -1,5 +1,5 @@
 import { fakerFR as faker } from "@faker-js/faker";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { OrderStatus, Prisma, PrismaClient } from "@prisma/client";
 import type { FakerImplementation } from "./types";
 
 type Order = Prisma.orderCreateInput;
@@ -20,7 +20,7 @@ export class OrderFactory implements FakerImplementation {
         },
       },
       final_price: faker.number.float({ min: 0.0, max: 100.0, fractionDigits: 2 }),
-      status: faker.lorem.word(),
+      status: faker.helpers.arrayElement(Object.values(OrderStatus)),
       pickup_day: faker.date.anytime(),
       pickup_time: faker.lorem.word(),
     };
