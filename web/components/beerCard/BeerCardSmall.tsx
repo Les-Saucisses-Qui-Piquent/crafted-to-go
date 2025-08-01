@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#000",
     marginRight: 6,
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   abv: {
     fontSize: 12,
