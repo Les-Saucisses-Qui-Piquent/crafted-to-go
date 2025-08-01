@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Modal } from "react-native";
+import { View, Text, StyleSheet, Modal, TouchableWithoutFeedback } from "react-native";
 import MainButton from "@/components/Buttons/MainButton";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
-import OrderModalCard, { OrderItem } from "../modals/OrderModal";
+import OrderModalCard from "../modals/OrderModal";
 
 export interface OrderCardProps {
   id: string;
@@ -21,9 +21,11 @@ export default function CommandCard(props: OrderCardProps) {
   const [modalVisible, setModalVisible] = useState(false);
   const { orderDetails } = useBreweryData();
   const { id, final_price, status, pickup_day, pickup_time } = props;
-  const items: OrderItem[] = orderDetails[id] || [];
+  const items = orderDetails[id] || [];
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString("fr-FR");
+
+  const closeModal = () => setModalVisible(false);
 
   return (
     <>
@@ -37,23 +39,22 @@ export default function CommandCard(props: OrderCardProps) {
       </View>
 
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <OrderModalCard
-              id={id}
-              pickup_day={pickup_day}
-              pickup_time={pickup_time}
-              final_price={final_price}
-              items={items}
-              onClose={() => setModalVisible(false)}
-              onValidate={(updatedItems) => {
-                // TODO : Appel à ton endpoint pour valider les items puis mettre à jour l'état
-                console.log("Valider la commande", updatedItems);
-                setModalVisible(false);
-              }}
-            />
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContainer}>
+                <OrderModalCard
+                  id={id}
+                  pickup_day={pickup_day}
+                  pickup_time={pickup_time}
+                  final_price={final_price}
+                  items={items}
+                  onClose={closeModal}
+                />
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </>
   );
@@ -79,10 +80,6 @@ const styles = StyleSheet.create({
   pickup: {
     fontSize: 12,
     color: "#555",
-  },
-  buttonContainer: {
-    marginTop: 10,
-    alignItems: "center",
   },
   modalOverlay: {
     flex: 1,

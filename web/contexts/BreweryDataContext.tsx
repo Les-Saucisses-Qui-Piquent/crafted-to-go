@@ -67,12 +67,14 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
 
         const userBrewery = breweries[0];
 
-        const [detailsData, ordersData, beersData, orderDetailsData] = await Promise.all([
+        const [detailsData, ordersData, beersData] = await Promise.all([
           apiClient("/brewery-details", { method: "GET" }),
           apiClient(`/orders?brewery_id=${userBrewery.id}`, { method: "GET" }),
           apiClient(`/beers?brewery_id=${userBrewery.id}`, { method: "GET" }),
-          apiClient(`/order-items?brewery_id=${userBrewery.id}`, { method: "GET" }),
         ]);
+        const orderDetailsData = await apiClient(`/order-items/${ordersData.id}`, {
+          method: "GET",
+        });
 
         const detail = detailsData.find((d: Brewery) => d.brewery_id === userBrewery.id);
 

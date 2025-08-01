@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
+import { Image } from "expo-image";
 import MainButton from "@/components/Buttons/MainButton";
+import SecondaryCTA from "../Buttons/SecondaryCTA";
 
 export interface OrderItem {
   id: string;
@@ -11,6 +13,7 @@ export interface OrderItem {
   beer_id: string;
   price: number;
   order_id: string;
+  image?: string; // Ajouté pour l’image de la bière
 }
 
 export interface OrderModalCardProps {
@@ -21,7 +24,6 @@ export interface OrderModalCardProps {
   items: OrderItem[];
   variant?: "onProgress" | "urgent" | "readyToPick";
   onClose: () => void;
-  onValidate: (updatedItems: OrderItem[]) => void;
 }
 
 const VARIANT_STYLES = {
@@ -47,11 +49,28 @@ export default function OrderModalCard({
   items,
   variant = "onProgress",
   onClose,
-  onValidate,
 }: OrderModalCardProps) {
   const [localItems, setLocalItems] = useState<OrderItem[]>(
-    items.map((it) => ({ ...it, is_ready: it.is_ready || false })),
+    items.map((it) => ({ ...it, is_ready: it.is_ready ?? false })),
   );
+
+  const onValidate = (updatedItems: OrderItem[]) => {
+    Alert.alert(
+      "Commande mise à jour",
+      `Articles prêts: ${updatedItems.filter((i) => i.is_ready).length}`,
+    );
+  };
+
+  const onContactClient = () => {
+    Alert.alert("Contacter le client", "Ouvre l'écran de contact");
+  };
+
+  const onCancelOrder = () => {
+    Alert.alert("Annuler la commande", "Êtes-vous sûr de vouloir annuler cette commande ?", [
+      { text: "Non", style: "cancel" },
+      { text: "Oui", style: "destructive", onPress: () => Alert.alert("Commande annulée") },
+    ]);
+  };
 
   const toggleReady = (itemId: string) => {
     setLocalItems((prev) =>
@@ -64,7 +83,15 @@ export default function OrderModalCard({
   const variantStyle = VARIANT_STYLES[variant];
 
   return (
-    <View style={[styles.orderCard, { backgroundColor: variantStyle.container.backgroundColor }]}>
+    <View
+      style={[
+        styles.orderCard,
+        {
+          backgroundColor: variantStyle.container.backgroundColor,
+          borderColor: variantStyle.container.borderColor,
+        },
+      ]}
+    >
       <TouchableOpacity style={styles.closeButton} onPress={onClose}>
         <Text style={styles.closeButtonText}>×</Text>
       </TouchableOpacity>
@@ -91,10 +118,19 @@ export default function OrderModalCard({
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.itemRow}>
-              <Text style={styles.itemText}>
+              <Image
+                source={item.image}
+                style={styles.itemImage}
+                contentFit="cover"
+                transition={1000}
+              />
+              <Text style={[styles.itemText, item.is_ready ? styles.itemReady : null]}>
                 {item.title} x {item.quantity} — {item.total} €
               </Text>
-              <TouchableOpacity style={styles.checkbox} onPress={() => toggleReady(item.id)}>
+              <TouchableOpacity
+                style={[styles.checkbox, item.is_ready && styles.checkboxChecked]}
+                onPress={() => toggleReady(item.id)}
+              >
                 <Text style={styles.checkboxText}>{item.is_ready ? "✅" : "⬜️"}</Text>
               </TouchableOpacity>
             </View>
@@ -102,7 +138,20 @@ export default function OrderModalCard({
         />
       </View>
 
-      <MainButton title="Mettre à jour & passer Ready" onPress={() => onValidate(localItems)} />
+      <MainButton title="Passer la commande en prête" onPress={() => onValidate(localItems)} />
+
+      <View style={styles.secondaryButtonsRow}>
+        <SecondaryCTA
+          title="Contacter le client"
+          onPress={onContactClient}
+          style={styles.secondaryButtonLeft}
+        />
+        <SecondaryCTA
+          title="Annuler la commande"
+          onPress={onCancelOrder}
+          style={styles.secondaryButtonRight}
+        />
+      </View>
     </View>
   );
 }
@@ -112,8 +161,7 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 20,
     borderRadius: 8,
-    borderWidth: 0.1,
-    borderColor: "#000",
+    borderWidth: 2,
     shadowColor: "rgba(0,0,0,0.25)",
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 1,
@@ -124,16 +172,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 12,
     right: 16,
+    zIndex: 10,
   },
   closeButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#333",
   },
   orderHeader: {
     marginBottom: 20,
   },
   orderTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
     marginBottom: 8,
   },
@@ -153,22 +203,66 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   itemsContainer: {
-    maxHeight: 200,
+    maxHeight: 250,
     marginBottom: 20,
   },
   itemRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#ccc",
+  },
+  itemImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+    marginRight: 12,
   },
   itemText: {
-    fontSize: 14,
+    fontSize: 16,
     flex: 1,
+  },
+  itemReady: {
+    textDecorationLine: "line-through",
+    color: "#6c757d",
   },
   checkbox: {
     marginLeft: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: "#999",
+    borderRadius: 4,
+  },
+  checkboxChecked: {
+    borderColor: "#32CD32",
+    backgroundColor: "#d0f0d0",
   },
   checkboxText: {
-    fontSize: 16,
+    fontSize: 18,
+  },
+  secondaryButtonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  secondaryButtonLeft: {
+    flex: 1,
+    backgroundColor: "#ddd",
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
+  },
+  secondaryButtonRight: {
+    flex: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FF4D4D",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
   },
 });
