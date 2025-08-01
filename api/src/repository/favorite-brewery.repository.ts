@@ -9,7 +9,12 @@ export default class FavoriteBreweryRepository implements IFavoriteBrewery {
   constructor(private prisma: PrismaClient) {}
 
   getFavoriteBreweries = async (userId: string) => {
-    return await this.prisma.favorite_brewery.findMany({ where: { user_id: userId } });
+    return await this.prisma.favorite_brewery.findMany({
+      where: { user_id: userId },
+      include: {
+        brewery: true,
+      },
+    });
   };
 
   createFavoriteBrewery = async (payload: FavoriteBreweryInsert) => {
