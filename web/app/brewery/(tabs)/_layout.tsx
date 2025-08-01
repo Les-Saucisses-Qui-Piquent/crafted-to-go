@@ -26,25 +26,31 @@ export default function BreweryTabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Home",
+            title: "dashboard",
           }}
         />
         <Tabs.Screen
           name="dashboard"
           options={{
-            title: "Dashboard",
+            title: "dashboard",
           }}
         />
         <Tabs.Screen
           name="inventory"
           options={{
-            title: "Inventory",
+            title: "inventory",
           }}
         />
         <Tabs.Screen
           name="orders"
           options={{
-            title: "Orders",
+            title: "orders",
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "profile",
           }}
         />
       </Tabs>

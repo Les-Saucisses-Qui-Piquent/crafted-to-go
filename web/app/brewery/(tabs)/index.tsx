@@ -1,12 +1,12 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import { View, Text } from "react-native";
+import React from "react";
 
-const BreweryIndex = () => {
+const dashboard = () => {
   return (
     <View>
-      <Text>Brewery Index</Text>
+      <Text>dashboard</Text>
     </View>
   );
 };
 
-export default BreweryIndex;
+export default dashboard;

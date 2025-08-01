@@ -144,4 +144,8 @@ export const icons: Record<string, IconData> = {
     component: Ionicons,
     name: "arrow-back-outline",
   },
+  box: {
+    component: Ionicons,
+    name: "cube-outline",
+  },
 };
