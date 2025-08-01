@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import type { BeerInsert, BeerUpdate } from "../interfaces/IBeer";
 import BeerRepository from "../repository/beer.repository";
 import { validateUUID } from "../../utils";
+import { ImageUploader } from "../services/upload.service";
 
 export default class BeerController {
   static async getBeers(request: FastifyRequest, reply: FastifyReply) {
@@ -98,6 +99,34 @@ export default class BeerController {
       }
       const deletedBeer = await beerRepository.deleteBeer(id);
       reply.send(deletedBeer);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  static async uploadImage(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
+    const { id } = request.params;
+    validateUUID(id, reply);
+
+    const data = await ImageUploader.upload(request);
+
+    const prisma = request.server.prisma;
+    const beerRepository = new BeerRepository(prisma);
+
+    try {
+      const beer = await beerRepository.getBeer(id);
+      if (!beer) {
+        reply.status(404).send({ clientMessage: "Beer not found" });
+        return;
+      }
+      const beerUpdated = await beerRepository.updateBeer(id, { image: data.url });
+      reply.send(beerUpdated);
     } catch (error) {
       request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });
