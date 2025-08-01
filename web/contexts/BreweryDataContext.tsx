@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { OrderCardProps } from "@/components/beerCard/OrderCard";
 import { OrderItem } from "@/components/modals/OrderModal";
+import { OpeningHours } from "@/app/registerBrewery";
 
 // --- Interfaces
 export interface Brewery {
@@ -16,6 +17,13 @@ export interface Brewery {
   created_at: string;
   updated_at: string;
   brewery_id: string;
+
+  phone_number?: string;
+  email?: string;
+  has_taproom?: boolean;
+  taproom_hours: OpeningHours;
+  opening_hours?: OpeningHours;
+  social_links?: string[];
 }
 
 interface BreweryDataContextType {
@@ -57,6 +65,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
       }
 
       try {
+        // Récupérer la brasserie liée à l'utilisateur
         const breweries = await apiClient(`/breweries?owner_id=${user.id}`, { method: "GET" });
 
         if (!breweries.length) {
@@ -67,28 +76,24 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
 
         const userBrewery = breweries[0];
 
+        // Récupérer les détails, commandes et bières en parallèle
         const [detailsData, ordersData, beersData] = await Promise.all([
-          apiClient("/brewery-details", { method: "GET" }),
+          apiClient(`/brewery-details?brewery_id=${userBrewery.id}`, { method: "GET" }),
           apiClient(`/orders?brewery_id=${userBrewery.id}`, { method: "GET" }),
           apiClient(`/beers?brewery_id=${userBrewery.id}`, { method: "GET" }),
         ]);
-        const orderDetailsData = await apiClient(`/order-items/${ordersData.id}`, {
-          method: "GET",
-        });
 
-        const detail = detailsData.find((d: Brewery) => d.brewery_id === userBrewery.id);
+        const breweryDetails = detailsData[0] || null;
 
-        setBrewery({
-          ...userBrewery,
-          image: detail?.image || null,
-          logo: detail?.logo || null,
-          description: detail?.description || "",
-        });
+        // Récupérer les détails des commandes pour chaque commande
+        const orderIds = ordersData.map((order: OrderCardProps) => order.id);
+        const orderDetailsRequests = orderIds.map((orderId: string) =>
+          apiClient(`/order-items/${orderId}`, { method: "GET" }),
+        );
+        const orderDetailsArrays = await Promise.all(orderDetailsRequests);
+        const orderDetailsData = orderDetailsArrays.flat();
 
-        setBeers(beersData);
-        setOrders(ordersData);
-
-        // Mapping des détails de commande
+        // Mapper les détails des commandes
         const detailsMap = orderDetailsData.reduce(
           (acc: Record<string, OrderItem[]>, od: OrderItem) => {
             const beer = beersData.find((b: BeerCardProps) => b.id === od.beer_id);
@@ -114,6 +119,21 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
           {},
         );
 
+        setBrewery({
+          ...userBrewery,
+          image: breweryDetails?.image || null,
+          logo: breweryDetails?.logo || null,
+          description: breweryDetails?.description || "",
+          phone_number: breweryDetails?.phone_number || "",
+          email: breweryDetails?.email || "",
+          has_taproom: breweryDetails?.has_taproom || false,
+          taproom_hours: breweryDetails?.taproom_hours || null,
+          opening_hours: breweryDetails?.opening_hours || null,
+          social_links: breweryDetails?.social_links || [],
+        });
+
+        setBeers(beersData);
+        setOrders(ordersData);
         setOrderDetails(detailsMap);
       } catch (error) {
         console.error("Erreur de chargement des données de brasserie :", error);
@@ -123,7 +143,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
     };
 
     fetchBreweryData();
-  }, []);
+  }, [user, apiClient]);
 
   return (
     <BreweryDataContext.Provider

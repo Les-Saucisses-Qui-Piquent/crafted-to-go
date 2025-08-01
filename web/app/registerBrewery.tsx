@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 //CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
-const DAY_LABELS: Record<Day, string> = {
+export const DAY_LABELS: Record<Day, string> = {
   monday: "Lundi",
   tuesday: "Mardi",
   wednesday: "Mercredi",
@@ -29,12 +29,12 @@ const DAY_LABELS: Record<Day, string> = {
   sunday: "Dimanche",
 } as const;
 
-const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
+export const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   const hour = i.toString().padStart(2, "0");
   return { label: `${hour}:00`, value: `${hour}:00` };
 });
 
-const DAYS = [
+export const DAYS = [
   "monday",
   "tuesday",
   "wednesday",
@@ -44,7 +44,7 @@ const DAYS = [
   "sunday",
 ] as const;
 
-type Day = (typeof DAYS)[number];
+export type Day = (typeof DAYS)[number];
 
 //INTERFACES ET MESSAGES D'ERREUR POUR LA VALIDATION DU FORMULAIRE
 type FormErrors = {
@@ -128,13 +128,13 @@ type Brewery = {
   siren: string;
 };
 
-type OpeningHoursDetail = {
+export type OpeningHoursDetail = {
   isOpen: boolean;
   openTime?: string; // Optionnel si isOpen est false
   closeTime?: string; // Optionnel si isOpen est false
 };
 
-type OpeningHours = Record<Day, OpeningHoursDetail>;
+export type OpeningHours = Record<Day, OpeningHoursDetail>;
 
 type BreweryDetail = {
   description: string;
@@ -150,7 +150,7 @@ type BreweryDetail = {
 
 type BreweryFormState = BreweryOwner & Address & Brewery & BreweryDetail;
 
-interface OpeningHoursSectionProps {
+export interface OpeningHoursSectionProps {
   title: string;
   hours: OpeningHours;
   onToggleDay: (day: Day) => void;
@@ -158,13 +158,13 @@ interface OpeningHoursSectionProps {
   summary: string;
 }
 
-const OpeningHoursSection: React.FC<OpeningHoursSectionProps> = ({
+export const OpeningHoursSection = ({
   title,
   hours,
   onToggleDay,
   onUpdateTime,
   summary,
-}) => {
+}: OpeningHoursSectionProps) => {
   return (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
