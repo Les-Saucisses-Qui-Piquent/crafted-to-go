@@ -4,57 +4,33 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TabBar from "@/components/TabBar";
 import TopBar from "@/components/TopBar";
 import { COLORS } from "@/constants";
+import { BreweryDataProvider } from "@/contexts/BreweryDataContext";
 
 export default function BreweryTabsLayout() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TopBar variant="brewery" />
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-        }}
-        tabBar={({ navigation, state }) => (
-          <TabBar
-            isClient={false}
-            activeTab={state.routeNames[state.index]}
-            onTabPress={(tabName) => navigation.navigate(tabName)}
-          />
-        )}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "index",
-          }}
-        />
-        <Tabs.Screen
-          name="dashboard"
-          options={{
-            title: "dashboard",
-          }}
-        />
-        <Tabs.Screen
-          name="inventory"
-          options={{
-            title: "inventory",
-          }}
-        />
-        <Tabs.Screen
-          name="orders"
-          options={{
-            title: "orders",
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "profile",
-          }}
-        />
-      </Tabs>
-    </View>
+    <BreweryDataProvider>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <TopBar variant="brewery" />
+        <Tabs
+          screenOptions={{ headerShown: false }}
+          tabBar={({ navigation, state }) => (
+            <TabBar
+              isClient={false}
+              activeTab={state.routeNames[state.index]}
+              onTabPress={(tabName) => navigation.navigate(tabName)}
+            />
+          )}
+        >
+          <Tabs.Screen name="index" />
+          <Tabs.Screen name="dashboard" />
+          <Tabs.Screen name="inventory" />
+          <Tabs.Screen name="orders" />
+          <Tabs.Screen name="profile" />
+        </Tabs>
+      </View>
+    </BreweryDataProvider>
   );
 }
 

@@ -1,75 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from "react-native";
-import { useApiClient } from "@/utils/api-client";
-import { useAuth } from "@/contexts/AuthContext";
-import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import TextCTA from "@/components/Buttons/TextCTA";
 import { COLORS } from "@/constants";
+import { useBreweryData } from "@/contexts/BreweryDataContext";
+import { BeerCardProps } from "@/components/beerCard/BeerCard";
 
-export interface Brewery {
-  id: string;
-  name: string;
-  image: string | null;
-  logo: string | null;
-  description: string;
-  owner_id: string;
-  created_at: string;
-  updated_at: string;
-  brewery_id: string;
-}
-
-export default function BreweryHomePage() {
-  const { apiClient } = useApiClient();
-  const { user } = useAuth();
-
-  const [brewery, setBrewery] = useState<Brewery>();
-  const [beers, setBeers] = useState<BeerCardProps[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBreweryData = async () => {
-      if (!user || user.role !== "brewer") {
-        console.warn("Utilisateur non autorisé ou non connecté.");
-        return;
-      }
-
-      try {
-        const breweryRes = await apiClient(`/breweries?owner_id=${user.id}`, {
-          method: "GET",
-        });
-        const breweries = await breweryRes.json();
-
-        if (!breweries.length) {
-          console.warn("Aucune brasserie trouvée pour cet utilisateur.");
-          return;
-        }
-
-        const userBrewery = breweries[0];
-
-        const detailsRes = await apiClient("/brewery-details", { method: "GET" });
-        const detailsData = await detailsRes.json();
-        const detail = detailsData.find((d: Brewery) => d.brewery_id === userBrewery.id);
-
-        setBrewery({
-          ...userBrewery,
-          image: detail?.image || null,
-          logo: detail?.logo || null,
-          description: detail?.description || "",
-        });
-
-        // 3. Récupère uniquement les bières de cette brasserie
-        const beersRes = await apiClient(`/beers?brewery_id=${userBrewery.id}`, { method: "GET" });
-        const beersData = await beersRes.json();
-        setBeers(beersData);
-      } catch (error) {
-        console.error("Erreur lors du chargement de la brasserie :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBreweryData();
-  }, [user]);
+export default function Dashboard() {
+  const { brewery, beers, loading } = useBreweryData();
 
   if (loading) {
     return (
@@ -86,6 +23,7 @@ export default function BreweryHomePage() {
       </View>
     );
   }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -101,13 +39,14 @@ export default function BreweryHomePage() {
         />
       </View>
       <Text style={styles.bannerSubtitle}>DASHBOARD</Text>
-      {/* 👉 SECTION COMMANDES EN COURS - À compléter */}
+
+      {/* SECTION COMMANDES EN COURS - À faire plus tard si tu veux */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>📦 Commandes en cours</Text>
-        {/* TODO : Composant ou liste des commandes à venir */}
+        {/* TODO: Liste commandes */}
       </View>
 
-      {/* Bières de la brasserie */}
+      {/* SECTION BIÈRES */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🍺 Bières de la brasserie</Text>
         {beers.map((beer: BeerCardProps) => (
