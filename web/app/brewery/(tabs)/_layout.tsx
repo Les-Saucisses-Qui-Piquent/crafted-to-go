@@ -26,7 +26,7 @@ export default function BreweryTabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "dashboard",
+            title: "index",
           }}
         />
         <Tabs.Screen

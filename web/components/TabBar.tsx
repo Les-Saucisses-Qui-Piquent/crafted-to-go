@@ -26,7 +26,7 @@ const clientTabs: TabItem[] = [
 ];
 
 const nonClientTabs: TabItem[] = [
-  { name: "dashboard", label: "Accueil", iconName: "home" },
+  { name: "index", label: "Accueil", iconName: "home" },
   { name: "inventory", label: "Inventaire", iconName: "box" },
   { name: "orders", label: "Commandes", iconName: "receipt" },
   { name: "profile", label: "Profil", iconName: "person" },
