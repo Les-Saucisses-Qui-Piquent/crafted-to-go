@@ -27,6 +27,7 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
           </View>
           <Text style={styles.stock}>En stock : {beer.quantity}</Text>
           <Text style={styles.price}>Prix : {beer.price}€</Text>
+          {beer.brewery && <Text style={styles.brewery}>En vente chez {beer.brewery.name}</Text>}
         </View>
       </View>
     </View>
@@ -91,6 +92,11 @@ const mobileStyles = StyleSheet.create({
     fontWeight: "300",
     color: "#888",
   },
+  brewery: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
+  },
 });
 
 // Tablet styles
@@ -150,5 +156,10 @@ const tabletStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "300",
     color: "#888",
+  },
+  brewery: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#000",
   },
 });
