@@ -18,36 +18,16 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={{ uri: beer.image }} />
-      <Text style={styles.title}>{beer.title}</Text>
-      <Text style={styles.description}>{beer.description}</Text>
-      <View
-        style={{
-          height: 1,
-          width: "100%",
-          backgroundColor: "#D9D9D9",
-          marginVertical: 16,
-        }}
-      />
-      {/* Attributes */}
-      <View style={styles.attributeBlock1}>
-        <Text style={styles.attributeLabel}>Style</Text>
-        <Text style={styles.attributeValue}>{beer.style}</Text>
-      </View>
-      <View style={styles.attributeBlock2}>
-        <Text style={styles.attributeLabel}>Couleur</Text>
-        <Text style={styles.attributeValue}>{beer.color}</Text>
-      </View>
-      <View style={styles.attributeBlock3}>
-        <Text style={styles.attributeLabel}>Taux</Text>
-        <Text style={styles.attributeValue}>{beer.abv}</Text>
-      </View>
-      <View style={styles.attributeBlock4}>
-        <Text style={styles.attributeLabel}>Prix</Text>
-        <Text style={styles.attributeValue}>{beer.price}</Text>
-      </View>
-      <View style={styles.attributeBlock5}>
-        <Text style={styles.attributeLabel}>Stock</Text>
-        <Text style={styles.attributeValue}>{beer.stock}</Text>
+      <View style={styles.infoContainer}>
+        <Text style={styles.title}>{beer.name}</Text>
+        <View style={styles.bottomInfo}>
+          <View style={styles.abvStyleRow}>
+            {beer.beer_style && <Text style={styles.beerStyle}>{beer.beer_style.label}</Text>}
+            <Text style={styles.abv}>{beer.abv_rate}%</Text>
+          </View>
+          <Text style={styles.stock}>En stock : {beer.quantity}</Text>
+          <Text style={styles.price}>Prix : {beer.price}€</Text>
+        </View>
       </View>
     </View>
   );
@@ -55,147 +35,119 @@ export default function BeerCardLarge({ beer, isTablet = isTabletDevice() }: Bee
 
 const mobileStyles = StyleSheet.create({
   container: {
-    position: "relative",
-    flexShrink: 0,
-    height: 229,
-    width: 714,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    width: 300,
+    height: 450,
+    backgroundColor: "#fff",
+    //borderRadius: 12,
+    //shadowColor: "#000",
+    //shadowOffset: { width: 0, height: 2 },
+    //shadowOpacity: 0.1,
+    //shadowRadius: 4,
+    elevation: 3,
   },
   image: {
-    position: "absolute",
-    left: 0,
-    right: 371,
-    height: 229,
-    borderRadius: 12,
-    overflow: "hidden",
+    width: "100%",
+    height: 300,
+    //borderTopLeftRadius: 12,
+    //borderTopRightRadius: 12,
+  },
+  infoContainer: {
+    padding: 15,
+    flex: 1,
+    justifyContent: "space-between",
   },
   title: {
-    position: "absolute",
-    top: 0,
-    left: 365,
-    right: 6,
-    color: "#1D1D1B",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 32,
+    fontSize: 20,
     fontWeight: "700",
-    letterSpacing: -0.96,
-    lineHeight: 34,
-    textAlign: "left",
-  },
-  description: {
-    position: "absolute",
-    top: 81,
-    left: 365,
-    right: 8,
-    color: "#636360",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 18,
-    textAlign: "justify",
-  },
-  divider: {
-    position: "absolute",
-    top: 182,
-    left: 366,
-    right: 3,
-    overflow: "visible",
-  },
-  attributeBlock1: { position: "absolute", top: 193, left: 367, width: 63 },
-  attributeBlock2: { position: "absolute", top: 193, left: 433, width: 63 },
-  attributeBlock3: { position: "absolute", top: 193, left: 517, width: 63 },
-  attributeBlock4: { position: "absolute", top: 193, left: 598, width: 63 },
-  attributeBlock5: { position: "absolute", top: 193, left: 679, width: 63 },
-  attributeLabel: {
-    color: "#636360",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 12,
-    fontWeight: "300",
-    lineHeight: 18,
-    textAlign: "left",
-  },
-  attributeValue: {
     color: "#000",
-    fontFamily: "Hanken Grotesk",
+    textTransform: "capitalize",
+    marginBottom: 8,
+  },
+  bottomInfo: {
+    gap: 6,
+  },
+  abvStyleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  beerStyle: {
+    fontSize: 16,
+    color: "#000",
+    marginRight: 8,
+    textTransform: "capitalize"
+  },
+  abv: {
+    fontSize: 16,
+    color: "#000",
+  },
+  stock: {
     fontSize: 14,
-    fontWeight: "800",
-    lineHeight: 18,
-    textAlign: "left",
-    marginTop: 2,
+    color: "#888",
+    fontWeight: "300",
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: "300",
+    color: "#888",
   },
 });
 
 // Tablet styles
 const tabletStyles = StyleSheet.create({
   container: {
-    position: "relative",
-    flexShrink: 0,
-    height: 520,
-    width: 355,
-    flexDirection: "column",
-    alignItems: "flex-start",
+    width: 350,
+    height: 550,
+    backgroundColor: "#fff",
+    //borderRadius: 12,
+    //shadowColor: "#000",
+    //shadowOffset: { width: 0, height: 2 },
+    //shadowOpacity: 0.1,
+    //shadowRadius: 4,
+    elevation: 3,
   },
   image: {
-    position: "absolute",
-    left: 1,
-    right: 3,
-    height: 234,
-    borderRadius: 12,
-    overflow: "hidden",
+    width: "100%",
+    height: 350,
+    //borderTopLeftRadius: 12,
+    //borderTopRightRadius: 12,
+  },
+  infoContainer: {
+    padding: 20,
+    flex: 1,
+    justifyContent: "space-between",
   },
   title: {
-    position: "absolute",
-    top: 260,
-    left: 0,
-    right: 0,
-    color: "#1D1D1B",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "700",
-    letterSpacing: -0.96,
-    lineHeight: 34,
-    textAlign: "left",
-  },
-  description: {
-    position: "absolute",
-    top: 311,
-    left: 0,
-    right: 2,
-    color: "#636360",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 18,
-    textAlign: "justify",
-  },
-  divider: {
-    position: "absolute",
-    top: 410,
-    left: 0,
-    right: 3,
-    overflow: "visible",
-  },
-  attributeBlock1: { position: "absolute", top: 436, left: 1, width: 63 },
-  attributeBlock2: { position: "absolute", top: 436, left: 68, width: 63 },
-  attributeBlock3: { position: "absolute", top: 436, left: 154, width: 63 },
-  attributeBlock4: { position: "absolute", top: 436, left: 237, width: 63 },
-  attributeBlock5: { position: "absolute", top: 436, left: 319, width: 63 },
-  attributeLabel: {
-    color: "#636360",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 12,
-    fontWeight: "300",
-    lineHeight: 18,
-    textAlign: "left",
-  },
-  attributeValue: {
     color: "#000",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 14,
-    fontWeight: "800",
-    lineHeight: 18,
-    textAlign: "left",
-    marginTop: 2,
+    textTransform: "capitalize",
+    marginBottom: 10,
+  },
+  bottomInfo: {
+    gap: 8,
+  },
+  abvStyleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  beerStyle: {
+    fontSize: 18,
+    color: "#000",
+    marginRight: 10,
+    textTransform: "capitalize"
+  },
+  abv: {
+    fontSize: 18,
+    color: "#000",
+  },
+  stock: {
+    fontSize: 16,
+    color: "#888",
+    fontWeight: "300",
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "300",
+    color: "#888",
   },
 });

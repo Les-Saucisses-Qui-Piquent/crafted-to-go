@@ -1,79 +1,51 @@
-import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, Dimensions, Button, TouchableOpacity } from "react-native";
+import React from "react";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import BeerCardLarge from "../beerCard/beerCardLarge";
 import { BeerCardProps } from "../beerCard/BeerCard";
 import { RelativePathString, useRouter } from "expo-router";
-
-const { width } = Dimensions.get("window");
 
 interface LargeBeerCarousselProps {
   beers: BeerCardProps[];
 }
 
 const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
-
-  const handleNext = () => {
-    if (currentIndex < beers.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
 
   const onPress = (beer: BeerCardProps) => {
     router.push({
       pathname: "/BeerDetails/[id]" as RelativePathString,
-      params: { ...beer, id: beer.id },
+      params: { 
+        ...beer, 
+        id: beer.id,
+        beer_style: beer.beer_style?.label || ""
+      },
     });
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={(event) => {
-          const index = Math.floor(event.nativeEvent.contentOffset.x / width);
-          setCurrentIndex(index);
-        }}
-      >
-        {beers.map((beer, index) => (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {beers.map((beer) => (
           <TouchableOpacity
             key={beer.id}
             style={styles.cardContainer}
-            onPress={() => onPress(beer)} // ✅ Ajout du clic
+            onPress={() => onPress(beer)}
           >
             <BeerCardLarge beer={beer} />
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <View style={styles.navigation}>
-        <Button title="Previous" onPress={handlePrev} disabled={currentIndex === 0} />
-        <Button title="Next" onPress={handleNext} disabled={currentIndex === beers.length - 1} />
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    paddingVertical: 5,
   },
   cardContainer: {
-    width: width,
-    alignItems: "center",
-  },
-  navigation: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
+    marginRight: 15,
+    marginLeft: 10,
   },
 });
 
