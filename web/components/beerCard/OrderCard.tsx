@@ -24,6 +24,7 @@ export default function CommandCard({
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR");
   };
+
   return (
     <View style={styles.card}>
       <Text style={styles.status}>📦 Statut: {status}</Text>

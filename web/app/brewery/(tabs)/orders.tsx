@@ -4,7 +4,7 @@ import CommandCard, { OrderCardProps } from "@/components/beerCard/OrderCard";
 import FilterBar from "@/components/filterBars/FilterBar";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
 
-const filters = ["Nouveau", "En cours", "Prêtes"];
+const filters = ["Nouveau", "En cours", "Prêtes", "Annulées", "toutes"];
 
 export default function Orders() {
   const { orders, loading } = useBreweryData();
@@ -15,7 +15,7 @@ export default function Orders() {
     setFilteredOrders(filterByStatus(orders, filters[selectedFilter]));
   }, [orders, selectedFilter]);
 
-  const filterByStatus = (ordersList: OrderCardProps[], filter: string) => {
+  function filterByStatus(ordersList: OrderCardProps[], filter: string) {
     switch (filter) {
       case "Nouveau":
         return ordersList.filter((order) => order.status === "new");
@@ -23,14 +23,17 @@ export default function Orders() {
         return ordersList.filter((order) => order.status === "progress");
       case "Prêtes":
         return ordersList.filter((order) => order.status === "ready");
+      case "Annulées":
+        return ordersList.filter((order) => order.status === "cancelled");
+      case "toutes":
       default:
         return ordersList;
     }
-  };
+  }
 
-  const handleFilterSelect = (index: number) => {
+  function handleFilterSelect(index: number) {
     setSelectedFilter(index);
-  };
+  }
 
   const renderItem = ({ item }: { item: OrderCardProps }) => (
     <View style={styles.orderWrapper}>
@@ -52,8 +55,12 @@ export default function Orders() {
     <View style={styles.container}>
       <View style={styles.statsContainer}>
         <StatBlock label="Nouvelles" count={orders.filter((o) => o.status === "new").length} />
-        <StatBlock label="En cours" count={orders.filter((o) => o.status === "progress").length} />
+        <StatBlock
+          label="En cours"
+          count={orders.filter((o) => o.status === "inProgress").length}
+        />
         <StatBlock label="Prêtes" count={orders.filter((o) => o.status === "ready").length} />
+        <StatBlock label="Annulées" count={orders.filter((o) => o.status === "cancelled").length} />
       </View>
 
       <View style={styles.filterContainer}>
