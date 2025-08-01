@@ -21,6 +21,7 @@ enum OrderStatus {
   in_progress
   ready
   cancelled
+  completed
 }
 
 model address {
