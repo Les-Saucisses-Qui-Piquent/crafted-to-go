@@ -10,6 +10,10 @@ export default async function (fastify: FastifyInstance) {
     handler: OrderController.getOrder,
   });
 
+  fastify.get("/orders/user/:userId", {
+    handler: OrderController.getOrdersFromUser,
+  });
+
   fastify.post("/orders", {
     handler: OrderController.createOrder,
   });
