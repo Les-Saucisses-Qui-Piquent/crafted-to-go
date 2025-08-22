@@ -12,7 +12,7 @@ const BreweryCaroussel = ({ breweries }: BreweryCarousselProps) => {
 
   const handleNavigate = (brewery: BreweryProps) => {
     router.push({
-      pathname: "/BreweryDetails/[id]" as RelativePathString,
+      pathname: "/customer/BreweryDetails/[id]" as RelativePathString,
       params: {
         id: brewery.id,
         brewery: JSON.stringify(brewery),

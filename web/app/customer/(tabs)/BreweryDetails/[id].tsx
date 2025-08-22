@@ -15,7 +15,6 @@ export interface BreweryDetailsProps {
   taproom_hours?: Record<string, string>;
   opening_hours?: Record<string, string>;
   social_links?: string[];
-  // Ajoute d'autres champs selon ta data
 }
 
 export default function BreweryDetails() {
@@ -106,7 +105,7 @@ export default function BreweryDetails() {
 
       {breweryData.opening_hours && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horaires d'ouverture</Text>
+          <Text style={styles.sectionTitle}>Horaires d&apos;ouverture</Text>
           {renderHours(breweryData.opening_hours)}
         </View>
       )}

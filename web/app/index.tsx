@@ -10,7 +10,7 @@ type Nav = {
 };
 
 // Add Welcome Screen
-const index = () => {
+const Index = () => {
   const { navigate } = useNavigation<Nav>();
 
   return (
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default index;
+export default Index;

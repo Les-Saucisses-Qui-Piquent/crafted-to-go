@@ -13,7 +13,7 @@ const SmallBeerCaroussel = ({ beers }: SmallBeerCarousselProps) => {
 
   const onPress = (beer: BeerCardProps) => {
     router.push({
-      pathname: "/BeerDetails/[id]" as RelativePathString,
+      pathname: "/customer/BeerDetails/[id]" as RelativePathString,
       params: {
         id: beer.id,
         name: beer.name,
