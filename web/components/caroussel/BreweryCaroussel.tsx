@@ -1,7 +1,7 @@
 import React from "react";
-import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from "react-native";
 import BreweryCardSmall, { BreweryProps } from "../brewery/BreweryCardSmall";
-import { RelativePathString, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 interface BreweryCarousselProps {
   breweries: BreweryProps[];
@@ -11,21 +11,29 @@ const BreweryCaroussel = ({ breweries }: BreweryCarousselProps) => {
   const router = useRouter();
 
   const handleNavigate = (brewery: BreweryProps) => {
-    router.push({
-      pathname: "/customer/BreweryDetails/[id]" as RelativePathString,
-      params: {
-        id: brewery.id,
-      },
-    });
+    router.push(`/customer/BreweryDetails/${brewery.id}`);
   };
+
+  if (!breweries || breweries.length === 0) {
+    return (
+      <View style={styles.empty}>
+        <Text>Aucune brasserie trouvée</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {breweries.map((brewery) => (
           <TouchableOpacity
             key={brewery.id}
-            style={styles.cardContainer}
+            style={styles.cardWrapper}
+            activeOpacity={0.8}
             onPress={() => handleNavigate(brewery)}
           >
             <BreweryCardSmall {...brewery} />
@@ -40,9 +48,17 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 5,
   },
-  cardContainer: {
+  scrollContent: {
+    paddingHorizontal: 10,
+    alignItems: "flex-start",
+  },
+  cardWrapper: {
     marginRight: 15,
-    marginLeft: 10,
+    // force une largeur fixe pour éviter chevauchement
+    width: 250,
+  },
+  empty: {
+    padding: 12,
   },
 });
 

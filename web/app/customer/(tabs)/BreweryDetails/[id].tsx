@@ -42,7 +42,7 @@ export default function BreweryDetails() {
     );
 
   const renderHours = (
-    hoursObj?: Record<string, string | { isOpen: boolean; openTime: string; closeTime: string }>,
+    hoursObj?: Record<string, string | { isOpen: boolean; openTime?: string; closeTime?: string }>,
   ) => {
     if (!hoursObj) return null;
 
@@ -59,7 +59,7 @@ export default function BreweryDetails() {
         const { isOpen, openTime, closeTime } = hours as OpeningHoursDetail;
         return (
           <Text key={day} style={styles.text}>
-            {day}: {isOpen ? `${openTime} - ${closeTime}` : "Fermé"}
+            {day}: {isOpen ? `${openTime ?? "?"} - ${closeTime ?? "?"}` : "Fermé"}
           </Text>
         );
       }
@@ -84,7 +84,7 @@ export default function BreweryDetails() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
-      <Text style={styles.title}>{breweryData.title}</Text>
+      <Text style={styles.title}>{breweryData.name}</Text>
 
       {(breweryData.logo || breweryData.image) && (
         <Image

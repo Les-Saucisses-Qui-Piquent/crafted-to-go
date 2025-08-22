@@ -45,6 +45,7 @@ export default function HomePage() {
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: { backgroundColor: "#fff", flex: 1 },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },

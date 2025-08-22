@@ -25,10 +25,16 @@ export interface BreweryProps {
   };
 }
 
-export default function BreweryCardSmall(brewery: BreweryProps) {
+export default function BreweryCardSmall(props: BreweryProps) {
+  const brewery = props;
+
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={brewery.image} />
+      {brewery.logo ? (
+        <Image style={styles.image} source={{ uri: brewery.logo }} />
+      ) : brewery.image ? (
+        <Image style={styles.image} source={{ uri: brewery.image }} />
+      ) : null}
       <Text style={styles.breweryName}>{brewery.name}</Text>
       {brewery.address && brewery.address.city && (
         <Text style={styles.address}>{brewery.address.city}</Text>

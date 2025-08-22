@@ -49,7 +49,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         setLoading(true);
 
-        const [beersData, breweriesData, favBeersData, favBreweriesData, userRes, userDetailsRes] =
+        const [beersData, breweriesRaw, favBeersData, favBreweriesData, userRes, userDetailsRes] =
           await Promise.all([
             apiClient("/beers", { method: "GET" }),
             apiClient("/breweries", { method: "GET" }),
@@ -74,8 +74,38 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           },
         };
 
+        const enrichBrewery = async (brewery: BreweryProps): Promise<BreweryProps | undefined> => {
+          try {
+            const detailsRes = await apiClient(`/brewery-details?brewery_id=${brewery.id}`, {
+              method: "GET",
+            });
+            const detailsArray = Array.isArray(detailsRes) ? detailsRes : [detailsRes];
+            // Filtre le bon détail pour cette brasserie
+            const details = detailsArray.find((d) => d.brewery_id === brewery.id) || {};
+
+            const { id: _id, ...detailsWithoutId } = details || {};
+
+            const merged = {
+              ...brewery,
+              ...detailsWithoutId,
+              opening_hours: details?.opening_hours ?? brewery.opening_hours,
+              taproom_hours: details?.taproom_hours ?? brewery.taproom_hours,
+              social_links: details?.social_links ?? brewery.social_links,
+            } as BreweryProps;
+
+            return merged;
+          } catch (err) {
+            console.error("Erreur enrichissement brasserie :", err, brewery?.id);
+            return brewery as BreweryProps;
+          }
+        };
+
+        const breweriesDetailed: BreweryProps[] = await Promise.all(
+          (breweriesRaw ?? []).map(enrichBrewery),
+        );
+
         setBeers(beersData);
-        setBreweries(breweriesData);
+        setBreweries(breweriesDetailed);
         setFavoriteBeers(favBeersData);
         setFavoriteBreweries(favBreweriesData);
         setUserDetails(fullUser);
@@ -88,6 +118,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     fetchData();
   }, []);
+
   const toggleFavoriteBeer = async (beerId: string): Promise<void> => {
     if (!user) return;
 
@@ -159,11 +190,15 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         apiClient(`/brewery-details?brewery_id=${id}`, { method: "GET" }),
       ]);
 
-      const details = Array.isArray(detailsRes) ? (detailsRes[0] ?? null) : (detailsRes ?? null);
+      const detailsArray = Array.isArray(detailsRes) ? detailsRes : [detailsRes];
+      // Filtre le bon détail pour cette brasserie
+      const details = detailsArray.find((d) => d.brewery_id === id) || {};
+
+      const { id: _id, ...detailsWithoutId } = details || {};
 
       const merged: BreweryProps = {
         ...breweryRes,
-        ...(details || {}),
+        ...detailsWithoutId,
         opening_hours: details?.opening_hours ?? breweryRes.opening_hours,
         taproom_hours: details?.taproom_hours ?? breweryRes.taproom_hours,
         social_links: details?.social_links ?? breweryRes.social_links,
@@ -179,7 +214,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const getOrdersByUserId = async (userId: string): Promise<OrderCardProps[]> => {
     try {
       const orders = await apiClient(`/orders/user/${userId}`, { method: "GET" });
-      console.log("Fetched orders:", orders);
       return orders;
     } catch (err) {
       console.error("Erreur fetch orders by user ID :", err);
