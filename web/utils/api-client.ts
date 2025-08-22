@@ -15,7 +15,7 @@ export const useApiClient = () => {
       credentials: "include",
     });
 
-    return response;
+    return await response.json();
   };
 
   return { apiClient };

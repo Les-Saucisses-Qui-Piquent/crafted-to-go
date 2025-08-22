@@ -68,7 +68,7 @@ const mobileStyles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     marginRight: 8,
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   abv: {
     fontSize: 16,
@@ -126,7 +126,7 @@ const tabletStyles = StyleSheet.create({
     fontSize: 18,
     color: "#000",
     marginRight: 10,
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   abv: {
     fontSize: 18,

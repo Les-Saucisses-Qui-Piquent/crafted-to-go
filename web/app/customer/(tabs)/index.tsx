@@ -1,58 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from "react-native";
+import { useClientData } from "@/contexts/CostumerDataProvider";
 import BeerCaroussel from "@/components/caroussel/BeerCaroussel";
 import BreweryCaroussel from "@/components/caroussel/BreweryCaroussel";
 import LargeBeerCaroussel from "@/components/caroussel/LargeBeerCaroussel";
 import SmallBeerCaroussel from "@/components/caroussel/SmallBeerCaroussel";
-import { useApiClient } from "@/utils/api-client";
 
 export default function HomePage() {
-  const { apiClient } = useApiClient();
-
-  const [beers, setBeers] = useState([]);
-  const [breweries, setBreweries] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const beersRes = await apiClient("/beers", { method: "GET" });
-        const beersData = await beersRes.json();
-
-        const breweriesRes = await apiClient("/breweries", { method: "GET" });
-        const breweriesData = await breweriesRes.json();
-
-        const breweryDetailsRes = await apiClient("/brewery-details", { method: "GET" });
-        const breweryDetailsData = await breweryDetailsRes.json();
-
-        // Fusionne les données brewery + brewery_details (par id commun)
-        const combinedBreweries = breweriesData.map((brewery: any) => {
-          const details = breweryDetailsData.find(
-            (detail: any) => detail.brewery_id === brewery.id,
-          );
-
-          return {
-            id: brewery.id,
-            title: brewery.name,
-            address: brewery.address, // Conserver l'adresse de la brasserie
-            image: details?.image || null,
-            logo: details?.logo || null,
-            description: details?.description || "",
-            ...details,
-          };
-        });
-
-        setBeers(beersData);
-        setBreweries(combinedBreweries);
-      } catch (error) {
-        console.error("Erreur API :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { beers, breweries, loading } = useClientData();
 
   if (loading) {
     return (
@@ -64,7 +19,6 @@ export default function HomePage() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Bannière d’accueil */}
       <View style={styles.banner}>
         <Image
           source={{ uri: "https://images.unsplash.com/photo-1506744038136-46273834b3fb" }}
@@ -77,32 +31,20 @@ export default function HomePage() {
         </Text>
       </View>
 
-      {/* Carrousel Brasseries */}
       <Text style={styles.sectionTitle}>Découvre nos brasseries partenaires</Text>
       <BreweryCaroussel breweries={breweries} />
 
-      {/* Carrousel Bières à la une */}
       <Text style={styles.sectionTitle}>Bières à la une</Text>
       <LargeBeerCaroussel beers={beers} />
 
-      {/* Suggestions */}
       <Text style={styles.sectionTitle}>Suggestions pour toi</Text>
       <BeerCaroussel beers={beers} />
 
-      {/* Petits formats */}
       <Text style={styles.sectionTitle}>Petits formats à emporter</Text>
       <SmallBeerCaroussel beers={beers} />
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          🍻 Crafted to Go - Le Click & Collect de la bière artisanale
-        </Text>
-      </View>
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: { backgroundColor: "#fff", flex: 1 },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
@@ -117,7 +59,13 @@ const styles = StyleSheet.create({
   bannerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.4)" },
   bannerTitle: { color: "#fff", fontSize: 28, fontWeight: "bold", marginBottom: 10, zIndex: 2 },
   bannerSubtitle: { color: "#fff", fontSize: 16, zIndex: 2 },
-  sectionTitle: { fontSize: 22, fontWeight: "600", marginTop: 15, marginBottom: 10, marginLeft: 10 },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    marginTop: 15,
+    marginBottom: 10,
+    marginLeft: 10,
+  },
   footer: { marginTop: 30, padding: 15, backgroundColor: "#f2f2f2", alignItems: "center" },
   footerText: { color: "#888", fontSize: 14 },
 });

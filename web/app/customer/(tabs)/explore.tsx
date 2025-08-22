@@ -2,46 +2,31 @@ import React, { useState, useMemo } from "react";
 import { View, Text, StyleSheet, SafeAreaView, ScrollView, Dimensions } from "react-native";
 import BeerCardLarge from "@/components/beerCard/beerCardLarge";
 import FilterPillar from "@/components/filterBars/FilterUnderline";
+import { useClientData } from "@/contexts/CostumerDataProvider";
+import { BeerCardProps } from "@/components/beerCard/BeerCard";
 
 const { width } = Dimensions.get("window");
 const isTabletDevice = () => width >= 600;
 
-// Interface pour une bière
-interface Beer {
-  id: number | string;
-  image: string;
-  name: string;
-  description: string;
-  style: string;
-  color: string;
-  abv: string;
-  price: string;
-  stock: string | number;
-  category: string;
-}
-
-// Props du composant ExploreScreen
 interface ExploreScreenProps {
-  beers: Beer[];
   filterCategories?: string[];
   title?: string;
   subtitle?: string;
 }
 
 export default function Explore({
-  beers = [],
   filterCategories = ["Toutes"],
   title = "Explorer",
   subtitle = "Découvrez notre sélection de bières artisanales",
 }: ExploreScreenProps) {
+  const { beers } = useClientData();
   const [selectedFilterIndex, setSelectedFilterIndex] = useState(0);
   const isTablet = isTabletDevice();
 
-  // Filtrage des bières selon la catégorie sélectionnée
   const filteredBeers = useMemo(() => {
     if (selectedFilterIndex === 0) return beers;
     const selectedCategory = filterCategories[selectedFilterIndex];
-    return beers.filter((beer) => beer.category === selectedCategory);
+    return beers.filter((beer: BeerCardProps) => beer.beer_style.label === selectedCategory);
   }, [selectedFilterIndex, beers, filterCategories]);
 
   const styles = isTablet ? tabletStyles : mobileStyles;
@@ -59,25 +44,11 @@ export default function Explore({
         onSelect={setSelectedFilterIndex}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <View style={styles.beerList}>
-          {filteredBeers.map((beer) => (
+          {filteredBeers.map((beer: BeerCardProps) => (
             <View key={beer.id} style={styles.beerCardContainer}>
-              <BeerCardLarge
-                image={beer.image}
-                name={beer.name}
-                description={beer.description}
-                style={beer.style}
-                color={beer.color}
-                abv={beer.abv}
-                price={beer.price}
-                stock={beer.stock}
-                isTablet={isTablet}
-              />
+              <BeerCardLarge beer={beer} isTablet={isTablet} />
             </View>
           ))}
         </View>
