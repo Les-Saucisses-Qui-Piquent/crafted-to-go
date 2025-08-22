@@ -20,6 +20,10 @@ export default class OrderDetailRepository implements IOrderDetail {
     return await this.prisma.order_detail.findMany({ where: { order_id: orderId } });
   };
 
+  getDetailFromUser = async (userId: string) => {
+    return await this.prisma.order_detail.findMany({ where: { order: { user_id: userId } } });
+  };
+
   createOrderDetail = async (payload: OrderDetailInsert) => {
     return await this.prisma.order_detail.create({ data: payload });
   };

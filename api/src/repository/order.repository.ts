@@ -12,6 +12,10 @@ export default class OrderRepository implements IOrder {
     return await this.prisma.order.findUnique({ where: { id } });
   };
 
+  getOrdersFromUser = async (userId: string) => {
+    return await this.prisma.order.findMany({ where: { user_id: userId } });
+  };
+
   createOrder = async (payload: OrderInsert) => {
     return await this.prisma.order.create({ data: payload });
   };
