@@ -1,37 +1,29 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ListRenderItem } from "react-native";
-import CommandCard from "../beerCard/OrderCard";
-
-type OrderCardVariant = "onProgress" | "urgent" | "readyToPick";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from "react-native";
+import { Image } from "expo-image";
+import MainButton from "@/components/Buttons/MainButton";
+import SecondaryCTA from "../Buttons/SecondaryCTA";
 
 export interface OrderItem {
   id: string;
   title: string;
-  number: number;
+  quantity: number;
   total: string;
-  image?: string;
+  is_ready?: boolean;
+  beer_id: string;
+  price: number;
+  order_id: string;
+  image?: string; // Ajouté pour l’image de la bière
 }
 
-export interface OrderCardProps {
-  orderNumber: string;
-  pickupDate: string;
-  pickupTime: string;
-  totalPrice: string;
-  items: OrderItem[];
-  variant?: OrderCardVariant;
-  onValidate?: () => void;
-  onClose?: () => void;
-}
-
-// Enhanced interface for order lists
-export interface Order extends OrderCardProps {
+export interface OrderModalCardProps {
   id: string;
-}
-
-export interface OrderListProps {
-  orders: Order[];
-  horizontal?: boolean;
-  showsScrollIndicator?: boolean;
+  pickup_day: string;
+  pickup_time: string;
+  final_price: number;
+  items: OrderItem[];
+  variant?: "onProgress" | "urgent" | "readyToPick";
+  onClose: () => void;
 }
 
 const VARIANT_STYLES = {
@@ -49,168 +41,150 @@ const VARIANT_STYLES = {
   },
 };
 
-// Main OrderCard Component
-function OrderCard({
-  orderNumber,
-  pickupDate,
-  pickupTime,
-  totalPrice,
+export default function OrderModalCard({
+  id,
+  pickup_day,
+  pickup_time,
+  final_price,
   items,
   variant = "onProgress",
-  onValidate,
   onClose,
-}: OrderCardProps) {
-  const variantStyle = VARIANT_STYLES[variant];
-
-  const renderOrderItem: ListRenderItem<OrderItem> = ({ item }) => (
-    <CommandCard title={item.title} number={item.number} total={item.total} image={item.image} />
+}: OrderModalCardProps) {
+  const [localItems, setLocalItems] = useState<OrderItem[]>(
+    items.map((it) => ({ ...it, is_ready: it.is_ready ?? false })),
   );
 
+  const onValidate = (updatedItems: OrderItem[]) => {
+    Alert.alert(
+      "Commande mise à jour",
+      `Articles prêts: ${updatedItems.filter((i) => i.is_ready).length}`,
+    );
+  };
+
+  const onContactClient = () => {
+    Alert.alert("Contacter le client", "Ouvre l'écran de contact");
+  };
+
+  const onCancelOrder = () => {
+    Alert.alert("Annuler la commande", "Êtes-vous sûr de vouloir annuler cette commande ?", [
+      { text: "Non", style: "cancel" },
+      { text: "Oui", style: "destructive", onPress: () => Alert.alert("Commande annulée") },
+    ]);
+  };
+
+  const toggleReady = (itemId: string) => {
+    setLocalItems((prev) =>
+      prev.map((it) => (it.id === itemId ? { ...it, is_ready: !it.is_ready } : it)),
+    );
+  };
+
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("fr-FR");
+
+  const variantStyle = VARIANT_STYLES[variant];
+
   return (
-    <View style={[styles.orderCard, { backgroundColor: variantStyle.container.backgroundColor }]}>
-      {/* Close button */}
-      {onClose && (
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>×</Text>
-        </TouchableOpacity>
-      )}
+    <View
+      style={[
+        styles.orderCard,
+        {
+          backgroundColor: variantStyle.container.backgroundColor,
+          borderColor: variantStyle.container.borderColor,
+        },
+      ]}
+    >
+      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.closeButtonText}>×</Text>
+      </TouchableOpacity>
 
-      {/* Order Header */}
       <View style={styles.orderHeader}>
-        <Text style={styles.orderTitle}>Order #{orderNumber}</Text>
-
+        <Text style={styles.orderTitle}>Commande #{id}</Text>
         <View style={styles.orderInfo}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Pick up date</Text>
-            <Text style={styles.infoLabel}>Total payment</Text>
+            <Text style={styles.infoLabel}>Date de retrait</Text>
+            <Text style={styles.infoLabel}>Montant total</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoValue}>
-              {pickupDate} - {pickupTime}
+              {formatDate(pickup_day)} • {pickup_time}
             </Text>
-            <Text style={styles.infoValue}>{totalPrice} TTC</Text>
+            <Text style={styles.infoValue}>{final_price.toFixed(2)} € TTC</Text>
           </View>
         </View>
       </View>
 
-      {/* Order Items */}
       <View style={styles.itemsContainer}>
         <FlatList
-          data={items}
-          renderItem={renderOrderItem}
+          data={localItems}
           keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <Image
+                source={item.image}
+                style={styles.itemImage}
+                contentFit="cover"
+                transition={1000}
+              />
+              <Text style={[styles.itemText, item.is_ready ? styles.itemReady : null]}>
+                {item.title} x {item.quantity} — {item.total} €
+              </Text>
+              <TouchableOpacity
+                style={[styles.checkbox, item.is_ready && styles.checkboxChecked]}
+                onPress={() => toggleReady(item.id)}
+              >
+                <Text style={styles.checkboxText}>{item.is_ready ? "✅" : "⬜️"}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
       </View>
 
-      {/* Validate Button */}
-      {onValidate && (
-        <TouchableOpacity
-          style={[styles.validateButton, { backgroundColor: variantStyle.button.backgroundColor }]}
-          onPress={onValidate}
-        >
-          <Text style={styles.validateButtonText}>Valider</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-}
+      <MainButton title="Passer la commande en prête" onPress={() => onValidate(localItems)} />
 
-// FlatList Implementation for multiple OrderCards
-export function OrderFlatList({
-  orders,
-  horizontal = false,
-  showsScrollIndicator = true,
-}: OrderListProps) {
-  const renderOrderCard: ListRenderItem<Order> = ({ item }) => (
-    <OrderCard
-      orderNumber={item.orderNumber}
-      pickupDate={item.pickupDate}
-      pickupTime={item.pickupTime}
-      totalPrice={item.totalPrice}
-      items={item.items}
-      variant={item.variant}
-      onValidate={item.onValidate}
-      onClose={item.onClose}
-    />
-  );
-
-  return (
-    <FlatList
-      data={orders}
-      renderItem={renderOrderCard}
-      keyExtractor={(item) => item.id}
-      horizontal={horizontal}
-      showsHorizontalScrollIndicator={showsScrollIndicator}
-      showsVerticalScrollIndicator={showsScrollIndicator}
-      contentContainerStyle={horizontal ? styles.horizontalList : styles.verticalList}
-      ItemSeparatorComponent={() => <View style={styles.orderSeparator} />}
-    />
-  );
-}
-
-// Map Implementation for multiple OrderCards
-export function OrderMapList({ orders }: Pick<OrderListProps, "orders">) {
-  return (
-    <View style={styles.mapContainer}>
-      {orders.map((order) => (
-        <View key={order.id} style={styles.mappedOrderWrapper}>
-          <OrderCard
-            orderNumber={order.orderNumber}
-            pickupDate={order.pickupDate}
-            pickupTime={order.pickupTime}
-            totalPrice={order.totalPrice}
-            items={order.items}
-            variant={order.variant}
-            onValidate={order.onValidate}
-            onClose={order.onClose}
-          />
-        </View>
-      ))}
+      <View style={styles.secondaryButtonsRow}>
+        <SecondaryCTA
+          title="Contacter le client"
+          onPress={onContactClient}
+          style={styles.secondaryButtonLeft}
+        />
+        <SecondaryCTA
+          title="Annuler la commande"
+          onPress={onCancelOrder}
+          style={styles.secondaryButtonRight}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   orderCard: {
-    width: 343,
-    minHeight: 340,
-    borderRadius: 7,
-    borderWidth: 0.1,
-    borderColor: "rgba(0, 0, 0, 1)",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: { width: 5, height: 4 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
-    elevation: 5,
+    width: "100%",
     padding: 20,
-    marginVertical: 8,
+    borderRadius: 8,
+    borderWidth: 2,
+    shadowColor: "rgba(0,0,0,0.25)",
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   closeButton: {
     position: "absolute",
-    top: 11,
-    right: 15,
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1,
+    top: 12,
+    right: 16,
+    zIndex: 10,
   },
   closeButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "rgba(0, 0, 0, 1)",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#333",
   },
   orderHeader: {
     marginBottom: 20,
   },
   orderTitle: {
-    fontSize: 19,
+    fontSize: 22,
     fontWeight: "700",
-    letterSpacing: -0.57,
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
     marginBottom: 8,
   },
   orderInfo: {
@@ -221,61 +195,74 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   infoLabel: {
-    fontSize: 10,
-    fontWeight: "300",
-    letterSpacing: -0.3,
-    color: "rgba(99, 99, 96, 1)",
-    fontFamily: "Hanken Grotesk",
+    fontSize: 12,
+    color: "#555",
   },
   infoValue: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "700",
-    letterSpacing: -0.3,
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
   },
   itemsContainer: {
-    flex: 1,
+    maxHeight: 250,
     marginBottom: 20,
   },
-  commandCardItem: {
-    marginVertical: 4,
-  },
-  itemSeparator: {
-    height: 8,
-  },
-  validateButton: {
-    height: 24,
-    borderRadius: 4,
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "rgba(0, 0, 0, 0.25)",
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
-    elevation: 2,
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#ccc",
   },
-  validateButtonText: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: "rgba(0, 0, 0, 1)",
-    fontFamily: "Hanken Grotesk",
+  itemImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+    marginRight: 12,
   },
-  horizontalList: {
-    paddingHorizontal: 16,
+  itemText: {
+    fontSize: 16,
+    flex: 1,
   },
-  verticalList: {
-    paddingVertical: 8,
+  itemReady: {
+    textDecorationLine: "line-through",
+    color: "#6c757d",
   },
-  orderSeparator: {
-    width: 16,
+  checkbox: {
+    marginLeft: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: "#999",
+    borderRadius: 4,
   },
-  mapContainer: {
-    gap: 16,
+  checkboxChecked: {
+    borderColor: "#32CD32",
+    backgroundColor: "#d0f0d0",
   },
-  mappedOrderWrapper: {
+  checkboxText: {
+    fontSize: 18,
+  },
+  secondaryButtonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  secondaryButtonLeft: {
+    flex: 1,
+    backgroundColor: "#ddd",
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
+  },
+  secondaryButtonRight: {
+    flex: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FF4D4D",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     alignItems: "center",
   },
 });
-
-export default OrderCard;

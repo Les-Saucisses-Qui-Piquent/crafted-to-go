@@ -26,9 +26,10 @@ const clientTabs: TabItem[] = [
 ];
 
 const nonClientTabs: TabItem[] = [
-  { name: "home", label: "Accueil", iconName: "home" },
-  { name: "profile", label: "Profil", iconName: "person" },
+  { name: "index", label: "Accueil", iconName: "home" },
+  { name: "inventory", label: "Inventaire", iconName: "box" },
   { name: "orders", label: "Commandes", iconName: "receipt" },
+  { name: "profile", label: "Profil", iconName: "person" },
 ];
 
 // Individual Tab Component

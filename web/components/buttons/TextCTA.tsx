@@ -1,3 +1,4 @@
+import { COLORS } from "@/constants";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: "left",
-    color: "rgba(0, 0, 0, 1)",
+    color: COLORS.black,
     fontFamily: "HankenGrotesk",
     fontSize: 16,
     fontWeight: "400",

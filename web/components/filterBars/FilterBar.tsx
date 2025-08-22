@@ -32,7 +32,7 @@ export default function FilterBar({ filters, selectedIndex, onSelect }: FilterBa
 const styles = StyleSheet.create({
   container: {
     height: 51,
-    width: 250,
+    width: 400,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
   filterText: {
     color: "#000",
     fontFamily: "Hanken Grotesk",
-    fontSize: 11,
-    fontWeight: "400",
+    fontSize: 12,
+    fontWeight: "500",
     letterSpacing: -0.33,
     lineHeight: 18,
   },
