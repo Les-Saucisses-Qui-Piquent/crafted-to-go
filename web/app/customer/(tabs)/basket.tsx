@@ -10,10 +10,12 @@ import {
   StatusBar,
 } from "react-native";
 import { useCart, CartItem } from "@/contexts/CartContext";
+import { useRouter, RelativePathString } from "expo-router";
 import MainButton from "@/components/Buttons/MainButton";
 
 const BasketScreen = () => {
   const { items, totalItems, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
+  const router = useRouter();
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -52,20 +54,9 @@ const BasketScreen = () => {
   };
 
   const handleCheckout = () => {
-    // Ici vous pouvez ajouter votre logique de checkout
-    Alert.alert("Commande", "Procéder à la commande ?", [
-      {
-        text: "Annuler",
-        style: "cancel",
-      },
-      {
-        text: "Continuer",
-        onPress: () => {
-          // envoyer vers index de payment
-          console.log("Naviguer vers checkout");
-        },
-      },
-    ]);
+    router.push({
+      pathname: "customer/payment/CheckoutConfirmation" as unknown as RelativePathString,
+    });
   };
 
   const formatPrice = (price: number) => {
