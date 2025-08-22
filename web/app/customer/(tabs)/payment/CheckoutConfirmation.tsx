@@ -61,9 +61,13 @@ const PAYMENT_METHODS = [
 ];
 
 const CheckoutConfirmationScreen = () => {
-  const { items, totalPrice, totalItems } = useCart();
+  // inclure clearCart pour vider le panier après création serveur
+  const { items, totalPrice, totalItems, clearCart } = useCart();
   const [selectedPayment, setSelectedPayment] = useState<string>("");
+  // selectedDate : ISO YYYY-MM-DD (pour envoi au backend)
   const [selectedDate, setSelectedDate] = useState<string>("");
+  // selectedDateLabel : label lisible pour l'UI ("Aujourd'hui", "Demain", ...)
+  const [selectedDateLabel, setSelectedDateLabel] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -168,7 +172,9 @@ const CheckoutConfirmationScreen = () => {
   };
 
   const handleDateSelection = (date: Date, label: string) => {
-    setSelectedDate(label);
+    // stocker à la fois le label pour l'affichage et la date ISO pour le backend
+    setSelectedDate(date.toISOString().slice(0, 10)); // YYYY-MM-DD
+    setSelectedDateLabel(label);
     const times = getAvailableTimesForDate(date);
     setAvailableTimes(times);
     setSelectedTime(times[0] || ""); // Sélectionner automatiquement la première heure disponible
@@ -188,17 +194,71 @@ const CheckoutConfirmationScreen = () => {
 
     Alert.alert(
       "Confirmer la commande",
-      `Commande de ${totalItems} article(s) pour ${totalPrice.toFixed(2)}€\n\nRécupération : ${selectedDate} à ${selectedTime}\nPaiement : ${PAYMENT_METHODS.find((p) => p.id === selectedPayment)?.name}`,
+      `Commande de ${totalItems} article(s) pour ${totalPrice.toFixed(2)}€\n\nRécupération : ${selectedDateLabel || selectedDate} à ${selectedTime}\nPaiement : ${PAYMENT_METHODS.find((p) => p.id === selectedPayment)?.name}`,
       [
         { text: "Modifier", style: "cancel" },
         {
           text: "Confirmer",
-          onPress: () => {
-            console.log("Commande confirmée");
+          onPress: async () => {
+            // construit le payload conforme à ta DB et appelle l'API
+            try {
+              if (!items || items.length === 0) {
+                Alert.alert("Panier vide", "Votre panier est vide.");
+                return;
+              }
 
-            router.push({
-              pathname: "customer/payment/CheckoutConfirmation" as unknown as RelativePathString,
-            });
+              const breweryId = items[0].breweryId;
+              if (!breweryId) {
+                Alert.alert("Erreur", "Brasserie introuvable pour la commande.");
+                return;
+              }
+
+              const payload = {
+                user_id: "guest", // remplacer par user_id réel si tu as l'auth
+                brewery_id: breweryId,
+                final_price: Number(totalPrice.toFixed(2)),
+                pickup_day: selectedDate, // YYYY-MM-DD
+                pickup_time: selectedTime, // ex "18:30"
+                payment_method: selectedPayment || null,
+                status: "new",
+                details: items.map((it) => ({
+                  beer_id: it.id,
+                  quantity: it.quantity,
+                  price: Number(it.price.toFixed(2)),
+                })),
+              };
+
+              const API_URL = (process.env.API_URL as string) || "http://localhost:3000";
+              const res = await fetch(`${API_URL.replace(/\/$/, "")}/orders`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              if (!res.ok) {
+                const text = await res.text().catch(() => "");
+                console.error("Order creation failed:", res.status, text);
+                throw new Error("Erreur création commande");
+              }
+
+              const json = await res.json();
+              const orderId = json.id || json.order?.id;
+              if (!orderId) {
+                console.warn("Réponse API ne contient pas d'id:", json);
+              }
+
+              // vider le panier local après succès
+              clearCart();
+
+              // rediriger vers la page de détail de commande (adapter le path si besoin)
+              router.push({
+                pathname: "customer/OrderDetails" as unknown as RelativePathString,
+                params: { orderId },
+              });
+            } catch (error) {
+              console.error("create order error", error);
+              Alert.alert("Erreur", "Impossible de créer la commande. Réessayez.");
+            }
           },
         },
       ],
@@ -238,7 +298,7 @@ const CheckoutConfirmationScreen = () => {
           <Text style={styles.sectionTitle}>📅 Date et heure de récupération</Text>
 
           <MainButton
-            title={`${selectedDate} || "Sélectionner une date"`}
+            title={selectedDateLabel || "Sélectionner une date"}
             onPress={() => setShowDatePicker(true)}
           />
 

@@ -7,7 +7,7 @@ interface CartModalProps {
   onClose: () => void;
 }
 
-const CartModal: React.FC<CartModalProps> = ({ visible, onClose }) => {
+const CartModal = ({ visible, onClose }: CartModalProps) => {
   return (
     <Modal
       visible={visible}
@@ -25,9 +25,7 @@ const CartModal: React.FC<CartModalProps> = ({ visible, onClose }) => {
             <Text style={styles.closeText}>Fermer</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Réutilise votre écran de panier existant */}
-        <CartScreen />
+        <CartScreen onClose={onClose} />
       </View>
     </Modal>
   );

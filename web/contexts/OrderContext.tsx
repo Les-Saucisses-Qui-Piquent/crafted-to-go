@@ -17,7 +17,7 @@ interface Order {
 interface OrderContextType {
   orders: Order[];
   pendingOrdersCount: number;
-  addOrder: (order: Omit<Order, "id" | "createdAt" | "updatedAt">) => void;
+  addOrder: (order: Omit<Order, "id" | "createdAt" | "updatedAt">) => Promise<string>; // <- now async
   updateOrderStatus: (orderId: string, status: Order["status"]) => void;
   getOrdersByStatus: (status: Order["status"]) => Order[];
   clearOrders: () => void;
@@ -61,7 +61,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     }
   };
 
-  const addOrder = (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">) => {
+  const addOrder = async (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">) => {
     const newOrder: Order = {
       ...orderData,
       id: Date.now().toString(),
@@ -70,6 +70,14 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
     };
 
     setOrders((prev) => [newOrder, ...prev]);
+
+    try {
+      await AsyncStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify([newOrder, ...orders]));
+    } catch (error) {
+      console.error("Erreur en sauvegardant la commande:", error);
+    }
+
+    return newOrder.id;
   };
 
   const updateOrderStatus = (orderId: string, status: Order["status"]) => {
