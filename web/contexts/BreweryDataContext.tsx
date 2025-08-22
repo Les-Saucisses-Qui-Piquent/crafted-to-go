@@ -88,7 +88,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
         // Récupérer les détails des commandes pour chaque commande
         const orderIds = ordersData.map((order: OrderCardProps) => order.id);
         const orderDetailsRequests = orderIds.map((orderId: string) =>
-          apiClient(`/order-items/${orderId}`, { method: "GET" }),
+          apiClient(`/order-details/order/${orderId}`, { method: "GET" }),
         );
         const orderDetailsArrays = await Promise.all(orderDetailsRequests);
         const orderDetailsData = orderDetailsArrays.flat();

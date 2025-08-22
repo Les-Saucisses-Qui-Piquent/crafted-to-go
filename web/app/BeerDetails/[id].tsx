@@ -10,7 +10,7 @@ import { BeerCardProps } from "@/components/beerCard/BeerCard";
 const BeerDetails = (beer: BeerCardProps) => {
   const { addItem } = useCart();
   const { favoriteBeers, toggleFavoriteBeer } = useClientData();
-  const isFavorited = favoriteBeers.some((b) => b.id === beer.id);
+  const isFavorite = favoriteBeers.some((b) => b.id === beer.id);
 
   const [quantity, setQuantity] = useState("1");
 
@@ -44,7 +44,7 @@ const BeerDetails = (beer: BeerCardProps) => {
       <BeerCardLarge beer={beer} />
 
       <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
-        <Text style={{ fontSize: 24 }}>{isFavorited ? "❤️" : "🤍"}</Text>
+        <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
       </TouchableOpacity>
 
       <View style={styles.actionContainer}>

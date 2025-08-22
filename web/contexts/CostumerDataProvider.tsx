@@ -3,12 +3,14 @@ import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
 import { useAuth } from "./AuthContext";
 import { useApiClient } from "@/utils/api-client";
+import { UserFull } from "@/app/customer/(tabs)/profile";
 
 interface ClientDataContextProps {
   beers: BeerCardProps[];
   breweries: BreweryProps[];
   favoriteBeers: BeerCardProps[];
   favoriteBreweries: BreweryProps[];
+  userDetails: UserFull;
   loading: boolean;
   toggleFavoriteBeer: (beerId: string) => Promise<void>;
   toggleFavoriteBrewery: (breweryId: string) => Promise<void>;
@@ -24,6 +26,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [breweries, setBreweries] = useState<BreweryProps[]>([]);
   const [favoriteBeers, setFavoriteBeers] = useState<BeerCardProps[]>([]);
   const [favoriteBreweries, setFavoriteBreweries] = useState<BreweryProps[]>([]);
+  const [userDetails, setUserDetails] = useState<UserFull | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -32,6 +35,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setBreweries([]);
       setFavoriteBeers([]);
       setFavoriteBreweries([]);
+      setUserDetails(null);
       setLoading(false);
       return;
     }
@@ -40,22 +44,37 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         setLoading(true);
 
-        const [beersData, breweriesData, favBeersData, favBreweriesData]: [
-          BeerCardProps[],
-          BreweryProps[],
-          BeerCardProps[],
-          BreweryProps[],
-        ] = await Promise.all([
+        const [beersData, breweriesData, favBeersData, favBreweriesData] = await Promise.all([
           apiClient("/beers", { method: "GET" }),
           apiClient("/breweries", { method: "GET" }),
           apiClient(`/favorite-beers/${user.id}`, { method: "GET" }),
           apiClient(`/favorite-breweries/${user.id}`, { method: "GET" }),
         ]);
 
+        const userRes = await apiClient(`/users/${user.id}`, { method: "GET" });
+
+        const userDetailsRes = await apiClient(`/user-details/user/${user.id}`, { method: "GET" });
+
+        let addressRes = null;
+        if (userDetailsRes?.address_id) {
+          addressRes = await apiClient(`/addresses/${userDetailsRes.address_id}`, {
+            method: "GET",
+          });
+        }
+
+        const fullUser: UserFull = {
+          ...userRes,
+          userDetails: {
+            ...userDetailsRes,
+            address: addressRes,
+          },
+        };
+
         setBeers(beersData);
         setBreweries(breweriesData);
         setFavoriteBeers(favBeersData);
         setFavoriteBreweries(favBreweriesData);
+        setUserDetails(fullUser);
       } catch (err) {
         console.error("Erreur chargement client :", err);
       } finally {
@@ -65,13 +84,12 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     fetchData();
   }, []);
-
   const toggleFavoriteBeer = async (beerId: string): Promise<void> => {
     if (!user) return;
 
-    const isFavorited = favoriteBeers.some((b) => b.id === beerId);
+    const isFavorite = favoriteBeers.some((b) => b.id === beerId);
     try {
-      if (isFavorited) {
+      if (isFavorite) {
         await apiClient(`/users/${user.id}/favorite_beers/${beerId}`, { method: "DELETE" });
         setFavoriteBeers((prev) => prev.filter((b) => b.id !== beerId));
       } else {
@@ -89,9 +107,9 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const toggleFavoriteBrewery = async (breweryId: string): Promise<void> => {
     if (!user) return;
 
-    const isFavorited = favoriteBreweries.some((b) => b.id === breweryId);
+    const isFavorite = favoriteBreweries.some((b) => b.id === breweryId);
     try {
-      if (isFavorited) {
+      if (isFavorite) {
         await apiClient(`/users/${user.id}/favorite_breweries/${breweryId}`, { method: "DELETE" });
         setFavoriteBreweries((prev) => prev.filter((b) => b.id !== breweryId));
       } else {
@@ -106,6 +124,10 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  if (userDetails === null) {
+    return null;
+  }
+
   return (
     <ClientDataContext.Provider
       value={{
@@ -116,6 +138,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         loading,
         toggleFavoriteBeer,
         toggleFavoriteBrewery,
+        userDetails,
       }}
     >
       {children}

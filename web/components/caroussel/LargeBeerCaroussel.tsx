@@ -14,7 +14,7 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
   const onPress = (beer: BeerCardProps) => {
     router.push({
       pathname: "/BeerDetails/[id]" as RelativePathString,
-      params: { 
+      params: {
         id: beer.id,
         name: beer.name,
         abv_rate: beer.abv_rate,
@@ -23,7 +23,7 @@ const LargeBeerCaroussel: React.FC<LargeBeerCarousselProps> = ({ beers }) => {
         image: beer.image,
         description: beer.description,
         beer_style: beer.beer_style?.label || "",
-        brewery: beer.brewery?.name || ""
+        brewery: beer.brewery?.name || "",
       },
     });
   };
