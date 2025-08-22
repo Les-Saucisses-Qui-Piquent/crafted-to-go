@@ -1,8 +1,9 @@
 import AppIcon from "@/utils/AppIcon";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useCart } from "@/contexts/CartContext";
-import React from "react";
+import React, { useState } from "react";
 import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from "react-native";
+import CartModal from "./modals/CartModal";
 
 interface TopBarProps {
   variant: "client" | "brewery";
@@ -14,6 +15,15 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
   const { unreadCount } = useNotifications();
   const { totalItems } = useCart();
   const isClient = variant === "client";
+  const [cartVisible, setCartVisible] = useState(false);
+
+  const handleCartPress = () => {
+    if (onCartPress) {
+      onCartPress();
+    } else {
+      setCartVisible(true);
+    }
+  };
 
   const renderBadge = (count: number) => {
     if (count === 0) return null;
@@ -46,11 +56,14 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
 
       {/* Cart Icon (only for client) */}
       {isClient && (
-        <TouchableOpacity style={styles.rightIcon} onPress={onCartPress} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.rightIcon} onPress={handleCartPress} activeOpacity={0.7}>
           <AppIcon name="cart-outline" size={28} color="#040404" />
           {renderBadge(totalItems)}
         </TouchableOpacity>
       )}
+
+      {/* Cart modal */}
+      <CartModal visible={cartVisible} onClose={() => setCartVisible(false)} />
     </View>
   );
 };
