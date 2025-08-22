@@ -64,6 +64,27 @@ export default class OrderDetailController {
     }
   }
 
+  static async getDetailFromUser(
+    request: FastifyRequest<{ Params: { userId: string } }>,
+    reply: FastifyReply,
+  ) {
+    const prisma = request.server.prisma;
+    const { userId } = request.params;
+    const orderDetailRepository = new OrderDetailRepository(prisma);
+
+    validateUUID(userId, reply);
+
+    try {
+      const orderDetails = await orderDetailRepository.getDetailFromUser(userId);
+      reply.send(orderDetails);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   static async createOrderDetail(
     request: FastifyRequest<{ Body: OrderDetailInsert }>,
     reply: FastifyReply,

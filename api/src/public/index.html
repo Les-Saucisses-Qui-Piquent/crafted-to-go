@@ -123,7 +123,6 @@
               <li><a href="#addresses">Addresses</a></li>
               <li><a href="#breweries">Breweries</a></li>
               <li><a href="#brewery-details">Brewery Details</a></li>
-              <li><a href="#brewery-owners">Brewery Owners</a></li>
               <li><a href="#beers">Beers</a></li>
               <li><a href="#beer-colors">Beer Colors</a></li>
               <li><a href="#beer-styles">Beer Styles</a></li>
@@ -131,6 +130,7 @@
               <li><a href="#order-details">Order Details</a></li>
               <li><a href="#favorite-beers">Favorite Beers</a></li>
               <li><a href="#favorite-breweries">Favorite Breweries</a></li>
+              <li><a href="#upload">Upload</a></li>
               <li><a href="#test">Test</a></li>
             </ul>
           </li>
@@ -216,6 +216,54 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
   "last_name": "Doe",
   "birth_date": "1990-01-01T00:00:00.000Z",
   "phone_number": "1234567890"
+}</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><code>POST /auth/register/brewery</code>: Register a new brewery owner and brewery.</p>
+          <ul>
+            <li><strong>Access</strong>: Public</li>
+            <li>
+              <strong>Request Body</strong>:
+              <pre><code class="language-json">{
+  "first_name": "Brew",
+  "last_name": "Master",
+  "owner_phone_number": "1234567890",
+  "birth_date": "1980-05-15T00:00:00.000Z",
+  "owner_email": "brew.master@example.com",
+  "password": "yoursecurepassword",
+  "address_line_1": "123 Brewery Street",
+  "address_line_2": "Suite 101",
+  "postal_code": "12345",
+  "city": "Brewery City",
+  "country": "USA",
+  "brewery_name": "Crafty Brews",
+  "rib": "FR7630001007941234567890185",
+  "siren": "123456789",
+  "description": "A great place for craft beer",
+  "social_links": ["https://twitter.com/craftybrews"],
+  "opening_hours": {
+    "monday": {"isOpen": true},
+    "tuesday": {"isOpen": true},
+    "wednesday": {"isOpen": true},
+    "thursday": {"isOpen": true},
+    "friday": {"isOpen": true},
+    "saturday": {"isOpen": true},
+    "sunday": {"isOpen": false}
+  },
+  "has_taproom": true,
+  "taproom_hours": {
+    "monday": {"isOpen": true},
+    "tuesday": {"isOpen": true},
+    "wednesday": {"isOpen": true},
+    "thursday": {"isOpen": true},
+    "friday": {"isOpen": true},
+    "saturday": {"isOpen": true},
+    "sunday": {"isOpen": false}
+  },
+  "brewery_email": "contact@craftybrews.com",
+  "brewery_phone_number": "0987654321"
 }</code></pre>
             </li>
           </ul>
@@ -330,6 +378,14 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
           </ul>
         </li>
         <li>
+          <code>POST /user-details/:id/upload-image</code>: Upload an image for user details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li><strong>Content-Type</strong>: multipart/form-data</li>
+            <li><strong>Request Body</strong>: Image file</li>
+          </ul>
+        </li>
+        <li>
           <code>PUT /user-details/:id</code>: Update user details.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
@@ -426,7 +482,7 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
   "RIB": "FR7630001007941234567890185",
   "siren": "123456789",
   "address_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
-  "brewery_owner_id": "f1e2d3c4-b5a6-f7e8-d9c0-b1a2f3e4d5c6"
+  "user_id": "f1e2d3c4-b5a6-f7e8-d9c0-b1a2f3e4d5c6"
 }</code></pre>
             </li>
           </ul>
@@ -486,6 +542,22 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
           </ul>
         </li>
         <li>
+          <code>POST /brewery-details/:id/upload-image</code>: Upload an image for brewery details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li><strong>Content-Type</strong>: multipart/form-data</li>
+            <li><strong>Request Body</strong>: Image file</li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /brewery-details/:id/upload-logo</code>: Upload a logo for brewery details.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li><strong>Content-Type</strong>: multipart/form-data</li>
+            <li><strong>Request Body</strong>: Image file</li>
+          </ul>
+        </li>
+        <li>
           <code>PUT /brewery-details/:id</code>: Update a brewery detail.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
@@ -499,58 +571,6 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
         </li>
         <li>
           <code>DELETE /brewery-details/:id</code>: Delete a brewery detail.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-          </ul>
-        </li>
-      </ul>
-
-      <h3 id="brewery-owners">Brewery Owners</h3>
-      <ul>
-        <li>
-          <code>GET /brewery-owners</code>: Get all brewery owners.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-          </ul>
-        </li>
-        <li>
-          <code>GET /brewery-owners/:id</code>: Get a single brewery owner.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-          </ul>
-        </li>
-        <li>
-          <code>POST /brewery-owners</code>: Create a new brewery owner.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-            <li>
-              <strong>Request Body</strong>:
-              <pre><code class="language-json">{
-  "first_name": "Brew",
-  "last_name": "Master",
-  "address_id": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
-  "birth_date": "1980-05-15T00:00:00.000Z",
-  "phone_number": "9876543210",
-  "email": "brew.master@example.com",
-  "password": "a_secure_password"
-}</code></pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <code>PUT /brewery-owners/:id</code>: Update a brewery owner.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-            <li>
-              <strong>Request Body</strong>: (all fields are optional)
-              <pre><code class="language-json">{
-  "email": "brew.master@newdomain.com"
-}</code></pre>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <code>DELETE /brewery-owners/:id</code>: Delete a brewery owner.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
           </ul>
@@ -588,6 +608,14 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
   "price": 5.99
 }</code></pre>
             </li>
+          </ul>
+        </li>
+        <li>
+          <code>POST /beers/:id/upload-image</code>: Upload an image for a beer.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+            <li><strong>Content-Type</strong>: multipart/form-data</li>
+            <li><strong>Request Body</strong>: Image file</li>
           </ul>
         </li>
         <li>
@@ -646,6 +674,12 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
           </ul>
         </li>
         <li>
+          <code>GET /orders/user/:userId</code>: Get all orders for a specific user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
           <code>POST /orders</code>: Create a new order.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
@@ -699,6 +733,13 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
         </li>
         <li>
           <code>GET /order-details/order/:orderId</code>: Get details for a specific order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /order-details/user/:userId</code>: Get details for all orders from a specific
+          user.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
           </ul>

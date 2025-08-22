@@ -40,6 +40,27 @@ export default class OrderController {
     }
   }
 
+  static async getOrdersFromUser(
+    request: FastifyRequest<{ Params: { userId: string } }>,
+    reply: FastifyReply,
+  ) {
+    const prisma = request.server.prisma;
+    const { userId } = request.params;
+    const orderRepository = new OrderRepository(prisma);
+    validateUUID(userId, reply);
+
+    try {
+      const orders = await orderRepository.getOrdersFromUser(userId);
+
+      reply.send(orders);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   static async createOrder(request: FastifyRequest<{ Body: OrderInsert }>, reply: FastifyReply) {
     const prisma = request.server.prisma;
     const orderRepository = new OrderRepository(prisma);

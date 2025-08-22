@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import type { BreweryDetailInsert, BreweryDetailUpdate } from "../interfaces/IBreweryDetail";
 import BreweryDetailRepository from "../repository/brewery-detail.repository";
 import { validateUUID } from "../../utils";
+import { ImageUploader } from "../services/upload.service";
 
 export default class BreweryDetailController {
   static async getBreweryDetails(request: FastifyRequest, reply: FastifyReply) {
@@ -107,6 +108,67 @@ export default class BreweryDetailController {
       }
       const deletedBreweryDetail = await breweryDetailRepository.deleteBreweryDetail(id);
       reply.send(deletedBreweryDetail);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  static async uploadImage(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
+    const { id } = request.params;
+    validateUUID(id, reply);
+
+    const prisma = request.server.prisma;
+    const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    try {
+      const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
+      if (!breweryDetail) {
+        reply.status(404).send({ clientMessage: "Brewery not found" });
+        return;
+      }
+
+      const data = await ImageUploader.upload(request);
+
+      const breweryUpdated = await breweryDetailRepository.updateBreweryDetail(id, {
+        image: data.url,
+      });
+      reply.send(breweryUpdated);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  static async uploadLogo(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
+    const { id } = request.params;
+    validateUUID(id, reply);
+
+    const data = await ImageUploader.upload(request);
+
+    const prisma = request.server.prisma;
+    const breweryDetailRepository = new BreweryDetailRepository(prisma);
+
+    try {
+      const breweryDetail = await breweryDetailRepository.getBreweryDetail(id);
+      if (!breweryDetail) {
+        reply.status(404).send({ clientMessage: "Brewery not found" });
+        return;
+      }
+      const breweryUpdated = await breweryDetailRepository.updateBreweryDetail(id, {
+        logo: data.url,
+      });
+      reply.send(breweryUpdated);
     } catch (error) {
       request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });

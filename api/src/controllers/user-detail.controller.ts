@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import type { UserDetailInsert, UserDetailUpdate } from "../interfaces/IUserDetail";
 import UserDetailRepository from "../repository/user-detail.repository";
 import { validateUUID } from "../../utils";
+import { ImageUploader } from "../services/upload.service";
 
 export default class UserDetailController {
   static async getUserDetails(request: FastifyRequest, reply: FastifyReply) {
@@ -125,6 +126,37 @@ export default class UserDetailController {
       }
       const deletedUserDetail = await userDetailRepository.deleteUserDetail(id);
       reply.send(deletedUserDetail);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  static async uploadImage(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+  ) {
+    const { id } = request.params;
+    validateUUID(id, reply);
+
+    const prisma = request.server.prisma;
+    const userDetailRepository = new UserDetailRepository(prisma);
+
+    try {
+      const userDetails = await userDetailRepository.getDetailFromUser(id);
+      if (!userDetails.length) {
+        reply.status(404).send({ clientMessage: "User not found" });
+        return;
+      }
+
+      const data = await ImageUploader.upload(request);
+
+      const userDetailUpdated = await userDetailRepository.updateUserDetail(id, {
+        image: data.url,
+      });
+      reply.send(userDetailUpdated);
     } catch (error) {
       request.server.log.error(error);
       reply.status(500).send({ clientMessage: "Server Error", error });

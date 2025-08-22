@@ -6,6 +6,7 @@ export type OrderUpdate = Prisma.orderUpdateInput;
 export interface IOrder {
   getOrders: () => Promise<order[]>;
   getOrder: (id: string) => Promise<order | null>;
+  getOrdersFromUser: (userId: string) => Promise<order[]>;
   createOrder: (payload: OrderInsert) => Promise<order>;
   updateOrder: (id: string, payload: OrderUpdate) => Promise<order>;
   deleteOrder: (id: string) => Promise<order>;
