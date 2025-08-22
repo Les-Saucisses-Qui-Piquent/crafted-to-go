@@ -4,6 +4,7 @@ import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
 import { useAuth } from "./AuthContext";
 import { useApiClient } from "@/utils/api-client";
 import { UserFull } from "@/app/customer/(tabs)/profile";
+import { OrderCardProps } from "@/components/OrderCard";
 
 interface ClientDataContextProps {
   beers: BeerCardProps[];
@@ -16,6 +17,7 @@ interface ClientDataContextProps {
   toggleFavoriteBrewery: (breweryId: string) => Promise<void>;
   getBeerById: (id: string) => Promise<BeerCardProps | undefined>;
   getBreweryById: (id: string) => Promise<BreweryProps | undefined>;
+  getOrdersByUserId: (userId: string) => Promise<OrderCardProps[]>;
 }
 
 const ClientDataContext = createContext<ClientDataContextProps | undefined>(undefined);
@@ -163,6 +165,17 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const getOrdersByUserId = async (userId: string): Promise<OrderCardProps[]> => {
+    try {
+      const orders = await apiClient(`/orders/user/${userId}`, { method: "GET" });
+      console.log("Fetched orders:", orders);
+      return orders;
+    } catch (err) {
+      console.error("Erreur fetch orders by user ID :", err);
+      return [];
+    }
+  };
+
   return (
     <ClientDataContext.Provider
       value={{
@@ -176,6 +189,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         userDetails,
         getBeerById,
         getBreweryById,
+        getOrdersByUserId,
       }}
     >
       {children}

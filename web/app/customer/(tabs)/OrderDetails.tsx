@@ -1,16 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useRouter, useLocalSearchParams, RelativePathString } from "expo-router";
+import { useRouter, RelativePathString } from "expo-router";
 import MainButton from "@/components/Buttons/MainButton";
 import { OrderItem } from "@/components/modals/OrderModal";
 
-export default function OrderDetails({ id, number, total }: OrderItem) {
+export default function OrderDetails({ id, total, quantity }: OrderItem) {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Détail de la commande {id}</Text>
-      <Text style={styles.detail}>Nombre de bières : {number}</Text>
+      <Text style={styles.detail}>Nombre de bières : {quantity}</Text>
       <Text style={styles.detail}>Total : {total}</Text>
       <MainButton
         title="Valider cette commande"
