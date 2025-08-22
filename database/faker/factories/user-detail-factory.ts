@@ -14,13 +14,9 @@ export class UserDetailFactory implements FakerImplementation {
           id: userId,
         },
       },
-      image: faker.image.url(),
+      image: faker.image.personPortrait(),
       beer_level: faker.number.int({ max: 100 }),
     };
-  };
-
-  private randomId = (ids: string[]) => {
-    return ids[Math.floor(Math.random() * ids.length)];
   };
 
   createOne = async (userId: string) => {

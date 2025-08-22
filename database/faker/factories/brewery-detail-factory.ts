@@ -1,6 +1,7 @@
 import { fakerFR as faker } from "@faker-js/faker";
 import { Prisma, PrismaClient } from "@prisma/client";
 import type { FakerImplementation } from "./types";
+import { fullData } from "./data";
 
 type BreweryDetail = Prisma.brewery_detailCreateInput;
 
@@ -14,6 +15,14 @@ type JsonHours = Record<Day, DayDetail>;
 
 export class BreweryDetailFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
+
+  private logoUrls = fullData
+    .filter((item) => item.asset_folder === "logo")
+    .map((item) => item.secure_url);
+
+  private imageUrls = fullData
+    .filter((item) => item.asset_folder === "brewery")
+    .map((item) => item.secure_url);
 
   private generate = (breweryId: string): BreweryDetail => {
     const getRandomTime = () => {
@@ -61,8 +70,8 @@ export class BreweryDetailFactory implements FakerImplementation {
     };
 
     return {
-      image: faker.image.url(),
-      logo: faker.image.url(),
+      image: faker.helpers.arrayElement(this.imageUrls),
+      logo: faker.helpers.arrayElement(this.logoUrls),
       description: faker.lorem.paragraph(),
       social_links: [faker.internet.url(), faker.internet.url()],
       opening_hours: openingHours,
