@@ -1,5 +1,6 @@
 import { fakerFR as faker } from "@faker-js/faker";
 import { Prisma, PrismaClient } from "@prisma/client";
+import { fullData } from "./data";
 import type { FakerImplementation } from "./types";
 
 type Beer = Prisma.beerCreateInput;
@@ -7,10 +8,14 @@ type Beer = Prisma.beerCreateInput;
 export class BeerFactory implements FakerImplementation {
   constructor(private readonly dbClient: PrismaClient) {}
 
+  private beerUrls = fullData
+    .filter((item) => item.asset_folder === "beers")
+    .map((item) => item.secure_url);
+
   private generate = (beerColorId: string, breweryId: string, beerStyleId: string): Beer => {
     return {
       name: faker.food.dish(),
-      image: faker.image.url(),
+      image: faker.helpers.arrayElement(this.beerUrls),
       beer_color_fk: {
         connect: {
           id: beerColorId,
