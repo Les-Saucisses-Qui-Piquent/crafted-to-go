@@ -30,7 +30,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [favoriteBreweries, setFavoriteBreweries] = useState<BreweryProps[]>([]);
   const [userDetails, setUserDetails] = useState<UserFull | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [breweryDetails, setBreweryDetails] = useState<Record<string, BreweryProps>>({});
 
   useEffect(() => {
     if (!user?.id) {
@@ -40,7 +39,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setFavoriteBreweries([]);
       setUserDetails(null);
       setLoading(false);
-      setBreweryDetails({});
       return;
     }
 
@@ -157,8 +155,6 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         taproom_hours: details?.taproom_hours ?? breweryRes.taproom_hours,
         social_links: details?.social_links ?? breweryRes.social_links,
       } as BreweryProps;
-
-      setBreweryDetails((prev) => ({ ...prev, [id]: merged }));
 
       return merged;
     } catch (err) {
