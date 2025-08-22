@@ -44,16 +44,15 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       try {
         setLoading(true);
 
-        const [beersData, breweriesData, favBeersData, favBreweriesData] = await Promise.all([
-          apiClient("/beers", { method: "GET" }),
-          apiClient("/breweries", { method: "GET" }),
-          apiClient(`/favorite-beers/${user.id}`, { method: "GET" }),
-          apiClient(`/favorite-breweries/${user.id}`, { method: "GET" }),
-        ]);
-
-        const userRes = await apiClient(`/users/${user.id}`, { method: "GET" });
-
-        const userDetailsRes = await apiClient(`/user-details/user/${user.id}`, { method: "GET" });
+        const [beersData, breweriesData, favBeersData, favBreweriesData, userRes, userDetailsRes] =
+          await Promise.all([
+            apiClient("/beers", { method: "GET" }),
+            apiClient("/breweries", { method: "GET" }),
+            apiClient(`/favorite-beers/${user.id}`, { method: "GET" }),
+            apiClient(`/favorite-breweries/${user.id}`, { method: "GET" }),
+            apiClient(`/users/${user.id}`, { method: "GET" }),
+            apiClient(`/user-details/user/${user.id}`, { method: "GET" }),
+          ]);
 
         let addressRes = null;
         if (userDetailsRes?.address_id) {
