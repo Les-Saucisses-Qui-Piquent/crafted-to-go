@@ -674,6 +674,12 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
           </ul>
         </li>
         <li>
+          <code>GET /orders/user/:userId</code>: Get all orders for a specific user.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
           <code>POST /orders</code>: Create a new order.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
@@ -727,6 +733,13 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
         </li>
         <li>
           <code>GET /order-details/order/:orderId</code>: Get details for a specific order.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
+          <code>GET /order-details/user/:userId</code>: Get details for all orders from a specific
+          user.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
           </ul>
