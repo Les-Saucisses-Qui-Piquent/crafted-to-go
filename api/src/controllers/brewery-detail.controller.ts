@@ -123,8 +123,6 @@ export default class BreweryDetailController {
     const { id } = request.params;
     validateUUID(id, reply);
 
-    const data = await ImageUploader.upload(request);
-
     const prisma = request.server.prisma;
     const breweryDetailRepository = new BreweryDetailRepository(prisma);
 
@@ -134,6 +132,9 @@ export default class BreweryDetailController {
         reply.status(404).send({ clientMessage: "Brewery not found" });
         return;
       }
+
+      const data = await ImageUploader.upload(request);
+
       const breweryUpdated = await breweryDetailRepository.updateBreweryDetail(id, {
         image: data.url,
       });

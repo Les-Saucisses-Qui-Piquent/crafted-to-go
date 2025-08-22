@@ -141,8 +141,6 @@ export default class UserDetailController {
     const { id } = request.params;
     validateUUID(id, reply);
 
-    const data = await ImageUploader.upload(request);
-
     const prisma = request.server.prisma;
     const userDetailRepository = new UserDetailRepository(prisma);
 
@@ -152,6 +150,9 @@ export default class UserDetailController {
         reply.status(404).send({ clientMessage: "User not found" });
         return;
       }
+
+      const data = await ImageUploader.upload(request);
+
       const userDetailUpdated = await userDetailRepository.updateUserDetail(id, {
         image: data.url,
       });

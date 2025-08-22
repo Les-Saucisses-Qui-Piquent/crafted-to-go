@@ -114,8 +114,6 @@ export default class BeerController {
     const { id } = request.params;
     validateUUID(id, reply);
 
-    const data = await ImageUploader.upload(request);
-
     const prisma = request.server.prisma;
     const beerRepository = new BeerRepository(prisma);
 
@@ -125,6 +123,9 @@ export default class BeerController {
         reply.status(404).send({ clientMessage: "Beer not found" });
         return;
       }
+
+      const data = await ImageUploader.upload(request);
+
       const beerUpdated = await beerRepository.updateBeer(id, { image: data.url });
       reply.send(beerUpdated);
     } catch (error) {
