@@ -839,24 +839,6 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
         </li>
       </ul>
 
-      <h3 id="upload">Upload</h3>
-      <ul>
-        <li>
-          <code>POST /upload</code>: Upload an image file.
-          <ul>
-            <li><strong>Access</strong>: Public (Unprotected)</li>
-            <li><strong>Content-Type</strong>: multipart/form-data</li>
-            <li><strong>Request Body</strong>: Image file</li>
-            <li>
-              <strong>Response</strong>:
-              <pre><code class="language-json">{
-  "url": "https://cloudinary.com/path/to/uploaded/image.jpg"
-}</code></pre>
-            </li>
-          </ul>
-        </li>
-      </ul>
-
       <h3 id="test">Test</h3>
       <ul>
         <li>

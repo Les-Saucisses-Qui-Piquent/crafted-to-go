@@ -18,6 +18,10 @@ export default async function (fastify: FastifyInstance) {
     handler: UserDetailController.createUserDetail,
   });
 
+  fastify.post("/user-details/:id/upload-image", {
+    handler: UserDetailController.uploadImage,
+  });
+
   fastify.put("/user-details/:id", {
     handler: UserDetailController.updateUserDetail,
   });

@@ -14,6 +14,10 @@ export default async function (fastify: FastifyInstance) {
     handler: BeerController.createBeer,
   });
 
+  fastify.post("/beers/:id/upload-image", {
+    handler: BeerController.uploadImage,
+  });
+
   fastify.put("/beers/:id", {
     handler: BeerController.updateBeer,
   });
