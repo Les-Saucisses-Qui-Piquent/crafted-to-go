@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import { OpeningHours } from "@/app/registerBrewery";
 
 export interface BreweryProps {
   id: string;
@@ -11,16 +12,16 @@ export interface BreweryProps {
   description: string;
   phone_number: string;
   email: string;
-  taproom_hours: any; // jsonb
-  opening_hours: any; // jsonb
+  taproom_hours: OpeningHours;
+  opening_hours: OpeningHours;
   social_links: string[] | null;
-  title: string;
-  address?: {
-    line_1?: string;
+  name: string;
+  address: {
+    line_1: string;
     line_2?: string;
-    city?: string;
-    postal_code?: string;
-    country?: string;
+    city: string;
+    postal_code: string;
+    country: string;
   };
 }
 
@@ -28,11 +29,9 @@ export default function BreweryCardSmall(brewery: BreweryProps) {
   return (
     <View style={styles.container}>
       <Image style={styles.image} source={brewery.image} />
-      <Text style={styles.breweryName}>{brewery.title}</Text>
+      <Text style={styles.breweryName}>{brewery.name}</Text>
       {brewery.address && brewery.address.city && (
-        <Text style={styles.address}>
-          {brewery.address.city}
-        </Text>
+        <Text style={styles.address}>{brewery.address.city}</Text>
       )}
     </View>
   );

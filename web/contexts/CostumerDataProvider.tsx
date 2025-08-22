@@ -18,6 +18,7 @@ interface ClientDataContextProps {
   getBeerById: (id: string) => Promise<BeerCardProps | undefined>;
   getBreweryById: (id: string) => Promise<BreweryProps | undefined>;
   getOrdersByUserId: (userId: string) => Promise<OrderCardProps[]>;
+  getBreweryIdByBeerId: (beerId: string) => Promise<string | undefined>;
 }
 
 const ClientDataContext = createContext<ClientDataContextProps | undefined>(undefined);
@@ -141,6 +142,16 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const getBreweryIdByBeerId = async (beerId: string): Promise<string | undefined> => {
+    try {
+      const beer = await apiClient(`/beers/${beerId}`, { method: "GET" });
+      return beer?.brewery_id;
+    } catch (err) {
+      console.error("Erreur fetch beer details :", err);
+      return undefined;
+    }
+  };
+
   const getBreweryById = async (id: string): Promise<BreweryProps | undefined> => {
     try {
       const [breweryRes, detailsRes] = await Promise.all([
@@ -190,6 +201,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         getBeerById,
         getBreweryById,
         getOrdersByUserId,
+        getBreweryIdByBeerId,
       }}
     >
       {children}

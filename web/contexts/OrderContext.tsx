@@ -40,7 +40,7 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({ children }) => {
 
   useEffect(() => {
     saveOrders();
-  }, [orders]);
+  }, []);
 
   const loadOrders = async () => {
     try {

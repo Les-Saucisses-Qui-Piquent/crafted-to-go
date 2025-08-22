@@ -23,7 +23,7 @@ interface OrderResponse {
   status?: string;
   created_at?: string;
   updated_at?: string;
-  details?: OrderDetail[]; // dépend de ton endpoint
+  details?: OrderDetail[];
 }
 
 export default function OrderDetails() {

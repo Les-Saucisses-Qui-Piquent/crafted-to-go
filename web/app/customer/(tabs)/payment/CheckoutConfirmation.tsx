@@ -14,96 +14,82 @@ import { useCart } from "@/contexts/CartContext";
 import SelectInput from "@/components/form/SelectInput";
 import MainButton from "@/components/Buttons/MainButton";
 import { RelativePathString, useRouter } from "expo-router";
-
-// Types pour les données de brasserie
-interface BreweryHours {
-  [key: string]: {
-    open: string;
-    close: string;
-    closed?: boolean;
-  };
-}
-
-interface Brewery {
-  id: string;
-  name: string;
-  address: string;
-  hours: BreweryHours;
-  preparationTime: number; // en minutes
-}
-
-// Méthodes de paiement disponibles
-const PAYMENT_METHODS = [
-  {
-    id: "card",
-    name: "Carte bancaire",
-    icon: "💳",
-    description: "Visa, Mastercard, American Express",
-  },
-  {
-    id: "apple_pay",
-    name: "Apple Pay",
-    icon: "📱",
-    description: "Paiement rapide et sécurisé",
-  },
-  {
-    id: "google_pay",
-    name: "Google Pay",
-    icon: "🤖",
-    description: "Paiement avec Google",
-  },
-  {
-    id: "cash",
-    name: "Espèces",
-    icon: "💵",
-    description: "Paiement à la récupération",
-  },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { useClientData } from "@/contexts/CostumerDataProvider";
+import { BeerCardProps } from "@/components/beerCard/BeerCard";
+import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
 
 const CheckoutConfirmationScreen = () => {
-  // inclure clearCart pour vider le panier après création serveur
   const { items, totalPrice, totalItems, clearCart } = useCart();
-  const [selectedPayment, setSelectedPayment] = useState<string>("");
-  // selectedDate : ISO YYYY-MM-DD (pour envoi au backend)
+  const { user, token } = useAuth();
+  const { getBreweryById, getBeerById, getBreweryIdByBeerId } = useClientData();
   const [selectedDate, setSelectedDate] = useState<string>("");
-  // selectedDateLabel : label lisible pour l'UI ("Aujourd'hui", "Demain", ...)
   const [selectedDateLabel, setSelectedDateLabel] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [brewery, setBrewery] = useState<Brewery | null>(null);
+  const [brewery, setBrewery] = useState<BreweryProps | null>(null);
+  const [beersDetails, setBeersDetails] = useState<BeerCardProps[]>([]);
   const router = useRouter();
 
-  // Données d'exemple pour la brasserie (remplacez par votre API)
-  const mockBrewery: Brewery = {
-    id: "1",
-    name: "Brasserie Artisanale",
-    address: "123 Rue de la Bière, 75001 Paris",
-    hours: {
-      monday: { open: "09:00", close: "18:00" },
-      tuesday: { open: "09:00", close: "18:00" },
-      wednesday: { open: "09:00", close: "18:00" },
-      thursday: { open: "09:00", close: "18:00" },
-      friday: { open: "09:00", close: "20:00" },
-      saturday: { open: "10:00", close: "20:00" },
-      sunday: {
-        closed: true,
-        open: "",
-        close: "",
-      },
-    },
-    preparationTime: 30,
-  };
-
+  const API_BASE = process.env.EXPO_PUBLIC_API_URL as string;
   useEffect(() => {
-    // Ici vous chargeriez les données de la brasserie depuis votre API
-    // En utilisant l'ID de la brasserie des articles du panier
-    const breweryId = items[0]?.breweryId;
-    if (breweryId) {
-      // Simuler un appel API
-      setBrewery(mockBrewery);
+    if (!items || items.length === 0) {
+      setBrewery(null);
+      setBeersDetails([]);
+      return;
     }
-  }, [items]);
+
+    let mounted = true;
+    (async () => {
+      try {
+        const firstBeerId = items[0]?.id;
+        const breweryIdFromBeer = firstBeerId ? await getBreweryIdByBeerId(firstBeerId) : undefined;
+        const breweryId = breweryIdFromBeer || items[0]?.breweryId;
+
+        if (!breweryId) {
+          if (mounted) setBrewery(null);
+        } else {
+          const b = await getBreweryById(breweryId);
+          if (mounted) {
+            if (b) {
+              setBrewery({
+                id: b.id,
+                name: b.name,
+                address: b.address,
+                hours: b.opening_hours,
+              });
+            } else {
+              setBrewery(null);
+            }
+          }
+        }
+
+        // charger les détails des bières pour affichage / validation
+        const details = await Promise.all(
+          items.map(async (it) => {
+            try {
+              const beer = await getBeerById(it.id);
+              return beer || { id: it.id, name: it.name, price: it.price };
+            } catch {
+              return { id: it.id, name: it.name, price: it.price };
+            }
+          }),
+        );
+        if (mounted) setBeersDetails(details);
+      } catch (err) {
+        console.error("Erreur lecture brasserie/bières :", err);
+        if (mounted) {
+          setBrewery(null);
+          setBeersDetails(items.map((it) => ({ id: it.id, name: it.name, price: it.price })));
+        }
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [items, getBreweryById, getBeerById, getBreweryIdByBeerId]);
 
   const getDayName = (date: Date): string => {
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -154,12 +140,10 @@ const CheckoutConfirmationScreen = () => {
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
 
-    // Ajouter le temps de préparation à l'heure actuelle si c'est aujourd'hui
     const minTime = isToday
       ? new Date(now.getTime() + brewery.preparationTime * 60000)
       : new Date(openTime);
 
-    // Générer les créneaux de 30 minutes
     const current = new Date(Math.max(openTime.getTime(), minTime.getTime()));
     current.setMinutes(Math.ceil(current.getMinutes() / 30) * 30);
 
@@ -172,21 +156,15 @@ const CheckoutConfirmationScreen = () => {
   };
 
   const handleDateSelection = (date: Date, label: string) => {
-    // stocker à la fois le label pour l'affichage et la date ISO pour le backend
-    setSelectedDate(date.toISOString().slice(0, 10)); // YYYY-MM-DD
+    setSelectedDate(date.toISOString().slice(0, 10));
     setSelectedDateLabel(label);
     const times = getAvailableTimesForDate(date);
     setAvailableTimes(times);
-    setSelectedTime(times[0] || ""); // Sélectionner automatiquement la première heure disponible
+    setSelectedTime(times[0] || "");
     setShowDatePicker(false);
   };
 
   const handleConfirmOrder = () => {
-    if (!selectedPayment) {
-      Alert.alert("Erreur", "Veuillez sélectionner un mode de paiement");
-      return;
-    }
-
     if (!selectedDate || !selectedTime) {
       Alert.alert("Erreur", "Veuillez sélectionner une date et heure de récupération");
       return;
@@ -194,44 +172,57 @@ const CheckoutConfirmationScreen = () => {
 
     Alert.alert(
       "Confirmer la commande",
-      `Commande de ${totalItems} article(s) pour ${totalPrice.toFixed(2)}€\n\nRécupération : ${selectedDateLabel || selectedDate} à ${selectedTime}\nPaiement : ${PAYMENT_METHODS.find((p) => p.id === selectedPayment)?.name}`,
+      `Commande de ${totalItems} article(s) pour ${totalPrice.toFixed(2)}€\n\nRécupération : ${selectedDateLabel || selectedDate} à ${selectedTime}\nPaiement : À la récupération (sur place)`,
       [
         { text: "Modifier", style: "cancel" },
         {
           text: "Confirmer",
           onPress: async () => {
-            // construit le payload conforme à ta DB et appelle l'API
             try {
               if (!items || items.length === 0) {
                 Alert.alert("Panier vide", "Votre panier est vide.");
                 return;
               }
 
-              const breweryId = items[0].breweryId;
-              if (!breweryId) {
+              // déterminer la brasserie à partir du premier beer_id si possible
+              const firstBeerId = items[0]?.id;
+              const breweryIdFromBeer = firstBeerId
+                ? await getBreweryIdByBeerId(firstBeerId)
+                : undefined;
+              const breweryIdFromItem = items[0]?.breweryId;
+              const resolvedBreweryId = brewery?.id || breweryIdFromBeer || breweryIdFromItem;
+
+              console.log("resolved brewery id:", resolvedBreweryId);
+              if (!resolvedBreweryId) {
                 Alert.alert("Erreur", "Brasserie introuvable pour la commande.");
                 return;
               }
 
-              const payload = {
-                user_id: "guest", // remplacer par user_id réel si tu as l'auth
-                brewery_id: breweryId,
+              const payload: any = {
+                user_id: user?.id || null,
+                brewery_id: brewery?.id || resolvedBreweryId,
                 final_price: Number(totalPrice.toFixed(2)),
-                pickup_day: selectedDate, // YYYY-MM-DD
-                pickup_time: selectedTime, // ex "18:30"
-                payment_method: selectedPayment || null,
+                pickup_day: selectedDate,
+                pickup_time: selectedTime,
+                payment_method: "cash",
                 status: "new",
-                details: items.map((it) => ({
-                  beer_id: it.id,
-                  quantity: it.quantity,
-                  price: Number(it.price.toFixed(2)),
-                })),
+                details: items.map((it, idx) => {
+                  // preferer l'id de la bière telle que fournie (it.id). si getBeerById renvoie autre id, replace si besoin.
+                  const beerDetail = beersDetails[idx];
+                  return {
+                    beer_id: beerDetail?.id || it.id,
+                    quantity: it.quantity,
+                    price: Number(it.price.toFixed(2)),
+                  };
+                }),
               };
 
-              const API_URL = (process.env.API_URL as string) || "http://localhost:3000";
-              const res = await fetch(`${API_URL.replace(/\/$/, "")}/orders`, {
+              const headers: Record<string, string> = { "Content-Type": "application/json" };
+              if (token) headers["Authorization"] = `Bearer ${token}`;
+
+              const res = await fetch(`${API_BASE.replace(/\/$/, "")}/orders`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers,
                 body: JSON.stringify(payload),
               });
 
@@ -247,10 +238,8 @@ const CheckoutConfirmationScreen = () => {
                 console.warn("Réponse API ne contient pas d'id:", json);
               }
 
-              // vider le panier local après succès
               clearCart();
 
-              // rediriger vers la page de détail de commande (adapter le path si besoin)
               router.push({
                 pathname: "customer/OrderDetails" as unknown as RelativePathString,
                 params: { orderId },
@@ -321,36 +310,14 @@ const CheckoutConfirmationScreen = () => {
           )}
         </View>
 
-        {/* Mode de paiement */}
+        {/* Paiement */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💳 Mode de paiement</Text>
-
-          {PAYMENT_METHODS.map((method) => (
-            <TouchableOpacity
-              key={method.id}
-              style={[
-                styles.paymentMethod,
-                selectedPayment === method.id && styles.paymentMethodSelected,
-              ]}
-              onPress={() => setSelectedPayment(method.id)}
-            >
-              <View style={styles.paymentMethodContent}>
-                <Text style={styles.paymentMethodIcon}>{method.icon}</Text>
-                <View style={styles.paymentMethodInfo}>
-                  <Text style={styles.paymentMethodName}>{method.name}</Text>
-                  <Text style={styles.paymentMethodDescription}>{method.description}</Text>
-                </View>
-              </View>
-              <View
-                style={[
-                  styles.radioButton,
-                  selectedPayment === method.id && styles.radioButtonSelected,
-                ]}
-              >
-                {selectedPayment === method.id && <View style={styles.radioButtonInner} />}
-              </View>
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.sectionTitle}>💳 Paiement</Text>
+          <View style={{ padding: 8 }}>
+            <Text>
+              Le paiement se fera uniquement sur place lors de la récupération de la commande.
+            </Text>
+          </View>
         </View>
 
         {/* Résumé */}
@@ -377,10 +344,10 @@ const CheckoutConfirmationScreen = () => {
         <TouchableOpacity
           style={[
             styles.confirmButton,
-            (!selectedPayment || !selectedDate || !selectedTime) && styles.confirmButtonDisabled,
+            (!selectedDate || !selectedTime) && styles.confirmButtonDisabled,
           ]}
           onPress={handleConfirmOrder}
-          disabled={!selectedPayment || !selectedDate || !selectedTime}
+          disabled={!selectedDate || !selectedTime}
         >
           <Text style={styles.confirmButtonText}>
             Confirmer la commande • {formatPrice(totalPrice)}
