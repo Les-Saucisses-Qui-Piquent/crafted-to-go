@@ -18,7 +18,7 @@ import SecondaryCTA from "../components/Buttons/SecondaryCTA";
 import { useAuth } from "@/contexts/AuthContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-//CONSTANTES POUR L'AFFICHAGE DES JOURS EN FRANCAIS ET LA GENERATION DES HORAIRES
+//CONSTANTES POUR L'AFFICHAGE DES JOURS EN FR ET LA GENERATION DES HORAIRES
 export const DAY_LABELS: Record<Day, string> = {
   monday: "Lundi",
   tuesday: "Mardi",

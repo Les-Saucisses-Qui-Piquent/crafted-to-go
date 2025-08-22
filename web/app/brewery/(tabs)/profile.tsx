@@ -77,7 +77,7 @@ export default function BreweryProfileScreen() {
     );
   }
 
-  const handleChange = (key: keyof FormData, value: any) => {
+  const handleChange = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -115,7 +115,7 @@ export default function BreweryProfileScreen() {
 
   const onSave = async () => {
     try {
-      const payload = {
+      const _payload = {
         description: formData.description,
         brewery_phone_number: formData.phone_number,
         brewery_email: formData.email,
@@ -236,7 +236,6 @@ export default function BreweryProfileScreen() {
             onToggleDay={(day) => toggleDayOpen("taproom_hours", day)}
             onUpdateTime={(day, timeKey, val) => updateDayTime("taproom_hours", day, timeKey, val)}
             summary={getHoursSummary(formData.taproom_hours)}
-            editable={editMode}
           />
         </View>
       )}
@@ -248,10 +247,8 @@ export default function BreweryProfileScreen() {
           onToggleDay={(day) => toggleDayOpen("opening_hours", day)}
           onUpdateTime={(day, timeKey, val) => updateDayTime("opening_hours", day, timeKey, val)}
           summary={getHoursSummary(formData.opening_hours)}
-          editable={editMode}
         />
       </View>
-
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Liens sociaux</Text>
         {editMode ? (
@@ -322,7 +319,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoPlaceholderText: {
-    color: COLORS.grayTie, // #BCBCBC
+    color: COLORS.grayTie,
     fontSize: SIZES.h4,
   },
   name: {
