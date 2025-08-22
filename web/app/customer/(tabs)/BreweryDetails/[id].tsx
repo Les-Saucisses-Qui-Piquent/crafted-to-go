@@ -1,40 +1,45 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, Linking } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-
-export interface BreweryDetailsProps {
-  id: string;
-  title: string;
-  name?: string;
-  image?: string | null;
-  logo?: string | null;
-  description?: string;
-  phone_number?: string;
-  email?: string;
-  has_taproom?: boolean;
-  taproom_hours?: Record<string, string>;
-  opening_hours?: Record<string, string>;
-  social_links?: string[];
-}
+import { useClientData } from "@/contexts/CostumerDataProvider";
+import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
+import { OpeningHoursDetail } from "@/app/registerBrewery";
 
 export default function BreweryDetails() {
   const params = useLocalSearchParams();
-  const { brewery } = params;
+  const id = params.id as string | undefined;
+  const { getBreweryById } = useClientData();
 
-  let breweryData: BreweryDetailsProps | null = null;
-  try {
-    breweryData = brewery ? JSON.parse(brewery as string) : null;
-  } catch (error) {
-    console.error("Erreur parsing brewery param", error);
-  }
+  const [breweryData, setBreweryData] = useState<BreweryProps | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  if (!breweryData) {
+  useEffect(() => {
+    if (!id) return;
+    let mounted = true;
+    setLoading(true);
+    getBreweryById(id)
+      .then((b) => {
+        if (mounted) setBreweryData(b ?? null);
+      })
+      .catch((err) => console.error("Erreur fetch brewery:", err))
+      .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  if (loading)
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Données de la brasserie introuvables.</Text>
+        <Text>Chargement...</Text>
       </View>
     );
-  }
+  if (!breweryData)
+    return (
+      <View style={styles.errorContainer}>
+        <Text>Données de la brasserie introuvables.</Text>
+      </View>
+    );
 
   const renderHours = (
     hoursObj?: Record<string, string | { isOpen: boolean; openTime: string; closeTime: string }>,
@@ -45,16 +50,16 @@ export default function BreweryDetails() {
       if (typeof hours === "string") {
         return (
           <Text key={day} style={styles.text}>
-            {capitalize(day)} : {hours}
+            {day}: {hours}
           </Text>
         );
       }
 
       if (typeof hours === "object" && hours !== null) {
-        const { isOpen, openTime, closeTime } = hours;
+        const { isOpen, openTime, closeTime } = hours as OpeningHoursDetail;
         return (
           <Text key={day} style={styles.text}>
-            {capitalize(day)} : {isOpen ? `${openTime} - ${closeTime}` : "Fermé"}
+            {day}: {isOpen ? `${openTime} - ${closeTime}` : "Fermé"}
           </Text>
         );
       }
@@ -63,17 +68,13 @@ export default function BreweryDetails() {
     });
   };
 
-  // Fonction utilitaire pour mettre la première lettre en majuscule (pour affichage FR)
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
-  // Affichage des liens sociaux
   const renderSocialLinks = () => {
     if (!breweryData?.social_links || breweryData.social_links.length === 0) return null;
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Réseaux sociaux</Text>
         {breweryData.social_links.map((link, index) => (
-          <Text key={index} style={styles.linkText} onPress={() => Linking.openURL(link)}>
+          <Text key={index} style={styles.linkText}>
             {link}
           </Text>
         ))}
@@ -83,7 +84,7 @@ export default function BreweryDetails() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
-      <Text style={styles.title}>{breweryData.title ?? breweryData.name}</Text>
+      <Text style={styles.title}>{breweryData.title}</Text>
 
       {(breweryData.logo || breweryData.image) && (
         <Image
@@ -96,23 +97,22 @@ export default function BreweryDetails() {
       <Text style={styles.description}>{breweryData.description}</Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Contact</Text>
         {breweryData.phone_number && (
-          <Text style={styles.text}>Téléphone: {breweryData.phone_number}</Text>
+          <Text style={styles.text}>Tel: {breweryData.phone_number}</Text>
         )}
         {breweryData.email && <Text style={styles.text}>Email: {breweryData.email}</Text>}
       </View>
 
       {breweryData.opening_hours && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horaires d&apos;ouverture</Text>
+          <Text style={styles.sectionTitle}>Horaires</Text>
           {renderHours(breweryData.opening_hours)}
         </View>
       )}
 
       {breweryData.has_taproom && breweryData.taproom_hours && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horaires du Taproom</Text>
+          <Text style={styles.sectionTitle}>Taproom</Text>
           {renderHours(breweryData.taproom_hours)}
         </View>
       )}

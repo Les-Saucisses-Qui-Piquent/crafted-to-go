@@ -16,16 +16,6 @@ const SmallBeerCaroussel = ({ beers }: SmallBeerCarousselProps) => {
       pathname: "/customer/BeerDetails/[id]" as RelativePathString,
       params: {
         id: beer.id,
-        name: beer.name,
-        beer_style: beer.beer_style?.label || "",
-        breweryName: beer.brewery?.name || "",
-        color: beer.color,
-        abv_rate: beer.abv_rate,
-        price: beer.price.toString(),
-        quantity: beer.quantity.toString(),
-        image: beer.image,
-        description: beer.description,
-        breweryId: beer.breweryId,
       },
     });
   };

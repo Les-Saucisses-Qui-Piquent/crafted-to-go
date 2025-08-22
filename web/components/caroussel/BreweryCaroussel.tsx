@@ -15,7 +15,6 @@ const BreweryCaroussel = ({ breweries }: BreweryCarousselProps) => {
       pathname: "/customer/BreweryDetails/[id]" as RelativePathString,
       params: {
         id: brewery.id,
-        brewery: JSON.stringify(brewery),
       },
     });
   };

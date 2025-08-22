@@ -14,6 +14,8 @@ interface ClientDataContextProps {
   loading: boolean;
   toggleFavoriteBeer: (beerId: string) => Promise<void>;
   toggleFavoriteBrewery: (breweryId: string) => Promise<void>;
+  getBeerById: (id: string) => Promise<BeerCardProps | undefined>;
+  getBreweryById: (id: string) => Promise<BreweryProps | undefined>;
 }
 
 const ClientDataContext = createContext<ClientDataContextProps | undefined>(undefined);
@@ -28,6 +30,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [favoriteBreweries, setFavoriteBreweries] = useState<BreweryProps[]>([]);
   const [userDetails, setUserDetails] = useState<UserFull | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [breweryDetails, setBreweryDetails] = useState<Record<string, BreweryProps>>({});
 
   useEffect(() => {
     if (!user?.id) {
@@ -37,6 +40,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setFavoriteBreweries([]);
       setUserDetails(null);
       setLoading(false);
+      setBreweryDetails({});
       return;
     }
 
@@ -127,6 +131,42 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return null;
   }
 
+  const getBeerById = async (id: string): Promise<BeerCardProps | undefined> => {
+    try {
+      const beer = await apiClient(`/beers/${id}`, { method: "GET" });
+      return beer;
+    } catch (err) {
+      console.error("Erreur fetch beer details :", err);
+      return undefined;
+    }
+  };
+
+  const getBreweryById = async (id: string): Promise<BreweryProps | undefined> => {
+    try {
+      const [breweryRes, detailsRes] = await Promise.all([
+        apiClient(`/breweries/${id}`, { method: "GET" }),
+        apiClient(`/brewery-details?brewery_id=${id}`, { method: "GET" }),
+      ]);
+
+      const details = Array.isArray(detailsRes) ? (detailsRes[0] ?? null) : (detailsRes ?? null);
+
+      const merged: BreweryProps = {
+        ...breweryRes,
+        ...(details || {}),
+        opening_hours: details?.opening_hours ?? breweryRes.opening_hours,
+        taproom_hours: details?.taproom_hours ?? breweryRes.taproom_hours,
+        social_links: details?.social_links ?? breweryRes.social_links,
+      } as BreweryProps;
+
+      setBreweryDetails((prev) => ({ ...prev, [id]: merged }));
+
+      return merged;
+    } catch (err) {
+      console.error("Erreur fetch brewery details :", err);
+      return undefined;
+    }
+  };
+
   return (
     <ClientDataContext.Provider
       value={{
@@ -138,6 +178,8 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         toggleFavoriteBeer,
         toggleFavoriteBrewery,
         userDetails,
+        getBeerById,
+        getBreweryById,
       }}
     >
       {children}
