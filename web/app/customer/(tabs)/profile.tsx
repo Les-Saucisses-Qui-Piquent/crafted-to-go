@@ -10,88 +10,77 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { RelativePathString, useRouter } from "expo-router";
 import { useApiClient } from "@/utils/api-client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useClientData } from "@/contexts/CostumerDataProvider";
 import Button from "@/components/Button";
 import AppIcon from "@/utils/AppIcon";
 import { COLORS } from "@/constants";
 import { Image } from "expo-image";
 
+export interface Address {
+  id: string;
+  line_1: string;
+  city: string;
+  postal_code: string;
+  country: string;
+}
+
+export interface UserDetails {
+  id: string;
+  user_id: string;
+  image?: string;
+  payment_method?: string;
+  address_id?: string;
+  address?: Address;
+}
+
+export interface UserFull {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  userDetails: UserDetails;
+}
+
 const Profile = () => {
   const { apiClient } = useApiClient();
   const { user } = useAuth();
+  const { userDetails, loading } = useClientData();
   const router = useRouter();
 
-  // States
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
-  // User info
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); // blank = no change
-  const [profileImage, setProfileImage] = useState(""); // à compléter selon ton modèle
+  const [email, setEmail] = useState(userDetails.email);
+  const [firstName, setFirstName] = useState(userDetails.first_name);
+  const [lastName, setLastName] = useState(userDetails.last_name);
+  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState(userDetails.userDetails.address?.line_1 || "");
+  const [city, setCity] = useState(userDetails.userDetails.address?.city || "");
+  const [postalCode, setPostalCode] = useState(userDetails.userDetails.address?.postal_code || "");
+  const [country, setCountry] = useState(userDetails.userDetails.address?.country || "");
+  const [paymentMethod, setPaymentMethod] = useState(userDetails.userDetails.payment_method || "");
+  const [profileImage, setProfileImage] = useState(userDetails.userDetails.image || "");
 
-  // Address
-  const [addressId, setAddressId] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [country, setCountry] = useState("");
+  const addressId = userDetails.userDetails.address_id;
+  const userDetailsId = userDetails.userDetails.id;
 
-  // Payment method
-  const [paymentMethod, setPaymentMethod] = useState("");
-
-  // User details id (for update)
-  const [userDetailsId, setUserDetailsId] = useState("");
-
-  // Load profile info
   useEffect(() => {
-    if (!user?.id) return;
-    setLoading(true);
-    (async () => {
-      try {
-        // User info
-        const userRes = await apiClient(`/users/${user.id}`, { method: "GET" });
-        const userData = await userRes.json();
-        setFirstName(userData.first_name || "");
-        setLastName(userData.last_name || "");
-        setEmail(userData.email || "");
+    if (editMode) {
+      setEmail(userDetails.email);
+      setFirstName(userDetails.first_name);
+      setLastName(userDetails.last_name);
+      setProfileImage(userDetails.userDetails.image || "");
+      setAddress(userDetails.userDetails.address?.line_1 || "");
+      setCity(userDetails.userDetails.address?.city || "");
+      setPostalCode(userDetails.userDetails.address?.postal_code || "");
+      setCountry(userDetails.userDetails.address?.country || "");
+      setPaymentMethod(userDetails.userDetails.payment_method || "");
+    }
+  }, []);
 
-        // User details (payment, address id, image)
-        const detailsRes = await apiClient(`/user-details/user/${user.id}`, { method: "GET" });
-        const detailsData = await detailsRes.json();
-        if (detailsData) {
-          setUserDetailsId(detailsData.id);
-          setPaymentMethod(detailsData.payment_method || "");
-          if (detailsData.address_id) setAddressId(detailsData.address_id);
-          if (detailsData.image) setProfileImage(detailsData.image);
-        }
-
-        // Address
-        if (detailsData?.address_id) {
-          const addrRes = await apiClient(`/addresses/${detailsData.address_id}`, {
-            method: "GET",
-          });
-          const addrData = await addrRes.json();
-          setAddress(addrData.line_1 || "");
-          setCity(addrData.city || "");
-          setPostalCode(addrData.postal_code?.toString() || "");
-          setCountry(addrData.country || "");
-        }
-      } catch (err) {
-        Alert.alert("Erreur", "Impossible de charger le profil.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
-  // Save profile
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -100,6 +89,8 @@ const Profile = () => {
         method: "PUT",
         body: JSON.stringify({
           email,
+          first_name: firstName,
+          last_name: lastName,
           ...(password ? { password } : {}),
         }),
       });
@@ -123,14 +114,15 @@ const Profile = () => {
           method: "PUT",
           body: JSON.stringify({
             payment_method: paymentMethod,
-            // image: profileImage, // à gérer si tu veux permettre l'édition de la photo
+            // image: profileImage, // à gérer si modification possible
           }),
         });
       }
 
-      setEditMode(false);
       Alert.alert("Succès", "Profil mis à jour !");
+      setEditMode(false);
     } catch (err) {
+      console.error(err);
       Alert.alert("Erreur", "Impossible de sauvegarder le profil.");
     } finally {
       setSaving(false);
@@ -177,6 +169,12 @@ const Profile = () => {
         {/* --- INFOS --- */}
         {editMode ? (
           <>
+            <Text style={styles.label}>Prénom</Text>
+            <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
+
+            <Text style={styles.label}>Nom</Text>
+            <TextInput style={styles.input} value={lastName} onChangeText={setLastName} />
+
             <Text style={styles.label}>Adresse e-mail</Text>
             <TextInput
               style={styles.input}
@@ -191,7 +189,6 @@ const Profile = () => {
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              autoCapitalize="none"
               secureTextEntry
               placeholder="Laisser vide pour ne pas changer"
             />
@@ -214,7 +211,6 @@ const Profile = () => {
               value={postalCode}
               onChangeText={setPostalCode}
               placeholder="Code postal"
-              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}
@@ -257,22 +253,28 @@ const Profile = () => {
           </>
         )}
 
+        {/* --- BOTTOM ACTIONS --- */}
         <View style={styles.bottomRow}>
-          <View style={styles.bottomRow}>
-            <TouchableOpacity style={styles.bottomButton} onPress={() => router.push("/favorite")}>
-              <AppIcon name="heart" size={22} color={COLORS.primary} />
-              <Text style={styles.buttonText}>Mes favoris</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.bottomButton, { marginLeft: 8 }]}
-              onPress={() =>
-                Alert.alert("À venir", "Gestion des moyens de paiement bientôt disponible !")
-              }
-            >
-              <AppIcon name="credit-card" size={22} color={COLORS.primary} />
-              <Text style={styles.buttonText}>Moyens de paiement</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.bottomButton}
+            onPress={() =>
+              router.push({
+                pathname: "/favorite" as unknown as RelativePathString,
+              })
+            }
+          >
+            <AppIcon name="heart" size={22} color={COLORS.primary} />
+            <Text style={styles.buttonText}>Mes favoris</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.bottomButton, { marginLeft: 8 }]}
+            onPress={() =>
+              Alert.alert("À venir", "Gestion des moyens de paiement bientôt disponible !")
+            }
+          >
+            <AppIcon name="credit-card" size={22} color={COLORS.primary} />
+            <Text style={styles.buttonText}>Moyens de paiement</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from "react-native";
-import CommandCard, { OrderCardProps } from "@/components/beerCard/OrderCard";
+import CommandCard, { OrderCardProps } from "@/components/OrderCard";
 import FilterBar from "@/components/filterBars/FilterBar";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
 

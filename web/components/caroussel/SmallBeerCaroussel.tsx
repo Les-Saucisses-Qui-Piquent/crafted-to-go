@@ -13,11 +13,9 @@ const SmallBeerCaroussel = ({ beers }: SmallBeerCarousselProps) => {
 
   const onPress = (beer: BeerCardProps) => {
     router.push({
-      pathname: "/BeerDetails/[id]" as RelativePathString,
-      params: { 
-        ...beer, 
+      pathname: "/customer/BeerDetails/[id]" as RelativePathString,
+      params: {
         id: beer.id,
-        beer_style: beer.beer_style?.label || ""
       },
     });
   };
@@ -25,8 +23,12 @@ const SmallBeerCaroussel = ({ beers }: SmallBeerCarousselProps) => {
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {beers.map((beer, index) => (
-          <TouchableOpacity onPress={() => onPress(beer)} key={beer.id} style={styles.cardContainer}>
+        {beers.map((beer) => (
+          <TouchableOpacity
+            onPress={() => onPress(beer)}
+            key={beer.id}
+            style={styles.cardContainer}
+          >
             <BeerCardSmall beer={beer} />
           </TouchableOpacity>
         ))}

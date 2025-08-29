@@ -13,7 +13,7 @@ export interface OrderItem {
   beer_id: string;
   price: number;
   order_id: string;
-  image?: string; // Ajouté pour l’image de la bière
+  image: string;
 }
 
 export interface OrderModalCardProps {

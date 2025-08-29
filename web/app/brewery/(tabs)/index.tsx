@@ -4,7 +4,7 @@ import TextCTA from "@/components/Buttons/TextCTA";
 import { COLORS } from "@/constants";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
-import CommandCard, { OrderCardProps } from "@/components/beerCard/OrderCard";
+import CommandCard, { OrderCardProps } from "@/components/OrderCard";
 
 export default function Dashboard() {
   const { brewery, beers, loading, orders } = useBreweryData();

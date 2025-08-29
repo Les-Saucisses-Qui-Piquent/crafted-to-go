@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableWithoutFeedback } from "react-native";
 import MainButton from "@/components/Buttons/MainButton";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
-import OrderModalCard from "../modals/OrderModal";
+import OrderModalCard from "./modals/OrderModal";
 
 export interface OrderCardProps {
   id: string;

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useApiClient } from "@/utils/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
-import { OrderCardProps } from "@/components/beerCard/OrderCard";
+import { OrderCardProps } from "@/components/OrderCard";
 import { OrderItem } from "@/components/modals/OrderModal";
 import { OpeningHours } from "@/app/registerBrewery";
 
@@ -88,7 +88,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
         // Récupérer les détails des commandes pour chaque commande
         const orderIds = ordersData.map((order: OrderCardProps) => order.id);
         const orderDetailsRequests = orderIds.map((orderId: string) =>
-          apiClient(`/order-items/${orderId}`, { method: "GET" }),
+          apiClient(`/order-details/order/${orderId}`, { method: "GET" }),
         );
         const orderDetailsArrays = await Promise.all(orderDetailsRequests);
         const orderDetailsData = orderDetailsArrays.flat();
@@ -107,6 +107,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
               beer_id: od.beer_id,
               price: od.price,
               order_id: od.order_id,
+              image: beer?.image || "",
             };
 
             if (!acc[od.order_id]) {
