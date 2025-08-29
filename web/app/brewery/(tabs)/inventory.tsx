@@ -5,7 +5,6 @@ import FilterPillar from "@/components/filterBars/FilterUnderline";
 import SecondaryCTA from "@/components/Buttons/SecondaryCTA";
 import { useRouter } from "expo-router";
 import BeerCardHorizontal from "@/components/beerCard/BeerCardHorizontal";
-import BeerCardActionsMenu from "@/components/BeerCardActionMenu";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 
 const filters = [
@@ -18,10 +17,6 @@ const filters = [
 export default function Inventory() {
   const { beers, loading } = useBreweryData();
   const [selectedFilter, setSelectedFilter] = useState(0);
-
-  // Menu d'actions
-  const [actionsVisible, setActionsVisible] = useState(false);
-  const [selectedBeer, setSelectedBeer] = useState<BeerCardProps>();
   const router = useRouter();
 
   const filteredBeers = beers.filter((beer) => {
@@ -40,21 +35,22 @@ export default function Inventory() {
     }
   });
 
-  // Handlers pour le menu d'actions
-  const handleEdit = () => {
-    setActionsVisible(false);
-    if (selectedBeer) router.push(`/BeerEdit/${selectedBeer.id}`);
+  // Handlers pour chaque action
+  const handleEdit = (beer: BeerCardProps) => {
+    router.push({
+      pathname: "./BeerFormScreen",
+      params: { isEdit: "true", beerId: beer.id },
+    });
   };
-  const handleEditStock = () => {
-    setActionsVisible(false);
-    if (selectedBeer) router.push(`/BeerStock/${selectedBeer.id}`);
+  const handleEditStock = (beer: BeerCardProps) => {
+    router.push({
+      pathname: "./BeerStock",
+      params: { beerId: beer.id },
+    });
   };
-  const handleDelete = () => {
-    setActionsVisible(false);
-    if (selectedBeer) {
-      // Ajoute ici ta logique de suppression (pop-up, api, etc)
-      alert(`Supprimer la bière : ${selectedBeer.name}`);
-    }
+  const handleDelete = (beer: BeerCardProps) => {
+    // Ajoute ici ta logique de suppression (pop-up, api, etc)
+    alert(`Supprimer la bière : ${beer.name}`);
   };
 
   return (
@@ -70,7 +66,12 @@ export default function Inventory() {
         <SecondaryCTA
           title="Ajouter une bière"
           style={styles.addBtn}
-          onPress={() => router.push("/BeerCreation")}
+          onPress={() =>
+            router.push({
+              pathname: "./BeerFormScreen",
+              params: { isEdit: "false" },
+            })
+          }
         />
       </View>
 
@@ -82,23 +83,13 @@ export default function Inventory() {
             <BeerCardHorizontal
               beer={beer}
               key={beer.id}
-              onMenuPress={() => {
-                setSelectedBeer(beer);
-                setActionsVisible(true);
-              }}
+              onEdit={handleEdit}
+              onEditStock={handleEditStock}
+              onDelete={handleDelete}
             />
           ))}
         </ScrollView>
       )}
-
-      {/* Menu d'actions global */}
-      <BeerCardActionsMenu
-        visible={actionsVisible}
-        onClose={() => setActionsVisible(false)}
-        onEdit={handleEdit}
-        onEditStock={handleEditStock}
-        onDelete={handleDelete}
-      />
     </View>
   );
 }

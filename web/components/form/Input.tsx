@@ -11,6 +11,7 @@ interface InputProps {
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
   secureTextEntry?: boolean;
   error?: string;
+  value?: string;
 }
 
 export default function Input({
@@ -23,6 +24,7 @@ export default function Input({
   keyboardType = "default",
   secureTextEntry = false,
   error,
+  value,
 }: InputProps) {
   const width = small ? 292 : 350;
 
@@ -35,7 +37,6 @@ export default function Input({
   return (
     <View style={[styles.inputContainer, { width }]}>
       <Text style={styles.label}>{label}</Text>
-      {/* <View style={styles.rectangle94} /> */}
       <TextInput
         style={styles.placeholder}
         placeholder={placeholder}
@@ -43,6 +44,7 @@ export default function Input({
         keyboardType={keyboardType}
         secureTextEntry={secureTextEntry}
         onChangeText={handleTextChange}
+        value={value}
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
@@ -61,12 +63,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   label: {
-    // position: "absolute",
-    // flexShrink: 0,
-    // top: 0,
-    // right: 0,
-    // bottom: 32,
-    // left: 0,
     textAlign: "left",
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "HankenGrotesk",
@@ -87,12 +83,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   placeholder: {
-    // position: "absolute",
-    // flexShrink: 0,
-    // top: 31,
-    // right: 10,
-    // bottom: 7,
-    // left: 9,
     textAlign: "left",
     color: "rgba(99, 99, 96, 1)",
     fontFamily: "HankenGrotesk",

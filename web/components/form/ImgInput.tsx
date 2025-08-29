@@ -1,7 +1,7 @@
 import { COLORS } from "@/constants";
 import AppIcon from "@/utils/AppIcon";
 import React from "react";
-import { View, ImageBackground, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 interface ImgInputProps {
   label: string;
