@@ -1,67 +1,93 @@
 import React, { useState } from "react";
-import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  TextInput,
+  Text,
+  Modal,
+} from "react-native";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
-import FilterPillar from "@/components/filterBars/FilterUnderline";
 import SecondaryCTA from "@/components/Buttons/SecondaryCTA";
 import { useRouter } from "expo-router";
 import BeerCardHorizontal from "@/components/beerCard/BeerCardHorizontal";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
-
-const filters = [
-  { label: "En ligne", key: "online" },
-  { label: "Stock dispo", key: "stock" },
-  { label: "Style", key: "style" },
-  { label: "Couleur", key: "color" },
-];
+import { useApiClient } from "@/utils/api-client";
+import ModalSmall from "@/components/modals/ModalSmall";
 
 export default function Inventory() {
-  const { beers, loading } = useBreweryData();
-  const [selectedFilter, setSelectedFilter] = useState(0);
+  const { beers, loading, refreshBeers } = useBreweryData();
   const router = useRouter();
+  const { apiClient } = useApiClient();
 
-  const filteredBeers = beers.filter((beer) => {
-    const filterKey = filters[selectedFilter].key;
-    switch (filterKey) {
-      case "online":
-        return beer.quantity && beer.quantity > 0;
-      case "stock":
-        return beer.quantity && beer.quantity > 0;
-      case "style":
-        return beer.beer_style;
-      case "color":
-        return beer.color?.toLowerCase().includes("blonde");
-      default:
-        return true;
-    }
-  });
+  // Etat pour la modale de changement de stock
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [stockValue, setStockValue] = useState("");
+  const [beerToEditStock, setBeerToEditStock] = useState<BeerCardProps | null>(null);
 
-  // Handlers pour chaque action
+  // Handler pour éditer la bière (formulaire complet)
   const handleEdit = (beer: BeerCardProps) => {
     router.push({
       pathname: "./BeerFormScreen",
       params: { isEdit: "true", beerId: beer.id },
     });
   };
-  const handleEditStock = (beer: BeerCardProps) => {
-    router.push({
-      pathname: "./BeerStock",
-      params: { beerId: beer.id },
-    });
+
+  // Handler pour ouvrir la modale de changement de stock
+  const openStockModal = (beer: BeerCardProps) => {
+    setBeerToEditStock(beer);
+    setStockValue(String(beer.quantity ?? ""));
+    setShowStockModal(true);
   };
+
+  // Handler pour valider le changement de stock depuis la modale
+  const confirmEditStock = async () => {
+    const newStock = Number(stockValue);
+    if (!Number.isFinite(newStock) || newStock < 0 || !beerToEditStock) {
+      Alert.alert("Valeur invalide", "Entrez un nombre positif.");
+      return;
+    }
+    setShowStockModal(false);
+    try {
+      await apiClient(`/beers/${beerToEditStock.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ quantity: newStock }),
+        headers: { "Content-Type": "application/json" },
+      });
+      Alert.alert("Stock mis à jour !");
+      refreshBeers?.();
+    } catch {
+      Alert.alert("Erreur", "Impossible de mettre à jour le stock.");
+    } finally {
+      setBeerToEditStock(null);
+    }
+  };
+
+  // Suppression de la bière
   const handleDelete = (beer: BeerCardProps) => {
-    alert(`Supprimer la bière : ${beer.name}`);
+    Alert.alert("Supprimer la bière", `Confirmer la suppression de "${beer.name}" ?`, [
+      { text: "Annuler", style: "cancel" },
+      {
+        text: "Supprimer",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await apiClient(`/beers/${beer.id}`, { method: "DELETE" });
+            Alert.alert("Bière supprimée !");
+            refreshBeers?.();
+          } catch (e) {
+            Alert.alert("Erreur", "Impossible de supprimer la bière.");
+          }
+        },
+      },
+    ]);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <View style={{ flex: 1 }}>
-          <FilterPillar
-            filters={filters.map((f) => f.label)}
-            selectedIndex={selectedFilter}
-            onSelect={setSelectedFilter}
-          />
-        </View>
         <SecondaryCTA
           title="Ajouter une bière"
           style={styles.addBtn}
@@ -78,17 +104,54 @@ export default function Inventory() {
         <ActivityIndicator size="large" color="#A09C9C" />
       ) : (
         <ScrollView contentContainerStyle={styles.beerList}>
-          {filteredBeers.map((beer) => (
+          {beers.map((beer) => (
             <BeerCardHorizontal
               beer={beer}
               key={beer.id}
               onEdit={handleEdit}
-              onEditStock={handleEditStock}
-              onDelete={handleDelete}
+              onEditStock={() => openStockModal(beer)}
+              onDelete={() => handleDelete(beer)}
             />
           ))}
         </ScrollView>
       )}
+
+      {/* Modale pour changement du stock */}
+      <Modal visible={showStockModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <ModalSmall onClose={() => setShowStockModal(false)}>
+            <Text style={{ marginBottom: 8, fontWeight: "bold", fontSize: 16 }}>
+              Changer le stock
+            </Text>
+            <Text style={{ fontSize: 13, marginBottom: 10 }}>
+              Stock actuel: {beerToEditStock?.quantity}
+            </Text>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderRadius: 6,
+                marginVertical: 8,
+                padding: 8,
+                width: 100,
+                textAlign: "center",
+                fontSize: 15,
+              }}
+              keyboardType="numeric"
+              value={stockValue}
+              onChangeText={setStockValue}
+              placeholder="Nouveau stock"
+            />
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+              <SecondaryCTA
+                title="Annuler"
+                style={{ flex: 1 }}
+                onPress={() => setShowStockModal(false)}
+              />
+              <SecondaryCTA title="Valider" style={{ flex: 1 }} onPress={confirmEditStock} />
+            </View>
+          </ModalSmall>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -114,5 +177,11 @@ const styles = StyleSheet.create({
   beerList: {
     gap: 16,
     paddingBottom: 40,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "#00000066",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

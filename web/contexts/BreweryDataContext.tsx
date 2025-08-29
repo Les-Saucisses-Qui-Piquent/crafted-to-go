@@ -32,6 +32,7 @@ interface BreweryDataContextType {
   orders: OrderCardProps[];
   orderDetails: Record<string, OrderItem[]>;
   loading: boolean;
+  refreshBeers?: () => Promise<void>; // <-- Ajouté
 }
 
 // --- Contexte
@@ -55,6 +56,20 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
   const [orders, setOrders] = useState<OrderCardProps[]>([]);
   const [orderDetails, setOrderDetails] = useState<Record<string, OrderItem[]>>({});
   const [loading, setLoading] = useState(true);
+
+  // Nouvelle fonction pour recharger les bières
+  const refreshBeers = async () => {
+    if (!brewery) return;
+    setLoading(true);
+    try {
+      const beersData = await apiClient(`/beers?brewery_id=${brewery.id}`, { method: "GET" });
+      setBeers(beersData);
+    } catch (error) {
+      console.error("Erreur lors du rafraîchissement des bières :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchBreweryData = async () => {
@@ -154,6 +169,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
         orders,
         orderDetails,
         loading,
+        refreshBeers,
       }}
     >
       {children}
