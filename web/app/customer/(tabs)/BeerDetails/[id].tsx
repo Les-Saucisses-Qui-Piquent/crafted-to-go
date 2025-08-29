@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, ScrollView } from "react-native";
 import SelectInput from "@/components/form/SelectInput";
 import MainButton from "@/components/Buttons/MainButton";
 import { useCart } from "@/contexts/CartContext";
 import { useClientData } from "@/contexts/CostumerDataProvider";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { useLocalSearchParams } from "expo-router";
+import SmallBeerCaroussel from "@/components/caroussel/SmallBeerCaroussel";
 
 const BeerDetails = () => {
   const params = useLocalSearchParams();
   const id = params.id as string | undefined;
 
   const { addItem } = useCart();
-  const { favoriteBeers, toggleFavoriteBeer, getBeerById } = useClientData();
+  const { favoriteBeers, toggleFavoriteBeer, getBeerById, beers } = useClientData();
 
   const [beer, setBeer] = useState<BeerCardProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -75,59 +76,68 @@ const BeerDetails = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.beerCard}>
-        <Image 
-          style={styles.image} 
-          source={{ uri: beer.image }}
-          resizeMode="cover"
-        />
-        <View style={styles.infoContainer}>
-          <Text style={styles.title}>{beer.name}</Text>
-          {beer.brewery && <Text style={styles.brewery}>Disponible chez {beer.brewery.name}</Text>}
-          <Text style={styles.description}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </Text>
-          <View style={styles.separator} />
-          <View style={styles.tableContainer}>
-            {/* Headers */}
-            <View style={styles.tableRow}>
-              <Text style={styles.tableHeader}>Style</Text>
-              <Text style={styles.tableHeader}>Couleur</Text>
-              <Text style={styles.tableHeader}>Taux</Text>
-              <Text style={styles.tableHeader}>Prix</Text>
-              <Text style={styles.tableHeader}>Stock</Text>
-            </View>
-            
-            {/* Values */}
-            <View style={styles.tableRow}>
-              <Text style={styles.tableValue}>{beer.beer_style?.label}</Text>
-              <Text style={styles.tableValue}>{beer.beer_color?.label}</Text>
-              <Text style={styles.tableValue}>{beer.abv_rate}°</Text>
-              <Text style={styles.tableValue}>{beer.price}€</Text>
-              <Text style={styles.tableValue}>{beer.quantity}</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.contentContainer}>
+        <View style={styles.beerCard}>
+          <Image 
+            style={styles.image} 
+            source={{ uri: beer.image }}
+            resizeMode="cover"
+          />
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>{beer.name}</Text>
+            {beer.brewery && <Text style={styles.brewery}>Disponible chez {beer.brewery.name}</Text>}
+            <Text style={styles.description}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </Text>
+            <View style={styles.separator} />
+            <View style={styles.tableContainer}>
+              {/* Headers */}
+              <View style={styles.tableRow}>
+                <Text style={styles.tableHeader}>Style</Text>
+                <Text style={styles.tableHeader}>Couleur</Text>
+                <Text style={styles.tableHeader}>Taux</Text>
+                <Text style={styles.tableHeader}>Prix</Text>
+                <Text style={styles.tableHeader}>Stock</Text>
+              </View>
+              
+              {/* Values */}
+              <View style={styles.tableRow}>
+                <Text style={styles.tableValue}>{beer.beer_style?.label}</Text>
+                <Text style={styles.tableValue}>{beer.beer_color?.label}</Text>
+                <Text style={styles.tableValue}>{beer.abv_rate}°</Text>
+                <Text style={styles.tableValue}>{beer.price}€</Text>
+                <Text style={styles.tableValue}>{beer.quantity}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
-        <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
-      </TouchableOpacity>
-
-      <View style={styles.actionContainer}>
-        <SelectInput
-                      label=""
-          items={quantityItems}
-          selectedValue={quantity}
-          onValueChange={setQuantity}
-          small
-          width={100}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
-          <View style={styles.addButtonBackground} />
-          <Text style={styles.addButtonText}>AJOUTER AU PANIER</Text>
+        <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
+          <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
         </TouchableOpacity>
-      </View>
+
+        <View style={styles.actionContainer}>
+          <SelectInput
+            label=""
+            items={quantityItems}
+            selectedValue={quantity}
+            onValueChange={setQuantity}
+            small
+            width={100}
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
+            <View style={styles.addButtonBackground} />
+            <Text style={styles.addButtonText}>AJOUTER AU PANIER</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.carouselContainer}>
+          <Text style={styles.sectionTitle}>Petits formats à emporter</Text>
+          <SmallBeerCaroussel beers={beers} />
+        </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -139,13 +149,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
     flex: 1,
+    borderWidth: 1,
+    borderColor: "red",
+  },
+  contentContainer: {
+    width: "100%",
+    gap: 16,
   },
   beerCard: {
     width: 300,
     height: 470,
     backgroundColor: "#fff",
     elevation: 3,
-    borderRadius: 10,
   },
   image: {
     width: "100%",
@@ -154,7 +169,6 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     margin: 5,
-    borderRadius: 10,
   },
   title: {
     fontSize: 24,
@@ -165,7 +179,6 @@ const styles = StyleSheet.create({
   tableContainer: {
     marginTop: 5,
     width: "100%",
-    //borderWidth: 1,
   },
       tableRow: {
       flexDirection: "row",
@@ -220,6 +233,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: 300,
+    paddingTop: 10,
   },
   addButton: {
     position: "relative",
@@ -248,6 +262,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "800",
     lineHeight: 36,
+  },
+  carouselContainer: {
+    width: 300,
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
   },
 });
 
