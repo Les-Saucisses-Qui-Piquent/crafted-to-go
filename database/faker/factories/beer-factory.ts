@@ -51,11 +51,13 @@ export class BeerFactory implements FakerImplementation {
 
   createMany = async (beerColorIds: string[], breweryIds: string[], beerStyleIds: string[]) => {
     const beers = await Promise.all(
-      beerStyleIds.map((beerStyleId) => {
-        const breweryId = this.randomId(breweryIds);
-        const colorId = this.randomId(beerColorIds);
-        return this.createOne(colorId, breweryId, beerStyleId);
-      }),
+      breweryIds.flatMap(breweryId => {
+        return Array.from({ length: 10 }, () => {
+          const colorId = this.randomId(beerColorIds);
+          const styleId = this.randomId(beerStyleIds);
+          return this.createOne(colorId, breweryId, styleId);
+        });
+      })
     );
 
     return beers;
