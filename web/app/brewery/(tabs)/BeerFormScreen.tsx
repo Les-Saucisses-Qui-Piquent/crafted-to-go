@@ -91,7 +91,6 @@ export default function BeerForm() {
   });
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Fetch beer style & color options
   useEffect(() => {
     async function fetchOptions() {
       const styles = await apiClient("/beer-styles", { method: "GET" });
@@ -102,7 +101,6 @@ export default function BeerForm() {
     fetchOptions();
   }, []);
 
-  // Prefill form for edit mode
   useEffect(() => {
     if (isEditMode && beerId) {
       setLoading(true);
@@ -165,6 +163,7 @@ export default function BeerForm() {
     setLoading(true);
 
     try {
+      let newBeerId: string | undefined;
       if (isEditMode && beerId) {
         const body: any = {};
         if (form.name) body.name = form.name;
@@ -175,15 +174,12 @@ export default function BeerForm() {
         if (form.quantity) body.quantity = Number(form.quantity);
         if (form.price) body.price = Number(form.price);
 
-        const res = await apiClient(`/beers/${beerId}`, {
+        await apiClient(`/beers/${beerId}`, {
           method: "PUT",
           body: JSON.stringify(body),
           headers: { "Content-Type": "application/json" },
         });
-
-        if (form.image?.uri) {
-          await uploadBeerImage(beerId, form.image);
-        }
+        newBeerId = beerId;
         Alert.alert("Bière modifiée !");
       } else {
         const body = {
@@ -202,12 +198,14 @@ export default function BeerForm() {
           body: JSON.stringify(body),
           headers: { "Content-Type": "application/json" },
         });
-
-        if (form.image?.uri && newBeer.id) {
-          await uploadBeerImage(newBeer.id, form.image);
-        }
+        newBeerId = newBeer.id;
         Alert.alert("Bière créée !");
       }
+
+      if (form.image?.uri && newBeerId) {
+        await uploadBeerImage(newBeerId, form.image);
+      }
+
       router.back();
     } catch (e) {
       console.log("Erreur handleSubmit:", e);
