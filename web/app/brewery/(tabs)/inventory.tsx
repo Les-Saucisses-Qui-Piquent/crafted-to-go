@@ -21,13 +21,15 @@ export default function Inventory() {
   const { beers, loading, refreshBeers } = useBreweryData();
   const router = useRouter();
   const { apiClient } = useApiClient();
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Etat pour la modale de changement de stock
   const [showStockModal, setShowStockModal] = useState(false);
   const [stockValue, setStockValue] = useState("");
   const [beerToEditStock, setBeerToEditStock] = useState<BeerCardProps | null>(null);
 
-  // Handler pour éditer la bière (formulaire complet)
+  const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
+  const [beerToDelete, setBeerToDelete] = useState<BeerCardProps | null>(null);
+
   const handleEdit = (beer: BeerCardProps) => {
     router.push({
       pathname: "./BeerFormScreen",
@@ -35,20 +37,19 @@ export default function Inventory() {
     });
   };
 
-  // Handler pour ouvrir la modale de changement de stock
   const openStockModal = (beer: BeerCardProps) => {
     setBeerToEditStock(beer);
     setStockValue(String(beer.quantity ?? ""));
     setShowStockModal(true);
   };
 
-  // Handler pour valider le changement de stock depuis la modale
   const confirmEditStock = async () => {
     const newStock = Number(stockValue);
     if (!Number.isFinite(newStock) || newStock < 0 || !beerToEditStock) {
       Alert.alert("Valeur invalide", "Entrez un nombre positif.");
       return;
     }
+    setActionLoading(beerToEditStock.id);
     setShowStockModal(false);
     try {
       await apiClient(`/beers/${beerToEditStock.id}`, {
@@ -61,30 +62,31 @@ export default function Inventory() {
     } catch {
       Alert.alert("Erreur", "Impossible de mettre à jour le stock.");
     } finally {
+      setActionLoading(null);
       setBeerToEditStock(null);
     }
   };
 
-  // Suppression de la bière
-  const handleDelete = (beer: BeerCardProps) => {
-    Alert.alert("Supprimer la bière", `Confirmer la suppression de "${beer.name}" ?`, [
-      { text: "Annuler", style: "cancel" },
-      {
-        text: "Supprimer",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await apiClient(`/beers/${beer.id}`, { method: "DELETE" });
-            Alert.alert("Bière supprimée !");
-            refreshBeers?.();
-          } catch (e) {
-            Alert.alert("Erreur", "Impossible de supprimer la bière.");
-          }
-        },
-      },
-    ]);
+  const openDeleteModal = (beer: BeerCardProps) => {
+    setBeerToDelete(beer);
+    setModalDeleteVisible(true);
   };
 
+  const confirmDeleteBeer = async () => {
+    if (!beerToDelete) return;
+    setActionLoading(beerToDelete.id);
+    setModalDeleteVisible(false);
+    try {
+      await apiClient(`/beers/${beerToDelete.id}`, { method: "DELETE" });
+      await refreshBeers?.();
+      Alert.alert("Bière supprimée !");
+    } catch (e) {
+      Alert.alert("Erreur", "Impossible de supprimer la bière.");
+    } finally {
+      setActionLoading(null);
+      setBeerToDelete(null);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -110,13 +112,13 @@ export default function Inventory() {
               key={beer.id}
               onEdit={handleEdit}
               onEditStock={() => openStockModal(beer)}
-              onDelete={() => handleDelete(beer)}
+              onDelete={() => openDeleteModal(beer)}
+              loading={actionLoading === beer.id}
             />
           ))}
         </ScrollView>
       )}
 
-      {/* Modale pour changement du stock */}
       <Modal visible={showStockModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <ModalSmall onClose={() => setShowStockModal(false)}>
@@ -148,6 +150,27 @@ export default function Inventory() {
                 onPress={() => setShowStockModal(false)}
               />
               <SecondaryCTA title="Valider" style={{ flex: 1 }} onPress={confirmEditStock} />
+            </View>
+          </ModalSmall>
+        </View>
+      </Modal>
+
+      <Modal visible={modalDeleteVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <ModalSmall onClose={() => setModalDeleteVisible(false)}>
+            <Text style={{ marginBottom: 8, fontWeight: "bold", fontSize: 16 }}>
+              Confirmer la suppression?
+            </Text>
+            <Text style={{ fontSize: 13, marginBottom: 16 }}>
+              Supprimer «{beerToDelete?.name}» de la liste?
+            </Text>
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+              <SecondaryCTA
+                title="Annuler"
+                style={{ flex: 1 }}
+                onPress={() => setModalDeleteVisible(false)}
+              />
+              <SecondaryCTA title="Supprimer" style={{ flex: 1 }} onPress={confirmDeleteBeer} />
             </View>
           </ModalSmall>
         </View>

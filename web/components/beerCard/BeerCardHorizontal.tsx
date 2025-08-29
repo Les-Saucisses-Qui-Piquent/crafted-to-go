@@ -10,6 +10,7 @@ interface BeerCardHorizontalProps {
   onEdit?: (beer: BeerCardProps) => void;
   onEditStock?: (beer: BeerCardProps) => void;
   onDelete?: (beer: BeerCardProps) => void;
+  loading?: boolean; // Ajout pour spinner/bouton
 }
 
 export default function BeerCardHorizontal({
@@ -17,6 +18,7 @@ export default function BeerCardHorizontal({
   onEdit,
   onEditStock,
   onDelete,
+  loading,
 }: BeerCardHorizontalProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -32,6 +34,7 @@ export default function BeerCardHorizontal({
           style={styles.menuBtn}
           onPress={() => setShowMenu(true)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          disabled={loading}
         >
           <AppIcon name="ellipsis-vertical" size={23} color="#636360" />
         </TouchableOpacity>

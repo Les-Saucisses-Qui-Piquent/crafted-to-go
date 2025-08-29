@@ -9,33 +9,33 @@ export default class BeerRepository implements IBeer {
       include: {
         beer_style: {
           select: {
-            label: true
-          }
+            label: true,
+          },
         },
         brewery: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   };
 
   getBeer = async (id: string) => {
-    return await this.prisma.beer.findUnique({ 
+    return await this.prisma.beer.findUnique({
       where: { id },
       include: {
         beer_style: {
           select: {
-            label: true
-          }
+            label: true,
+          },
         },
         brewery: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   };
 
@@ -48,6 +48,14 @@ export default class BeerRepository implements IBeer {
   };
 
   deleteBeer = async (id: string) => {
+    await this.prisma.order_detail.deleteMany({
+      where: { beer_id: id },
+    });
+
+    await this.prisma.favorite_beer.deleteMany({
+      where: { beer_id: id },
+    });
+
     return await this.prisma.beer.delete({ where: { id } });
   };
 }
