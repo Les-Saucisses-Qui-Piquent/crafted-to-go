@@ -16,6 +16,11 @@ export default class BeerRepository implements IBeer {
           select: {
             name: true
           }
+        },
+        beer_color: {
+          select: {
+            label: true
+          }
         }
       }
     });
@@ -33,6 +38,11 @@ export default class BeerRepository implements IBeer {
         brewery: {
           select: {
             name: true
+          }
+        },
+        beer_color: {
+          select: {
+            label: true
           }
         }
       }

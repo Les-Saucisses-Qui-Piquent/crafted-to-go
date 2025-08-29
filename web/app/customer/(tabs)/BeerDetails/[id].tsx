@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import BeerCardLarge from "@/components/beerCard/beerCardLarge";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, Image } from "react-native";
 import SelectInput from "@/components/form/SelectInput";
 import MainButton from "@/components/Buttons/MainButton";
 import { useCart } from "@/contexts/CartContext";
@@ -76,7 +75,37 @@ const BeerDetails = () => {
 
   return (
     <View style={styles.container}>
-      <BeerCardLarge beer={beer} />
+      <View style={styles.beerCard}>
+        <Image 
+          style={styles.image} 
+          source={{ uri: beer.image }}
+          resizeMode="cover"
+        />
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>{beer.name}</Text>
+          {beer.brewery && <Text style={styles.brewery}>Disponible chez {beer.brewery.name}</Text>}
+          <View style={styles.separator} />
+          <View style={styles.tableContainer}>
+            {/* Headers */}
+            <View style={styles.tableRow}>
+              <Text style={styles.tableHeader}>Style</Text>
+              <Text style={styles.tableHeader}>Couleur</Text>
+              <Text style={styles.tableHeader}>Taux</Text>
+              <Text style={styles.tableHeader}>Prix</Text>
+              <Text style={styles.tableHeader}>Stock</Text>
+            </View>
+            
+            {/* Values */}
+            <View style={styles.tableRow}>
+              <Text style={styles.tableValue}>{beer.beer_style?.label}</Text>
+              <Text style={styles.tableValue}>{beer.beer_color?.label}</Text>
+              <Text style={styles.tableValue}>{beer.abv_rate}°</Text>
+              <Text style={styles.tableValue}>{beer.price}€</Text>
+              <Text style={styles.tableValue}>{beer.quantity}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
 
       <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
         <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
@@ -99,6 +128,61 @@ const BeerDetails = () => {
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
+  beerCard: {
+    width: 300,
+    height: 500,
+    backgroundColor: "#fff",
+    elevation: 3,
+  },
+  image: {
+    width: "100%",
+    height: 300,
+  },
+  infoContainer: {
+    padding: 10,
+    flex: 1,
+    justifyContent: "flex-start",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#000",
+    textTransform: "capitalize",
+  },
+  tableContainer: {
+    marginTop: 16,
+  },
+  tableRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  tableHeader: {
+    flex: 1,
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+  },
+  tableValue: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
+  },
+  brewery: {
+    fontSize: 12,
+    color: "#000",
+    marginTop: 2,
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#D9D9D9",
+    width: "100%",
+    //marginVertical: 10,
+  },
   favoriteBtn: {
     position: "absolute",
     top: 16,
