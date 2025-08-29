@@ -63,6 +63,12 @@ export interface BeerColor {
   label: string;
 }
 
+export type ExpoFileObject = {
+  uri: string;
+  name: string;
+  type: string;
+};
+
 export default function BeerForm() {
   const router = useRouter();
   const { isEdit, beerId } = useLocalSearchParams<{ isEdit?: string; beerId?: string }>();
@@ -85,6 +91,7 @@ export default function BeerForm() {
   });
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Fetch beer style & color options
   useEffect(() => {
     async function fetchOptions() {
       const styles = await apiClient("/beer-styles", { method: "GET" });
@@ -95,6 +102,7 @@ export default function BeerForm() {
     fetchOptions();
   }, []);
 
+  // Prefill form for edit mode
   useEffect(() => {
     if (isEditMode && beerId) {
       setLoading(true);
@@ -158,30 +166,26 @@ export default function BeerForm() {
 
     try {
       if (isEditMode && beerId) {
-        // Edition: PUT /beers/:id
-        const body: Partial<BeerApiResponse> = {
-          name: form.name,
-          beer_color_id: form.beer_color_id,
-          beer_style_id: form.beer_style_id,
-          abv_rate: form.abv_rate ? Number(form.abv_rate) : undefined,
-          ibu_rate: form.ibu_rate ? Number(form.ibu_rate) : undefined,
-          quantity: form.quantity ? Number(form.quantity) : undefined,
-          price: form.price ? Number(form.price) : undefined,
-        };
+        const body: any = {};
+        if (form.name) body.name = form.name;
+        if (form.beer_color_id) body.beer_color = { connect: { id: form.beer_color_id } };
+        if (form.beer_style_id) body.beer_style = { connect: { id: form.beer_style_id } };
+        if (form.abv_rate) body.abv_rate = Number(form.abv_rate);
+        if (form.ibu_rate) body.ibu_rate = Number(form.ibu_rate);
+        if (form.quantity) body.quantity = Number(form.quantity);
+        if (form.price) body.price = Number(form.price);
 
-        await apiClient(`/beers/${beerId}`, {
+        const res = await apiClient(`/beers/${beerId}`, {
           method: "PUT",
           body: JSON.stringify(body),
           headers: { "Content-Type": "application/json" },
         });
 
-        // Upload image si nouvelle
         if (form.image?.uri) {
           await uploadBeerImage(beerId, form.image);
         }
         Alert.alert("Bière modifiée !");
       } else {
-        // Création: POST /beers
         const body = {
           name: form.name,
           beer_color_id: form.beer_color_id,
@@ -206,6 +210,7 @@ export default function BeerForm() {
       }
       router.back();
     } catch (e) {
+      console.log("Erreur handleSubmit:", e);
       const errorMessage =
         typeof e === "object" && e !== null && "message" in e
           ? (e as { message?: string }).message
@@ -218,17 +223,15 @@ export default function BeerForm() {
 
   const uploadBeerImage = async (beerId: string, imageAsset: ImageAsset) => {
     const formData = new FormData();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     formData.append("image", {
       uri: imageAsset.uri,
       name: imageAsset.fileName || "beer.jpg",
       type: imageAsset.type || "image/jpeg",
-    });
+    } as any);
+
     await apiClient(`/beers/${beerId}/upload-image`, {
       method: "POST",
       body: formData,
-      headers: { "Content-Type": "multipart/form-data" },
     });
   };
 
@@ -241,7 +244,7 @@ export default function BeerForm() {
         <AppIcon name="notifications-outline" size={20} color="#000" />
       </View>
 
-      {/* Champs */}
+      {/* Fields */}
       <View style={styles.row}>
         <Input
           label="Nom"
@@ -290,6 +293,7 @@ export default function BeerForm() {
         />
       </View>
 
+      {/* Image uploader */}
       <BeerImageUploader
         image={form.image}
         existingImage={form.existingImage}
@@ -319,10 +323,10 @@ export default function BeerForm() {
         />
       </View>
 
-      {/* Loading */}
+      {/* Loading spinner */}
       {loading && <ActivityIndicator size="large" color="#A09C9C" style={{ marginVertical: 20 }} />}
 
-      {/* Bouton submit */}
+      {/* Submit button */}
       <SecondaryCTA
         title={isEditMode ? "Modifier la bière" : "Créer la bière"}
         style={styles.submitBtn}

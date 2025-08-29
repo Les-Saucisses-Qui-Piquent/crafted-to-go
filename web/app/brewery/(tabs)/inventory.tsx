@@ -49,7 +49,6 @@ export default function Inventory() {
     });
   };
   const handleDelete = (beer: BeerCardProps) => {
-    // Ajoute ici ta logique de suppression (pop-up, api, etc)
     alert(`Supprimer la bière : ${beer.name}`);
   };
 
