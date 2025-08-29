@@ -12,7 +12,9 @@ export interface BeerCardProps {
   brewery: {
     name: string;
   };
-  color: string;
+  beer_color: {
+    label: string;
+  };
   abv_rate: string;
   price: number;
   quantity: number;
@@ -38,7 +40,7 @@ export default function BeerCard(beer: BeerCardProps) {
       <Text style={styles.attributeLabel}>Style</Text>
       <Text style={styles.attributeValue}>{beer.beer_style.label}</Text>
       <Text style={styles.attributeLabel2}>Couleur</Text>
-      <Text style={styles.attributeValue2}>{beer.color}</Text>
+      <Text style={styles.attributeValue2}>{beer.beer_color.label}</Text>
       <Text style={styles.attributeLabel3}>Taux</Text>
       <Text style={styles.attributeValue3}>{beer.abv_rate}</Text>
       <Text style={styles.attributeLabel4}>PDV</Text>

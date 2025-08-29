@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   picker: {
-    marginTop: 5,
-    height: 40,
+    marginTop: 0,
+    height: 36,
     width: "100%",
   },
 });
