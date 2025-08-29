@@ -2,9 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useApiClient } from "@/utils/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
-import { OrderCardProps } from "@/components/OrderCard";
+import { OrderModalCardProps } from "@/components/modals/OrderModal";
 import { OrderItem } from "@/components/modals/OrderModal";
 import { OpeningHours } from "@/app/registerBrewery";
+import { OrderCardProps } from "@/components/OrderCard";
 
 // --- Interfaces
 export interface Brewery {
@@ -32,7 +33,8 @@ interface BreweryDataContextType {
   orders: OrderCardProps[];
   orderDetails: Record<string, OrderItem[]>;
   loading: boolean;
-  refreshBeers?: () => Promise<void>; // <-- Ajouté
+  refreshBeers?: () => Promise<void>;
+  updateOrderStatus?: (orderId: string, newStatus: string) => Promise<void>;
 }
 
 // --- Contexte
@@ -42,6 +44,8 @@ const BreweryDataContext = createContext<BreweryDataContextType>({
   orders: [],
   orderDetails: {},
   loading: true,
+  refreshBeers: undefined,
+  updateOrderStatus: undefined,
 });
 
 export const useBreweryData = () => useContext(BreweryDataContext);
@@ -68,6 +72,21 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
       console.error("Erreur lors du rafraîchissement des bières :", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fonction pour changer le statut d'une commande
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      await apiClient(`/orders/${orderId}`, {
+        method: "PUT",
+        body: JSON.stringify({ status: newStatus }),
+      });
+      setOrders((prev) =>
+        prev.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)),
+      );
+    } catch (err) {
+      console.error("Erreur update order status:", err);
     }
   };
 
@@ -101,7 +120,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
         const breweryDetails = detailsData[0] || null;
 
         // Récupérer les détails des commandes pour chaque commande
-        const orderIds = ordersData.map((order: OrderCardProps) => order.id);
+        const orderIds = ordersData.map((order: OrderModalCardProps) => order.id);
         const orderDetailsRequests = orderIds.map((orderId: string) =>
           apiClient(`/order-details/order/${orderId}`, { method: "GET" }),
         );
@@ -170,6 +189,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
         orderDetails,
         loading,
         refreshBeers,
+        updateOrderStatus,
       }}
     >
       {children}
