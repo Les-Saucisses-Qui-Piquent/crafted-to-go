@@ -38,6 +38,8 @@ model beer {
   created_at     DateTime        @default(now())
   updated_at     DateTime        @default(now())
   beer_style_ids String          @db.Uuid
+  beer_format    BeerFormat      @default(cl_25)
+  description    String?
   beer_color     beer_color      @relation(fields: [beer_color_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_beer_color_id_foreign")
   brewery        brewery         @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_brewery_id_foreign")
   beer_style     beer_style      @relation(fields: [beer_style_ids], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "beer_style")
@@ -206,4 +208,12 @@ enum OrderStatus {
   ready
   cancelled
   completed
+}
+
+enum BeerFormat {
+  cl_25
+  cl_33
+  cl_44
+  cl_50
+  cl_75
 }

@@ -16,6 +16,14 @@ enum UserRole {
   admin
 }
 
+enum BeerFormat {
+  cl_25
+  cl_33
+  cl_44
+  cl_50
+  cl_75
+}
+
 enum OrderStatus {
   new
   in_progress
@@ -46,6 +54,8 @@ model beer {
   image          String?
   beer_color_id  String   @db.Uuid
   brewery_id     String   @db.Uuid
+  beer_format    BeerFormat @default(cl_25)
+  description    String?
   abv_rate       Float
   ibu_rate       Float
   quantity       Int
