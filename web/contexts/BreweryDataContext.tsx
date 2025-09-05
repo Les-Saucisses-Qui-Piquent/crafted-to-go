@@ -178,7 +178,7 @@ export const BreweryDataProvider = ({ children }: { children: React.ReactNode })
     };
 
     fetchBreweryData();
-  }, [user, apiClient]);
+  }, [user]);
 
   return (
     <BreweryDataContext.Provider

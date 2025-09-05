@@ -23,6 +23,16 @@ export interface BeerForm {
   value?: string;
 }
 
+export interface BeerBody {
+  name: string;
+  beer_color?: { connect: { id: string } };
+  beer_style?: { connect: { id: string } };
+  abv_rate: GLfloat;
+  ibu_rate: number;
+  quantity: number;
+  price: GLfloat;
+}
+
 export interface BeerStyleOption {
   label: string;
   value: string;
@@ -165,19 +175,19 @@ export default function BeerForm() {
     try {
       let newBeerId: string | undefined;
       if (isEditMode && beerId) {
-        const body: any = {};
-        if (form.name) body.name = form.name;
-        if (form.beer_color_id) body.beer_color = { connect: { id: form.beer_color_id } };
-        if (form.beer_style_id) body.beer_style = { connect: { id: form.beer_style_id } };
-        if (form.abv_rate) body.abv_rate = Number(form.abv_rate);
-        if (form.ibu_rate) body.ibu_rate = Number(form.ibu_rate);
-        if (form.quantity) body.quantity = Number(form.quantity);
-        if (form.price) body.price = Number(form.price);
+        const body = {
+          name: form.name,
+          beer_color_id: form.beer_color_id,
+          beer_style_ids: form.beer_style_id,
+          abv_rate: Number(form.abv_rate),
+          ibu_rate: form.ibu_rate ? Number(form.ibu_rate) : undefined,
+          quantity: Number(form.quantity),
+          price: Number(form.price),
+        };
 
         await apiClient(`/beers/${beerId}`, {
           method: "PUT",
           body: JSON.stringify(body),
-          headers: { "Content-Type": "application/json" },
         });
         newBeerId = beerId;
         Alert.alert("Bière modifiée !");
@@ -196,7 +206,6 @@ export default function BeerForm() {
         const newBeer: BeerApiResponse = await apiClient("/beers", {
           method: "POST",
           body: JSON.stringify(body),
-          headers: { "Content-Type": "application/json" },
         });
         newBeerId = newBeer.id;
         Alert.alert("Bière créée !");
@@ -221,11 +230,12 @@ export default function BeerForm() {
 
   const uploadBeerImage = async (beerId: string, imageAsset: ImageAsset) => {
     const formData = new FormData();
+    // @ts-expect-error React Native FormData file object
     formData.append("image", {
       uri: imageAsset.uri,
       name: imageAsset.fileName || "beer.jpg",
       type: imageAsset.type || "image/jpeg",
-    } as any);
+    } as { uri: string; name: string; type: string });
 
     await apiClient(`/beers/${beerId}/upload-image`, {
       method: "POST",
