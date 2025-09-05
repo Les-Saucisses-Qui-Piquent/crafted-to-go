@@ -19,6 +19,27 @@ export default class BeerController {
     }
   }
 
+  static async getBeersByBrewery(
+    request: FastifyRequest<{ Params: { breweryId: string } }>,
+    reply: FastifyReply,
+  ) {
+    const prisma = request.server.prisma;
+    const { breweryId } = request.params;
+
+    const beerRepository = new BeerRepository(prisma);
+
+    validateUUID(breweryId, reply);
+    try {
+      const beers = await beerRepository.getBeersByBrewery(breweryId);
+      reply.send(beers);
+    } catch (error) {
+      request.server.log.error(error);
+      reply.status(500).send({ clientMessage: "Server Error", error });
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
   static async getBeer(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const prisma = request.server.prisma;
     const { id } = request.params;
