@@ -96,6 +96,17 @@ export default function BreweryDetails() {
 
       <Text style={styles.description}>{breweryData.description}</Text>
 
+      {breweryData.address && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Adresse et coordonnées</Text>
+          <View style={styles.addressContainer}>
+            <Text style={styles.addressText}>
+              📍 {breweryData.address.line_1} {breweryData.address.postal_code} {breweryData.address.city}
+            </Text>
+          </View>
+        </View>
+      )}
+
       <View style={styles.section}>
         {breweryData.phone_number && (
           <Text style={styles.text}>Tel: {breweryData.phone_number}</Text>
@@ -123,14 +134,80 @@ export default function BreweryDetails() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  errorContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 16 },
-  errorText: { color: "red", fontSize: 16, textAlign: "center" },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 12, textAlign: "center" },
-  logo: { width: 200, height: 100, marginBottom: 16, alignSelf: "center" },
-  description: { fontSize: 16, color: "#444", marginBottom: 16 },
-  section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: "600", marginBottom: 8 },
-  text: { fontSize: 14, color: "#555" },
-  linkText: { color: "#1E90FF", textDecorationLine: "underline", marginBottom: 4 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "HankenGrotesk",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 12,
+    textAlign: "center",
+    fontFamily: "HankenGrotesk",
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 16,
+    alignSelf: "center",
+  },
+  description: {
+    fontSize: 16,
+    color: "#636360",
+    marginBottom: 16,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "200",
+    textAlign: "justify",
+    lineHeight: 18,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 4,
+    fontFamily: "HankenGrotesk",
+    borderWidth: 1,
+    borderColor: "blue",
+    borderRadius: 8,
+  },
+  addressContainer: {
+    borderWidth: 1,
+    borderColor: "#E21221",
+    borderRadius: 8,
+  },
+  addressText: {
+    fontSize: 12,
+    color: "#000",
+    fontFamily: "HankenGrotesk",
+    fontWeight: "200",
+    lineHeight: 14,
+    textAlign: "justify",
+    borderWidth: 1,
+    letterSpacing: 0.5,
+  },
+  text: {
+    fontSize: 14,
+    color: "#555",
+    fontFamily: "HankenGrotesk",
+  },
+  linkText: {
+    color: "#1E90FF",
+    textDecorationLine: "underline",
+    marginBottom: 4,
+    fontFamily: "HankenGrotesk",
+  },
 });
