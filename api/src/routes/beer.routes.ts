@@ -10,6 +10,10 @@ export default async function (fastify: FastifyInstance) {
     handler: BeerController.getBeer,
   });
 
+  fastify.get("/beers/brewery/:breweryId", {
+    handler: BeerController.getBeersByBrewery,
+  });
+
   fastify.post("/beers", {
     handler: BeerController.createBeer,
   });

@@ -19,10 +19,16 @@ export default class BeerRepository implements IBeer {
         },
         beer_color: {
           select: {
-            label: true
-          }
+            label: true,
+          },
         },
       },
+    });
+  };
+
+  getBeersByBrewery = async (breweryId: string) => {
+    return await this.prisma.beer.findMany({
+      where: { brewery_id: breweryId },
     });
   };
 
@@ -37,15 +43,15 @@ export default class BeerRepository implements IBeer {
         },
         brewery: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         beer_color: {
           select: {
-            label: true
-          }
-        }
-      }
+            label: true,
+          },
+        },
+      },
     });
   };
 

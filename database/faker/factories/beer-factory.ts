@@ -30,6 +30,7 @@ export class BeerFactory implements FakerImplementation {
       ibu_rate: faker.number.float({ min: 0.0, max: 10.0, fractionDigits: 2 }),
       quantity: faker.number.int({ max: 100 }),
       price: faker.number.float({ min: 0.0, max: 10.0, fractionDigits: 2 }),
+
       style_fk: {
         connect: {
           id: beerStyleId,
@@ -51,13 +52,13 @@ export class BeerFactory implements FakerImplementation {
 
   createMany = async (beerColorIds: string[], breweryIds: string[], beerStyleIds: string[]) => {
     const beers = await Promise.all(
-      breweryIds.flatMap(breweryId => {
+      breweryIds.flatMap((breweryId) => {
         return Array.from({ length: 10 }, () => {
           const colorId = this.randomId(beerColorIds);
           const styleId = this.randomId(beerStyleIds);
           return this.createOne(colorId, breweryId, styleId);
         });
-      })
+      }),
     );
 
     return beers;

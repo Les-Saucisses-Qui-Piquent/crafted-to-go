@@ -4,6 +4,7 @@ export type BeerInsert = Prisma.beerCreateInput;
 export type BeerUpdate = Prisma.beerUpdateInput;
 
 export interface IBeer {
+  getBeersByBrewery: (breweryId: string) => Promise<beer[]>;
   getBeers: () => Promise<beer[]>;
   getBeer: (id: string) => Promise<beer | null>;
   createBeer: (payload: BeerInsert) => Promise<beer>;
