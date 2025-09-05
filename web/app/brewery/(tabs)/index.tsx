@@ -65,7 +65,7 @@ export default function Dashboard() {
             <View style={styles.beerInfo}>
               <Text style={styles.beerName}>{beer.name}</Text>
               <Text style={styles.beerType}>{beer.beer_style.label}</Text>
-              <Text style={styles.beerType}>{beer.color}</Text>
+              <Text style={styles.beerType}>{beer.beer_color.label}</Text>
               <Text style={styles.beerDescription}>{beer.description}</Text>
               <Text style={styles.beerDescription}>Prix: {beer.price} €</Text>
               <Text style={styles.beerDescription}>Quantité: {beer.quantity}</Text>

@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   container: {
     padding: SIZES.padding3,
     paddingBottom: 50,
-    backgroundColor: COLORS.secondaryWhite, // #F9F9FF
+    backgroundColor: COLORS.secondaryWhite,
   },
   center: {
     flex: 1,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 150,
     borderRadius: SIZES.radius / 2,
-    backgroundColor: COLORS.greyscale300, // #E0E0E0
+    backgroundColor: COLORS.greyscale300,
     marginBottom: SIZES.padding3,
   },
   logoPlaceholder: {
@@ -334,27 +334,28 @@ const styles = StyleSheet.create({
     padding: SIZES.padding3,
     marginBottom: SIZES.padding3 * 2,
     shadowColor: COLORS.black,
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.07,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
   },
   rowCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
     marginBottom: SIZES.padding3 * 2,
+    gap: SIZES.padding2,
   },
   infoCard: {
     backgroundColor: COLORS.white,
     borderRadius: SIZES.radius / 2,
     padding: SIZES.padding3,
     flex: 1,
-    marginHorizontal: SIZES.padding / 2,
+    marginBottom: SIZES.padding2,
     shadowColor: COLORS.black,
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.05,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
+    marginRight: SIZES.padding2,
   },
   sectionTitle: {
     ...FONTS.h2,
@@ -371,8 +372,9 @@ const styles = StyleSheet.create({
     paddingVertical: SIZES.padding2,
     paddingHorizontal: SIZES.padding3,
     fontSize: SIZES.body3,
-    backgroundColor: COLORS.greyscale500, // #FAFAFA
+    backgroundColor: COLORS.greyscale500,
     color: COLORS.black2,
+    marginBottom: SIZES.padding2,
   },
   textArea: {
     minHeight: 100,
@@ -383,7 +385,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray2,
   },
   linkText: {
-    color: COLORS.success, // #0ABE75
+    color: COLORS.success,
     textDecorationLine: "underline",
     marginBottom: 6,
   },
@@ -400,6 +402,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginTop: SIZES.padding3 * 2,
     marginBottom: 50,
+    gap: SIZES.padding2,
   },
   button: {
     backgroundColor: COLORS.success,
@@ -409,7 +412,7 @@ const styles = StyleSheet.create({
     minWidth: 140,
     alignItems: "center",
     shadowColor: COLORS.success,
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.18,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 5 },
     elevation: 5,

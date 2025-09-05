@@ -16,6 +16,7 @@ import BeerCardHorizontal from "@/components/beerCard/BeerCardHorizontal";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { useApiClient } from "@/utils/api-client";
 import ModalSmall from "@/components/modals/ModalSmall";
+import { COLORS, SIZES } from "@/constants";
 
 export default function Inventory() {
   const { beers, loading, refreshBeers } = useBreweryData();
@@ -182,29 +183,50 @@ export default function Inventory() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    backgroundColor: COLORS.secondaryWhite,
+    paddingHorizontal: SIZES.padding3,
+    paddingTop: SIZES.padding3,
   },
   topBar: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    gap: 12,
+    marginBottom: SIZES.padding2,
+    gap: SIZES.padding2,
   },
   addBtn: {
-    marginLeft: 12,
-    width: 128,
-    height: 27,
+    marginLeft: SIZES.padding,
+    width: 140,
+    height: 32,
   },
   beerList: {
-    gap: 16,
+    gap: SIZES.padding3,
     paddingBottom: 40,
+  },
+  beerRow: {
+    flexDirection: "column",
+    gap: SIZES.padding2,
+    width: "100%",
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: "#00000066",
     justifyContent: "center",
     alignItems: "center",
+  },
+  stockInput: {
+    borderWidth: 1,
+    borderRadius: 6,
+    marginVertical: 8,
+    padding: 8,
+    width: 100,
+    textAlign: "center",
+    fontSize: 15,
+    backgroundColor: COLORS.greyscale500,
+    borderColor: COLORS.greyscale300,
+  },
+  modalBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 10,
   },
 });

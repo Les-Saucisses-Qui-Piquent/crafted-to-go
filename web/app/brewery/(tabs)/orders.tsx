@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import CommandCard, { OrderCardProps } from "@/components/OrderCard";
 import FilterBar from "@/components/filterBars/FilterBar";
 import { useBreweryData } from "@/contexts/BreweryDataContext";
+import { COLORS, SIZES } from "@/constants";
 
 const filters = ["Nouveau", "En cours", "Prêtes", "Annulées", "toutes"];
 
@@ -87,31 +88,38 @@ function StatBlock({ label, count }: { label: string; count: number }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 10 },
+  container: { flex: 1, backgroundColor: COLORS.secondaryWhite, padding: SIZES.padding3 },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: SIZES.padding2,
+    gap: SIZES.padding2,
   },
   statBlock: {
-    backgroundColor: "#F5F5F5",
-    paddingVertical: 10,
+    backgroundColor: COLORS.grayscale100,
+    paddingVertical: 14,
     paddingHorizontal: 15,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: "center",
     flex: 1,
     marginHorizontal: 5,
+    shadowColor: COLORS.black,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   statCount: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#000",
+    color: COLORS.primary,
   },
   statLabel: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 4,
+    fontSize: 13,
+    color: COLORS.gray2,
+    marginTop: 2,
+    fontWeight: "500",
   },
   filterContainer: {
     alignItems: "center",
@@ -120,11 +128,18 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: "space-between",
     marginBottom: 15,
+    gap: SIZES.padding2,
   },
   listContainer: {
     paddingBottom: 30,
   },
   orderWrapper: {
-    width: Dimensions.get("window").width / 2 - 20,
+    flex: 1,
+    marginBottom: SIZES.padding2,
+  },
+  emptyText: {
+    color: COLORS.gray,
+    textAlign: "center",
+    marginTop: SIZES.padding3,
   },
 });
