@@ -44,6 +44,7 @@ export const COLORS = {
   yellow: "#fad230",
   red2: "rgba(254,101,105,255)",
   blue2: "rgba(48,114,255,255)",
+  pink2: "#F8D8D8",
 };
 
 export const SIZES = {

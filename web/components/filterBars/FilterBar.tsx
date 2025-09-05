@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { COLORS } from "@/constants/theme";
 
 interface FilterBarProps {
   filters: string[];
@@ -32,21 +33,22 @@ export default function FilterBar({ filters, selectedIndex, onSelect }: FilterBa
 const styles = StyleSheet.create({
   container: {
     height: 51,
-    width: 400,
+    width: "100%",
+    maxWidth: 400,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
   },
   background: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#fff",
-    borderColor: "#D9D9D9",
+    backgroundColor: COLORS.pink2,
+    borderColor: COLORS.pink2,
     borderWidth: 0.5,
-    borderRadius: 8,
-    shadowColor: "rgba(0,0,0,0.25)",
-    shadowOffset: { width: 0, height: 0.5 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
+    borderRadius: 25,
+    shadowColor: "#666666",
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    shadowOpacity: 0.5,
   },
   filtersRow: {
     flexDirection: "row",
@@ -58,27 +60,29 @@ const styles = StyleSheet.create({
   filterButton: {
     flex: 1,
     marginHorizontal: 3,
-    backgroundColor: "#F7F7F7",
-    borderRadius: 6,
+    backgroundColor: COLORS.pink2,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#F7F7F7",
+    borderColor: COLORS.pink2,
     alignItems: "center",
     justifyContent: "center",
     height: 36,
   },
   selectedFilter: {
-    backgroundColor: "#D5E9E1",
-    borderColor: "#D5E9E1",
+    backgroundColor: "white",
+    borderColor: "white",
   },
   filterText: {
-    color: "#000",
-    fontFamily: "Hanken Grotesk",
-    fontSize: 12,
-    fontWeight: "500",
+    color: "#666",
+    fontFamily: "HankenGrotesk",
+    fontSize: 14,
+    fontWeight: "400",
     letterSpacing: -0.33,
     lineHeight: 18,
   },
   selectedFilterText: {
-    fontWeight: "700",
+    fontWeight: "800",
+    color: "black",
+    fontSize: 15,
   },
 });
