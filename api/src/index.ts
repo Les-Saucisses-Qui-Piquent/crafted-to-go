@@ -8,8 +8,9 @@ import fastifyMultipart from "@fastify/multipart";
 export default async (fastify: FastifyInstance): Promise<void> => {
   // Register plugins
   await fastify.register(corsPlugin);
-  await fastify.register(fastifyMultipart);
-
+  await fastify.register(fastifyMultipart, {
+    attachFieldsToBody: true, // <--- AJOUTE CECI
+  });
   // Register all route modules
   await fastify.register(authRoutes);
 

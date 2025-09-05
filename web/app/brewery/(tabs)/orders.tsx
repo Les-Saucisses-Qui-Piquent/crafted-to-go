@@ -55,10 +55,7 @@ export default function Orders() {
     <View style={styles.container}>
       <View style={styles.statsContainer}>
         <StatBlock label="Nouvelles" count={orders.filter((o) => o.status === "new").length} />
-        <StatBlock
-          label="En cours"
-          count={orders.filter((o) => o.status === "in_Progress").length}
-        />
+        <StatBlock label="En cours" count={orders.filter((o) => o.status === "progress").length} />
         <StatBlock label="Prêtes" count={orders.filter((o) => o.status === "ready").length} />
         <StatBlock label="Annulées" count={orders.filter((o) => o.status === "cancelled").length} />
       </View>

@@ -18,8 +18,8 @@ export default function SecondaryCTA({
 }: SecondaryCTAProps) {
   let backgroundColor = "rgba(252, 248, 248, 1)";
   if (isBlack) backgroundColor = "#000";
-  let textColor = isBlack ? "#FFF" : "#000";
-  let width = tablet ? 294 : 128;
+  const textColor = isBlack ? "#FFF" : "#000";
+  const width = tablet ? 294 : 128;
 
   return (
     <TouchableOpacity style={[styles.secondaryCTAContainer, { width }, style]} onPress={onPress}>

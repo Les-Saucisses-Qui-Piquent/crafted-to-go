@@ -19,13 +19,29 @@ export interface OrderCardProps {
 
 export default function CommandCard(props: OrderCardProps) {
   const [modalVisible, setModalVisible] = useState(false);
-  const { orderDetails } = useBreweryData();
+  const { orderDetails, updateOrderStatus } = useBreweryData();
   const { id, final_price, status, pickup_day, pickup_time } = props;
   const items = orderDetails[id] || [];
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString("fr-FR");
+  const formatDate = (d: string | number | Date) => new Date(d).toLocaleDateString("fr-FR");
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+    if (status === "new" && updateOrderStatus) {
+      setTimeout(() => {
+        updateOrderStatus(id, "progress");
+      }, 100);
+    }
+  };
+
+  const handleReady = async () => {
+    await updateOrderStatus!(id, "ready");
+    closeModal();
+  };
 
   const closeModal = () => setModalVisible(false);
+
+  const showReadyButton = status === "progress";
 
   return (
     <>
@@ -35,7 +51,7 @@ export default function CommandCard(props: OrderCardProps) {
         <Text style={styles.pickup}>
           🕒 Pickup: {formatDate(pickup_day)} à {pickup_time}
         </Text>
-        <MainButton title="Détails de la commande" onPress={() => setModalVisible(true)} />
+        <MainButton title="Détails de la commande" onPress={handleOpenModal} />
       </View>
 
       <Modal visible={modalVisible} animationType="slide" transparent>
@@ -51,6 +67,7 @@ export default function CommandCard(props: OrderCardProps) {
                   items={items}
                   onClose={closeModal}
                 />
+                {showReadyButton && <MainButton title="Commande prête" onPress={handleReady} />}
               </View>
             </TouchableWithoutFeedback>
           </View>
