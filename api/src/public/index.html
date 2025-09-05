@@ -592,6 +592,12 @@ fastify.post("/some-protected-route", { preHandler: authMiddleware }, async (req
           </ul>
         </li>
         <li>
+          <code>GET /beers/brewery/:breweryId</code>: Get all beers for a specific brewery.
+          <ul>
+            <li><strong>Access</strong>: Public (Unprotected)</li>
+          </ul>
+        </li>
+        <li>
           <code>POST /beers</code>: Create a new beer.
           <ul>
             <li><strong>Access</strong>: Public (Unprotected)</li>
