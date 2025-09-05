@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useClientData } from "@/contexts/CostumerDataProvider";
 import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
 import { OpeningHoursDetail } from "@/app/registerBrewery";
+import FilterBar from "@/components/filterBars/FilterBar";
 
 export default function BreweryDetails() {
   const params = useLocalSearchParams();
@@ -12,6 +13,9 @@ export default function BreweryDetails() {
 
   const [breweryData, setBreweryData] = useState<BreweryProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedTab, setSelectedTab] = useState<number>(0);
+  
+  const tabs = ["Informations", "Catalogue"];
 
   useEffect(() => {
     if (!id) return;
@@ -99,6 +103,55 @@ export default function BreweryDetails() {
     );
   };
 
+  const renderInformationsTab = () => (
+    <>
+      <Text style={styles.description}>{breweryData?.description}</Text>
+
+      {breweryData?.address && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Adresse et coordonnées</Text>
+          <View style={styles.addressContainer}>
+            <Text style={styles.addressText}>
+              📍 {breweryData.address.line_1} {breweryData.address.postal_code} {breweryData.address.city} 
+            </Text>
+            <Text style={styles.addressText}>📞 Tel: {formatPhoneNumber(breweryData.phone_number)}</Text>
+            <Text style={styles.addressText}>✉️ Email: {breweryData.email.toLowerCase()}</Text>
+          </View>
+        </View>
+      )}
+
+      {breweryData?.opening_hours && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Horaires</Text>
+          {renderHours(breweryData.opening_hours)}
+        </View>
+      )}
+
+      {breweryData?.has_taproom && breweryData?.taproom_hours && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Taproom</Text>
+          {renderHours(breweryData.taproom_hours)}
+        </View>
+      )}
+
+      {renderSocialLinks()}
+    </>
+  );
+
+  const renderCatalogueTab = () => (
+    <View style={styles.section}>
+      <Text style={styles.text}>test</Text>
+    </View>
+  );
+
+  const renderTabContent = () => {
+    if (selectedTab === 0) {
+      return renderInformationsTab();
+    } else {
+      return renderCatalogueTab();
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
       <Text style={styles.title}>{breweryData.name}</Text>
@@ -113,36 +166,15 @@ export default function BreweryDetails() {
         </View>
       )}
 
-      <Text style={styles.description}>{breweryData.description}</Text>
+      <View style={styles.filterBarContainer}>
+        <FilterBar 
+          filters={tabs}
+          selectedIndex={selectedTab}
+          onSelect={setSelectedTab}
+        />
+      </View>
 
-      {breweryData.address && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Adresse et coordonnées</Text>
-          <View style={styles.addressContainer}>
-            <Text style={styles.addressText}>
-              📍 {breweryData.address.line_1} {breweryData.address.postal_code} {breweryData.address.city} 
-            </Text>
-                         <Text style={styles.addressText}>📞 Tel: {formatPhoneNumber(breweryData.phone_number)}</Text>
-            <Text style={styles.addressText}>✉️ Email: {breweryData.email.toLowerCase()}</Text>
-          </View>
-        </View>
-      )}
-
-      {breweryData.opening_hours && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horaires</Text>
-          {renderHours(breweryData.opening_hours)}
-        </View>
-      )}
-
-      {breweryData.has_taproom && breweryData.taproom_hours && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Taproom</Text>
-          {renderHours(breweryData.taproom_hours)}
-        </View>
-      )}
-
-      {renderSocialLinks()}
+      {renderTabContent()}
     </ScrollView>
   );
 }
@@ -173,11 +205,16 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     overflow: "hidden",
-    paddingBottom: 20,
+    paddingBottom: 6,
   },
   breweryImage: {
     width: "100%",
     height: 150,
+  },
+  filterBarContainer: {
+    alignItems: "center",
+    marginVertical: 15,
+    //paddingHorizontal: 16,
   },
   description: {
     fontSize: 16,
@@ -196,14 +233,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
     fontFamily: "HankenGrotesk",
-    borderWidth: 1,
-    borderColor: "blue",
-    borderRadius: 8,
   },
   addressContainer: {
-    borderWidth: 1,
-    borderColor: "#E21221",
-    borderRadius: 8,
   },
   addressText: {
     fontSize: 12,
