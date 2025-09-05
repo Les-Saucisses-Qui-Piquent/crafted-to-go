@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import BeerCardLarge from "@/components/beerCard/beerCardLarge";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, ScrollView } from "react-native";
 import SelectInput from "@/components/form/SelectInput";
 import MainButton from "@/components/Buttons/MainButton";
 import { useCart } from "@/contexts/CartContext";
 import { useClientData } from "@/contexts/CostumerDataProvider";
 import { BeerCardProps } from "@/components/beerCard/BeerCard";
 import { useLocalSearchParams } from "expo-router";
+import SmallBeerCaroussel from "@/components/caroussel/SmallBeerCaroussel";
 
 const BeerDetails = () => {
   const params = useLocalSearchParams();
   const id = params.id as string | undefined;
 
   const { addItem } = useCart();
-  const { favoriteBeers, toggleFavoriteBeer, getBeerById } = useClientData();
+  const { favoriteBeers, toggleFavoriteBeer, getBeerById, beers } = useClientData();
 
   const [beer, setBeer] = useState<BeerCardProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -76,29 +76,152 @@ const BeerDetails = () => {
 
   return (
     <View style={styles.container}>
-      <BeerCardLarge beer={beer} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.contentContainer}>
+        <View style={styles.beerCard}>
+          <Image 
+            style={styles.image} 
+            source={{ uri: beer.image }}
+            resizeMode="cover"
+          />
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>{beer.name}</Text>
+            {beer.brewery && <Text style={styles.brewery}>Disponible chez {beer.brewery.name}</Text>}
+            <Text style={styles.description}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </Text>
+            <View style={styles.separator} />
+            <View style={styles.tableContainer}>
+              {/* Headers */}
+              <View style={styles.tableRow}>
+                <Text style={styles.tableHeader}>Style</Text>
+                <Text style={styles.tableHeader}>Couleur</Text>
+                <Text style={styles.tableHeader}>Taux</Text>
+                <Text style={styles.tableHeader}>Prix</Text>
+                <Text style={styles.tableHeader}>Stock</Text>
+              </View>
+              
+              {/* Values */}
+              <View style={styles.tableRow}>
+                <Text style={styles.tableValue}>{beer.beer_style?.label}</Text>
+                <Text style={styles.tableValue}>{beer.beer_color?.label}</Text>
+                <Text style={styles.tableValue}>{beer.abv_rate}°</Text>
+                <Text style={styles.tableValue}>{beer.price}€</Text>
+                <Text style={styles.tableValue}>{beer.quantity}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
-      <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
-        <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={handleToggleFavorite} style={styles.favoriteBtn}>
+          <Text style={{ fontSize: 24 }}>{isFavorite ? "❤️" : "🤍"}</Text>
+        </TouchableOpacity>
 
-      <View style={styles.actionContainer}>
-        <SelectInput
-          label="Quantité"
-          items={quantityItems}
-          selectedValue={quantity}
-          onValueChange={setQuantity}
-          small
-          width={100}
-        />
-        <MainButton title="Ajouter au panier" onPress={handleAddToCart} isBlack />
-      </View>
+        <View style={styles.actionContainer}>
+          <SelectInput
+            label=""
+            items={quantityItems}
+            selectedValue={quantity}
+            onValueChange={setQuantity}
+            small
+            width={100}
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
+            <View style={styles.addButtonBackground} />
+            <Text style={styles.addButtonText}>AJOUTER AU PANIER</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.carouselContainer}>
+          <Text style={styles.sectionTitle}>Petits formats à emporter</Text>
+          <SmallBeerCaroussel beers={beers} />
+        </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
+  container: { 
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "red",
+  },
+  contentContainer: {
+    width: "100%",
+    gap: 16,
+  },
+  beerCard: {
+    width: 300,
+    height: 470,
+    backgroundColor: "#fff",
+    elevation: 3,
+  },
+  image: {
+    width: "100%",
+    height: 300,
+  },
+  infoContainer: {
+    flex: 1,
+    margin: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#000",
+    textTransform: "capitalize",
+  },
+  tableContainer: {
+    marginTop: 5,
+    width: "100%",
+  },
+      tableRow: {
+      flexDirection: "row",
+      width: "100%",
+      marginBottom: 4,
+      justifyContent: "space-between",
+    },
+    tableHeader: {
+      width: "18%",
+      fontSize: 12,
+      color: "#666",
+      textAlign: "left",
+      fontWeight: "200",
+    },
+    tableValue: {
+      width: "18%",
+      fontSize: 12,
+      fontWeight: "bold",
+      color: "#000",
+      textAlign: "left",
+
+  },
+  brewery: {
+    fontSize: 12,
+    color: "#000",
+    marginTop: 2,
+    marginBottom: 8,
+    fontWeight: "600",
+  },
+  description: {
+    fontSize: 10,
+    color: "#666",
+    marginBottom: 10,
+    lineHeight: 12,
+    textAlign: "justify",
+    fontWeight: "200",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#D9D9D9",
+    width: "100%",
+    //marginVertical: 10,
+  },
   favoriteBtn: {
     position: "absolute",
     top: 16,
@@ -106,11 +229,48 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   actionContainer: {
-    marginTop: 24,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    width: 240,
+    width: 300,
+    paddingTop: 10,
+  },
+  addButton: {
+    position: "relative",
+    height: 36,
+    width: 180,
+  },
+  addButtonBackground: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#000",
+    shadowColor: "rgba(0, 0, 0, 0.25)",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowRadius: 4,
+  },
+  addButtonText: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    textAlign: "center",
+    color: "#FFF",
+    fontFamily: "HankenGrotesk",
+    fontSize: 14,
+    fontWeight: "800",
+    lineHeight: 36,
+  },
+  carouselContainer: {
+    width: 300,
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
   },
 });
 
