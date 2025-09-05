@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { COLORS } from "@/constants/theme";
 
 interface FilterBarProps {
   filters: string[];
@@ -40,14 +41,14 @@ const styles = StyleSheet.create({
   },
   background: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#173B2C",
-    borderColor: "#173B2C",
+    backgroundColor: COLORS.pink2,
+    borderColor: COLORS.pink2,
     borderWidth: 0.5,
     borderRadius: 25,
-    shadowColor: "rgba(0,0,0,0.25)",
-    shadowOffset: { width: 0, height: 0.5 },
-    shadowRadius: 4,
-    shadowOpacity: 1,
+    shadowColor: "#666666",
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    shadowOpacity: 0.5,
   },
   filtersRow: {
     flexDirection: "row",
@@ -59,10 +60,10 @@ const styles = StyleSheet.create({
   filterButton: {
     flex: 1,
     marginHorizontal: 3,
-    backgroundColor: "#173B2C",
+    backgroundColor: COLORS.pink2,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#173B2C",
+    borderColor: COLORS.pink2,
     alignItems: "center",
     justifyContent: "center",
     height: 36,
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
   },
   filterText: {
-    color: "white",
+    color: "#666",
     fontFamily: "HankenGrotesk",
     fontSize: 14,
     fontWeight: "400",
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   },
   selectedFilterText: {
     fontWeight: "800",
-    color: "#173B2C",
+    color: "black",
     fontSize: 15,
   },
 });

@@ -50,26 +50,49 @@ export default function BreweryDetails() {
   ) => {
     if (!hoursObj) return null;
 
-    return Object.entries(hoursObj).map(([day, hours]) => {
-      if (typeof hours === "string") {
-        return (
-          <Text key={day} style={styles.text}>
-            {day}: {hours}
-          </Text>
-        );
-      }
+    // Ordre logique des jours de la semaine avec traduction française
+    const dayOrder = [
+      { key: 'monday', label: 'Lundi' },
+      { key: 'tuesday', label: 'Mardi' },
+      { key: 'wednesday', label: 'Mercredi' },
+      { key: 'thursday', label: 'Jeudi' },
+      { key: 'friday', label: 'Vendredi' },
+      { key: 'saturday', label: 'Samedi' },
+      { key: 'sunday', label: 'Dimanche' }
+    ];
+    
+    const sortedEntries = dayOrder
+      .map(({ key, label }) => ({ key, label, hours: hoursObj[key] }))
+      .filter(({ hours }) => hours !== undefined);
 
-      if (typeof hours === "object" && hours !== null) {
-        const { isOpen, openTime, closeTime } = hours as OpeningHoursDetail;
-        return (
-          <Text key={day} style={styles.text}>
-            {day}: {isOpen ? `${openTime ?? "?"} - ${closeTime ?? "?"}` : "Fermé"}
-          </Text>
-        );
-      }
+    return (
+      <View style={styles.hoursContainer}>
+        {sortedEntries.map(({ key, label, hours }) => {
+          if (typeof hours === "string") {
+            return (
+              <View key={key} style={styles.hourRow}>
+                <Text style={styles.dayText}>{label}:</Text>
+                <Text style={styles.timeText}>{hours}</Text>
+              </View>
+            );
+          }
 
-      return null;
-    });
+          if (typeof hours === "object" && hours !== null) {
+            const { isOpen, openTime, closeTime } = hours as OpeningHoursDetail;
+            return (
+              <View key={key} style={styles.hourRow}>
+                <Text style={styles.dayText}>{label}:</Text>
+                <Text style={[styles.timeText, !isOpen && styles.closedText]}>
+                  {isOpen ? `${openTime ?? "?"} - ${closeTime ?? "?"}` : "Fermé"}
+                </Text>
+              </View>
+            );
+          }
+
+          return null;
+        })}
+      </View>
+    );
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -120,17 +143,21 @@ export default function BreweryDetails() {
         </View>
       )}
 
-      {breweryData?.opening_hours && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Horaires</Text>
-          {renderHours(breweryData.opening_hours)}
-        </View>
-      )}
+      {(breweryData?.opening_hours || (breweryData?.has_taproom && breweryData?.taproom_hours)) && (
+        <View style={styles.hoursSection}>
+          {breweryData?.opening_hours && (
+            <View style={styles.hourColumn}>
+              <Text style={styles.sectionTitle}>Horaires</Text>
+              {renderHours(breweryData.opening_hours)}
+            </View>
+          )}
 
-      {breweryData?.has_taproom && breweryData?.taproom_hours && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Taproom</Text>
-          {renderHours(breweryData.taproom_hours)}
+          {breweryData?.has_taproom && breweryData?.taproom_hours && (
+            <View style={styles.hourColumn}>
+              <Text style={styles.sectionTitle}>Taproom</Text>
+              {renderHours(breweryData.taproom_hours)}
+            </View>
+          )}
         </View>
       )}
 
@@ -219,7 +246,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#636360",
-    marginBottom: 16,
+    marginVertical: 16,
     fontFamily: "HankenGrotesk",
     fontWeight: "200",
     textAlign: "justify",
@@ -256,5 +283,46 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     marginBottom: 4,
     fontFamily: "HankenGrotesk",
+  },
+  hoursContainer: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 8,
+    paddingRight: 10,
+  },
+  hourRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 2,
+  },
+  dayText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "500",
+    color: "#000",
+    textTransform: "capitalize",
+    flex: 1,
+  },
+  timeText: {
+    fontSize: 12,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "400",
+    color: "#666",
+    flex: 1,
+    textAlign: "right",
+  },
+  closedText: {
+    color: "#999",
+    fontStyle: "italic",
+  },
+  hoursSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    gap: 25,
+    paddingRight: 10,
+  },
+  hourColumn: {
+    flex: 1,
   },
 });
