@@ -1,5 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Image, ActivityIndicator, Alert } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Image,
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  TouchableOpacity,
+  Platform,
+  TextInput,
+  KeyboardAvoidingView,
+} from "react-native";
 import Input from "@/components/form/Input";
 import SelectInput from "@/components/form/SelectInput";
 import SecondaryCTA from "@/components/Buttons/SecondaryCTA";
@@ -9,6 +21,9 @@ import { useBreweryData } from "@/contexts/BreweryDataContext";
 import * as ImagePicker from "expo-image-picker";
 import AppIcon from "@/utils/AppIcon";
 import BeerImageUploader from "@/components/form/BeerImageUploader";
+import { COLORS, SIZES } from "@/constants/theme";
+
+// ===== TYPES (originaux, tous présents) =====
 
 export interface BeerForm {
   name: string;
@@ -99,16 +114,31 @@ export default function BeerForm() {
     image: null,
     existingImage: undefined,
   });
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+
+  const nameInputRef = useRef<TextInput>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   useEffect(() => {
+    let mounted = true;
     async function fetchOptions() {
-      const styles = await apiClient("/beer-styles", { method: "GET" });
-      setBeerStyles(styles.map((s: BeerStyle) => ({ label: s.label, value: s.id })));
-      const colors = await apiClient("/beer-colors", { method: "GET" });
-      setBeerColors(colors.map((c: BeerColor) => ({ label: c.label, value: c.id })));
+      try {
+        const styles = await apiClient("/beer-styles", { method: "GET" });
+        const colors = await apiClient("/beer-colors", { method: "GET" });
+        if (!mounted) return;
+        setBeerStyles(styles.map((s: BeerStyle) => ({ label: s.label, value: s.id })));
+        setBeerColors(colors.map((c: BeerColor) => ({ label: c.label, value: c.id })));
+      } catch (e) {
+        Alert.alert("Erreur chargement styles/couleurs", "Impossible de charger les options.");
+      }
     }
     fetchOptions();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -138,11 +168,20 @@ export default function BeerForm() {
       [id]: value,
     }));
   };
+
   const handleSelectChange = (key: keyof BeerForm, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const pickImage = async () => {
+    Keyboard.dismiss();
+    if (Platform.OS === "ios") {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission requise", "Veuillez autoriser l’accès à vos images.");
+        return;
+      }
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -159,15 +198,21 @@ export default function BeerForm() {
   };
 
   const handleSubmit = async () => {
+    if (!form.name) {
+      nameInputRef.current?.focus?.();
+      scrollToTop();
+      Alert.alert("Champ requis", "Merci d'indiquer le nom de la bière.");
+      return;
+    }
     if (
-      !form.name ||
       !form.beer_style_id ||
       !form.beer_color_id ||
       !form.abv_rate ||
       !form.quantity ||
       !form.price
     ) {
-      Alert.alert("Tous les champs obligatoires doivent être remplis.");
+      scrollToTop();
+      Alert.alert("Champs manquants", "Merci de remplir tous les champs obligatoires.");
       return;
     }
     setLoading(true);
@@ -188,9 +233,10 @@ export default function BeerForm() {
         await apiClient(`/beers/${beerId}`, {
           method: "PUT",
           body: JSON.stringify(body),
+          headers: { "Content-Type": "application/json" },
         });
         newBeerId = beerId;
-        Alert.alert("Bière modifiée !");
+        Alert.alert("Succès", "Bière modifiée !");
       } else {
         const body = {
           name: form.name,
@@ -208,7 +254,7 @@ export default function BeerForm() {
           body: JSON.stringify(body),
         });
         newBeerId = newBeer.id;
-        Alert.alert("Bière créée !");
+        Alert.alert("Succès", "Bière créée !");
       }
 
       if (form.image?.uri && newBeerId) {
@@ -222,7 +268,7 @@ export default function BeerForm() {
         typeof e === "object" && e !== null && "message" in e
           ? (e as { message?: string }).message
           : "Erreur inconnue";
-      Alert.alert("Erreur lors de l'enregistrement", errorMessage || "Erreur inconnue");
+      Alert.alert("Erreur", errorMessage || "Erreur inconnue");
     } finally {
       setLoading(false);
     }
@@ -244,131 +290,173 @@ export default function BeerForm() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <Image style={styles.logo} />
-        <View style={{ flex: 1 }} />
-        <AppIcon name="notifications-outline" size={20} color="#000" />
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.select({ ios: 0, android: 24 })}
+    >
+      <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.headerRow}>
+            <Image style={styles.logo} />
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity hitSlop={16}>
+              <AppIcon name="notifications-outline" size={22} color="#222" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.formCard}>
+            <View style={styles.row}>
+              <Input
+                label="Nom"
+                id="name"
+                placeholder="Nom de la bière"
+                onInputChanged={handleInputChange}
+                value={form.name}
+              />
+            </View>
+            <View style={styles.row}>
+              <SelectInput
+                label="Type"
+                items={beerStyles}
+                onValueChange={(v: string) => handleSelectChange("beer_style_id", v)}
+                selectedValue={form.beer_style_id}
+                small
+              />
+              <View style={{ width: 12 }} />
+              <SelectInput
+                label="Couleur"
+                items={beerColors}
+                onValueChange={(v: string) => handleSelectChange("beer_color_id", v)}
+                selectedValue={form.beer_color_id}
+                small
+              />
+            </View>
+            <View style={styles.row}>
+              <Input
+                label="ABV"
+                id="abv_rate"
+                placeholder="Taux d'alcool (%)"
+                onInputChanged={handleInputChange}
+                keyboardType="numeric"
+                value={form.abv_rate}
+                small
+              />
+              <View style={{ width: 12 }} />
+              <Input
+                label="IBU"
+                id="ibu_rate"
+                placeholder="Amertume"
+                onInputChanged={handleInputChange}
+                keyboardType="numeric"
+                value={form.ibu_rate}
+                small
+              />
+            </View>
+            <BeerImageUploader
+              image={form.image}
+              existingImage={form.existingImage}
+              onPickImage={pickImage}
+              loading={loading}
+            />
+            <View style={styles.row}>
+              <Input
+                label="Quantité"
+                id="quantity"
+                placeholder="Quantité"
+                onInputChanged={handleInputChange}
+                keyboardType="numeric"
+                value={form.quantity}
+                small
+              />
+              <View style={{ width: 12 }} />
+              <Input
+                label="Prix"
+                id="price"
+                placeholder="Prix (€)"
+                onInputChanged={handleInputChange}
+                keyboardType="numeric"
+                value={form.price}
+                small
+              />
+            </View>
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color={COLORS.greyscale900}
+                style={{ marginVertical: 20 }}
+              />
+            )}
+            <SecondaryCTA
+              title={isEditMode ? "Modifier la bière" : "Créer la bière"}
+              style={styles.submitBtn}
+              onPress={handleSubmit}
+            />
+          </View>
+        </ScrollView>
       </View>
-
-      {/* Fields */}
-      <View style={styles.row}>
-        <Input
-          label="Nom"
-          id="name"
-          placeholder="Nom de la bière"
-          onInputChanged={handleInputChange}
-          value={form.name}
-        />
-      </View>
-      <View style={styles.row}>
-        <SelectInput
-          label="Type"
-          items={beerStyles}
-          onValueChange={(v: string) => handleSelectChange("beer_style_id", v)}
-          selectedValue={form.beer_style_id}
-          small
-        />
-        <View style={{ width: 12 }} />
-        <SelectInput
-          label="Couleur"
-          items={beerColors}
-          onValueChange={(v: string) => handleSelectChange("beer_color_id", v)}
-          selectedValue={form.beer_color_id}
-          small
-        />
-      </View>
-      <View style={styles.row}>
-        <Input
-          label="ABV"
-          id="abv_rate"
-          placeholder="Taux d'alcool"
-          onInputChanged={handleInputChange}
-          keyboardType="numeric"
-          value={form.abv_rate}
-          small
-        />
-        <View style={{ width: 12 }} />
-        <Input
-          label="IBU"
-          id="ibu_rate"
-          placeholder="Amertume"
-          onInputChanged={handleInputChange}
-          keyboardType="numeric"
-          value={form.ibu_rate}
-          small
-        />
-      </View>
-
-      {/* Image uploader */}
-      <BeerImageUploader
-        image={form.image}
-        existingImage={form.existingImage}
-        onPickImage={pickImage}
-        loading={loading}
-      />
-
-      <View style={styles.row}>
-        <Input
-          label="Quantité"
-          id="quantity"
-          placeholder="Quantité"
-          onInputChanged={handleInputChange}
-          keyboardType="numeric"
-          value={form.quantity}
-          small
-        />
-        <View style={{ width: 12 }} />
-        <Input
-          label="Prix"
-          id="price"
-          placeholder="Prix (€)"
-          onInputChanged={handleInputChange}
-          keyboardType="numeric"
-          value={form.price}
-          small
-        />
-      </View>
-
-      {/* Loading spinner */}
-      {loading && <ActivityIndicator size="large" color="#A09C9C" style={{ marginVertical: 20 }} />}
-
-      {/* Submit button */}
-      <SecondaryCTA
-        title={isEditMode ? "Modifier la bière" : "Créer la bière"}
-        style={styles.submitBtn}
-        onPress={handleSubmit}
-      />
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-    padding: 16,
+  flex: {
+    flex: 1,
+    backgroundColor: COLORS.secondaryWhite,
+  },
+  scrollContainer: {
+    padding: SIZES.padding3,
     alignItems: "center",
+    paddingBottom: 56,
+    // Pas de minHeight, pas de flexGrow ici !
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    marginVertical: 8,
+    marginTop: Platform.select({ ios: SIZES.padding2 * 2, android: SIZES.padding2 }),
+    marginBottom: SIZES.padding2,
   },
   logo: {
     width: 36,
     height: 36,
     borderRadius: 8,
+    backgroundColor: COLORS.greyscale300,
+  },
+  formCard: {
+    width: "100%",
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding3,
+    shadowColor: COLORS.black,
+    shadowOpacity: 0.09,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
+    marginBottom: SIZES.padding2,
+    flexShrink: 0,
   },
   row: {
     flexDirection: "row",
-    gap: 12,
+    gap: SIZES.padding,
     width: "100%",
+    marginBottom: SIZES.padding2,
+    alignItems: "center",
+  },
+  input: {
+    flex: 1,
+    minWidth: 120,
   },
   submitBtn: {
-    marginTop: 30,
+    marginTop: 24,
     alignSelf: "center",
-    width: 200,
+    width: 220,
+    borderRadius: SIZES.radius / 1.5,
+    height: 48,
+    justifyContent: "center",
   },
 });
