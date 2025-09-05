@@ -68,16 +68,33 @@ export default function BreweryDetails() {
     });
   };
 
+  const formatPhoneNumber = (phone: string) => {
+    // Supprime tous les espaces et caractères non numériques sauf le +
+    const cleanPhone = phone.replace(/[^\d+]/g, '');
+    
+    // Si c'est un numéro français (+33...)
+    if (cleanPhone.startsWith('+33')) {
+      const number = cleanPhone.slice(3); // Enlève le +33
+      // Formate : +33 X XX XX XX XX
+      return `+33 ${number.substring(0, 1)} ${number.substring(1, 3)} ${number.substring(3, 5)} ${number.substring(5, 7)} ${number.substring(7, 9)}`;
+    }
+    
+    // Sinon retourne le numéro tel quel
+    return phone;
+  };
+
   const renderSocialLinks = () => {
     if (!breweryData?.social_links || breweryData.social_links.length === 0) return null;
     return (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Réseaux sociaux</Text>
-        {breweryData.social_links.map((link, index) => (
-          <Text key={index} style={styles.linkText}>
-            {link}
-          </Text>
-        ))}
+        <View style={styles.addressContainer}>
+          {breweryData.social_links.map((link, index) => (
+            <Text key={index} style={styles.addressText}>
+              🌐 {link.toLowerCase()}
+            </Text>
+          ))}
+        </View>
       </View>
     );
   };
@@ -101,18 +118,13 @@ export default function BreweryDetails() {
           <Text style={styles.sectionTitle}>Adresse et coordonnées</Text>
           <View style={styles.addressContainer}>
             <Text style={styles.addressText}>
-              📍 {breweryData.address.line_1} {breweryData.address.postal_code} {breweryData.address.city}
+              📍 {breweryData.address.line_1} {breweryData.address.postal_code} {breweryData.address.city} 
             </Text>
+                         <Text style={styles.addressText}>📞 Tel: {formatPhoneNumber(breweryData.phone_number)}</Text>
+            <Text style={styles.addressText}>✉️ Email: {breweryData.email.toLowerCase()}</Text>
           </View>
         </View>
       )}
-
-      <View style={styles.section}>
-        {breweryData.phone_number && (
-          <Text style={styles.text}>Tel: {breweryData.phone_number}</Text>
-        )}
-        {breweryData.email && <Text style={styles.text}>Email: {breweryData.email}</Text>}
-      </View>
 
       {breweryData.opening_hours && (
         <View style={styles.section}>
@@ -196,8 +208,8 @@ const styles = StyleSheet.create({
     fontWeight: "200",
     lineHeight: 14,
     textAlign: "justify",
-    borderWidth: 1,
     letterSpacing: 0.5,
+    paddingBottom: 4,
   },
   text: {
     fontSize: 14,
