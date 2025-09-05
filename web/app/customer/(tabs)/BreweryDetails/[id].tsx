@@ -103,12 +103,14 @@ export default function BreweryDetails() {
     <ScrollView style={styles.container} contentContainerStyle={{ padding: 16 }}>
       <Text style={styles.title}>{breweryData.name}</Text>
 
-      {(breweryData.logo || breweryData.image) && (
-        <Image
-          source={{ uri: breweryData.logo ?? breweryData.image ?? "" }}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      {breweryData.image && (
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: breweryData.image }}
+            style={styles.breweryImage}
+            resizeMode="cover"
+          />
+        </View>
       )}
 
       <Text style={styles.description}>{breweryData.description}</Text>
@@ -163,17 +165,19 @@ const styles = StyleSheet.create({
     fontFamily: "HankenGrotesk",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 12,
-    textAlign: "center",
+    fontSize: 32,
+    fontWeight: "700",
+    marginBottom: 6,
+    textAlign: "left",
     fontFamily: "HankenGrotesk",
   },
-  logo: {
-    width: 200,
-    height: 100,
-    marginBottom: 16,
-    alignSelf: "center",
+  imageContainer: {
+    overflow: "hidden",
+    paddingBottom: 20,
+  },
+  breweryImage: {
+    width: "100%",
+    height: 150,
   },
   description: {
     fontSize: 16,
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
     fontFamily: "HankenGrotesk",
     fontWeight: "200",
     textAlign: "justify",
-    lineHeight: 18,
+    lineHeight: 22,
   },
   section: {
     marginBottom: 20,
