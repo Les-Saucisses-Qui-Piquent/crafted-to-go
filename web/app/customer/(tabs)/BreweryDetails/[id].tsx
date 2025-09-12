@@ -225,7 +225,6 @@ export default function BreweryDetails() {
     <View style={styles.section}>
       {breweryBeers.length > 0 ? (
         <View>
-          <Text style={styles.sectionTitle}>Catalogue des bières ({breweryBeers.length})</Text>
           {breweryBeers.map(renderBeerItem)}
         </View>
       ) : (
@@ -390,10 +389,15 @@ const styles = StyleSheet.create({
   },
   beerItem: {
     flexDirection: "row",
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "white",
     padding: 12,
     borderRadius: 8,
-    marginBottom: 12,
+    marginVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   beerImage: {
     width: 80,
@@ -405,14 +409,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   beerName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
     fontFamily: "HankenGrotesk",
     color: "#000",
     marginBottom: 8,
   },
   beerDetails: {
-    gap: 4,
+    gap: 2,
   },
   beerDetailRow: {
     flexDirection: "row",
@@ -420,18 +424,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   beerDetailLabel: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: "HankenGrotesk",
-    fontWeight: "500",
+    fontWeight: "300",
     color: "#666",
     flex: 1,
   },
   beerDetailValue: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: "HankenGrotesk",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#000",
     flex: 1,
     textAlign: "right",
+    textTransform: "uppercase",
   },
 });
