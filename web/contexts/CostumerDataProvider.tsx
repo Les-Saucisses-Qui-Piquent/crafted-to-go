@@ -17,6 +17,7 @@ interface ClientDataContextProps {
   toggleFavoriteBrewery: (breweryId: string) => Promise<void>;
   getBeerById: (id: string) => Promise<BeerCardProps | undefined>;
   getBreweryById: (id: string) => Promise<BreweryProps | undefined>;
+  getBeersByBrewery: (breweryId: string) => Promise<BeerCardProps[]>;
   getOrdersByUserId: (userId: string) => Promise<OrderCardProps[]>;
   getBreweryIdByBeerId: (beerId: string) => Promise<string | undefined>;
 }
@@ -211,6 +212,16 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
+  const getBeersByBrewery = async (breweryId: string): Promise<BeerCardProps[]> => {
+    try {
+      const beers = await apiClient(`/beers/brewery/${breweryId}`, { method: "GET" });
+      return beers || [];
+    } catch (err) {
+      console.error("Erreur fetch beers by brewery:", err);
+      return [];
+    }
+  };
+
   const getOrdersByUserId = async (userId: string): Promise<OrderCardProps[]> => {
     try {
       const orders = await apiClient(`/orders/user/${userId}`, { method: "GET" });
@@ -234,6 +245,7 @@ export const ClientDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         userDetails,
         getBeerById,
         getBreweryById,
+        getBeersByBrewery,
         getOrdersByUserId,
         getBreweryIdByBeerId,
       }}
