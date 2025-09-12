@@ -8,6 +8,7 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  TouchableOpacity,
 } from "react-native";
 import { useCart, CartItem } from "@/contexts/CartContext";
 import { useRouter, RelativePathString } from "expo-router";
@@ -40,17 +41,9 @@ const BasketScreen = () => {
   };
 
   const handleClearCart = () => {
-    Alert.alert("Vider le panier", "Êtes-vous sûr de vouloir vider tout le panier ?", [
-      {
-        text: "Annuler",
-        style: "cancel",
-      },
-      {
-        text: "Vider",
-        style: "destructive",
-        onPress: clearCart,
-      },
-    ]);
+    console.log("🔴 Bouton vider cliqué");
+    clearCart();
+    console.log("✅ Panier vidé");
   };
 
   const handleCheckout = () => {
@@ -65,32 +58,34 @@ const BasketScreen = () => {
 
   const renderCartItem = ({ item }: { item: CartItem }) => (
     <View style={styles.cartItem}>
-      <View style={styles.itemImageContainer}>
-        {item.image ? (
-          <Image source={{ uri: item.image }} style={styles.itemImage} />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>🍺</Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.itemDetails}>
+      {item.image && (
+        <Image 
+          source={{ uri: item.image }} 
+          style={styles.itemImage} 
+          resizeMode="cover"
+        />
+      )}
+      
+      <View style={styles.itemInfo}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.breweryName}>{item.breweryName}</Text>
-        {item.variant && <Text style={styles.itemVariant}>{item.variant}</Text>}
-        <Text style={styles.itemPrice}>{formatPrice(item.price)}</Text>
+        
+        <View style={styles.itemDetails}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>PRIX:</Text>
+            <Text style={styles.detailValue}>{formatPrice(item.price)}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>QTÉ:</Text>
+            <Text style={styles.detailValue}>{item.quantity}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>TOTAL:</Text>
+            <Text style={styles.detailValue}>{formatPrice(item.price * item.quantity)}</Text>
+          </View>
+        </View>
+        
       </View>
-
-      <View style={styles.quantityContainer}>
-        <MainButton onPress={() => handleQuantityChange(item.id, item.quantity - 1)} title={"-"} />
-
-        <Text style={styles.quantityText}>{item.quantity}</Text>
-
-        <MainButton onPress={() => handleQuantityChange(item.id, item.quantity + 1)} title={"+"} />
-      </View>
-
-      <MainButton onPress={() => removeItem(item.id)} title={"x"} />
     </View>
   );
 
@@ -109,43 +104,49 @@ const BasketScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mon Panier</Text>
-        {items.length > 0 && <MainButton title="Vider" onPress={handleClearCart} />}
+        {items.length > 0 && (
+          <TouchableOpacity onPress={handleClearCart} style={styles.clearButton}>
+            <Text style={styles.clearButtonText}>Vider</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Cart Items */}
       {items.length > 0 ? (
-        <>
-          <FlatList
-            data={items}
-            renderItem={renderCartItem}
-            keyExtractor={(item) => `${item.id}-${item.variant || "default"}`}
-            style={styles.cartList}
-            showsVerticalScrollIndicator={false}
-          />
+        <FlatList
+          data={items}
+          renderItem={renderCartItem}
+          keyExtractor={(item) => `${item.id}-${item.variant || "default"}`}
+          style={styles.cartList}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={() => (
+            <View style={styles.summary}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Articles ({totalItems})</Text>
+                <Text style={styles.summaryValue}>{formatPrice(totalPrice)}</Text>
+              </View>
 
-          {/* Summary */}
-          <View style={styles.summary}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Articles ({totalItems})</Text>
-              <Text style={styles.summaryValue}>{formatPrice(totalPrice)}</Text>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Livraison</Text>
+                <Text style={styles.summaryValue}>Gratuite</Text>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.summaryRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>{formatPrice(totalPrice)}</Text>
+              </View>
+
+              {/* Checkout Button */}
+              <TouchableOpacity onPress={handleCheckout} style={styles.customCheckoutButton}>
+                <Text style={styles.customCheckoutButtonText}>
+                  COMMANDER
+                </Text>
+              </TouchableOpacity>
             </View>
-
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Livraison</Text>
-              <Text style={styles.summaryValue}>Gratuite</Text>
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.summaryRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>{formatPrice(totalPrice)}</Text>
-            </View>
-          </View>
-
-          {/* Checkout Button */}
-          <MainButton onPress={handleCheckout} title={`Commander • ${formatPrice(totalPrice)}`} />
-        </>
+          )}
+        />
       ) : (
         renderEmptyCart()
       )}
@@ -174,82 +175,89 @@ const styles = StyleSheet.create({
     color: "#212529",
   },
   clearButton: {
-    color: "#dc3545",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#dc3545",
+    borderRadius: 6,
+  },
+  clearButtonText: {
+    color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+    fontFamily: "HankenGrotesk",
   },
   cartList: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   cartItem: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 12,
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 12,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  itemImageContainer: {
-    width: 60,
-    height: 60,
-    marginRight: 12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   itemImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 8,
-  },
-  placeholderImage: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    fontSize: 24,
-  },
-  itemDetails: {
-    flex: 1,
+    width: 80,
+    height: 120,
+    borderRadius: 6,
     marginRight: 12,
   },
+  itemInfo: {
+    flex: 1,
+  },
   itemName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
-    color: "#212529",
+    fontFamily: "HankenGrotesk",
+    color: "#000",
     marginBottom: 4,
   },
   breweryName: {
     fontSize: 14,
-    color: "#6c757d",
+    fontFamily: "HankenGrotesk",
+    color: "#666",
+    marginBottom: 8,
+  },
+  itemDetails: {
+    marginBottom: 12,
+  },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 2,
   },
-  itemVariant: {
-    fontSize: 12,
-    color: "#868e96",
-    marginBottom: 4,
+  detailLabel: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "300",
+    color: "#666",
+    flex: 1,
   },
-  itemPrice: {
-    fontSize: 16,
+  detailValue: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
     fontWeight: "600",
-    color: "#28a745",
+    color: "#000",
+    flex: 1,
+    textAlign: "right",
+    textTransform: "uppercase",
   },
-  quantityContainer: {
+  actionRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
-    marginRight: 12,
+  },
+  quantityControls: {
+    flexDirection: "row",
+    gap: 8,
   },
   quantityButton: {
     width: 32,
@@ -288,6 +296,7 @@ const styles = StyleSheet.create({
   summary: {
     backgroundColor: "#fff",
     marginHorizontal: 20,
+    marginTop: 10,
     marginBottom: 20,
     padding: 20,
     borderRadius: 12,
@@ -350,6 +359,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
+  },
+  customCheckoutButton: {
+    backgroundColor: "#000",
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    alignSelf: "center",
+    width: 220,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  customCheckoutButtonText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#fff",
+    fontFamily: "HankenGrotesk",
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
   emptyCart: {
     flex: 1,
