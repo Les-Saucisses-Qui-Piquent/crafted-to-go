@@ -1,5 +1,3 @@
-import { icons } from "@/constants/icons";
-import AppIcon from "@/utils/AppIcon";
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
@@ -12,24 +10,24 @@ interface TabBarProps {
 interface TabItem {
   name: string;
   label: string;
-  iconName: keyof typeof icons;
+  emoji: string;
 }
 
 // Define tab configurations
 const clientTabs: TabItem[] = [
-  { name: "index", label: "Accueil", iconName: "home" },
-  { name: "explore", label: "Explorer", iconName: "grid" },
-  { name: "favorite", label: "Favoris", iconName: "heart" },
-  { name: "basket", label: "Panier", iconName: "cart" },
-  { name: "orders", label: "Commandes", iconName: "receipt" },
-  { name: "profile", label: "Profil", iconName: "person" },
+  { name: "index", label: "Accueil", emoji: "🏠" },
+  { name: "explore", label: "Explorer", emoji: "🔍" },
+  { name: "favorite", label: "Favoris", emoji: "❤️" },
+  { name: "basket", label: "Panier", emoji: "🛒" },
+  { name: "orders", label: "Commandes", emoji: "📋" },
+  { name: "profile", label: "Profil", emoji: "👤" },
 ];
 
 const nonClientTabs: TabItem[] = [
-  { name: "index", label: "Accueil", iconName: "home" },
-  { name: "inventory", label: "Inventaire", iconName: "box" },
-  { name: "orders", label: "Commandes", iconName: "receipt" },
-  { name: "profile", label: "Profil", iconName: "person" },
+  { name: "index", label: "Accueil", emoji: "🏠" },
+  { name: "inventory", label: "Inventaire", emoji: "📦" },
+  { name: "orders", label: "Commandes", emoji: "📋" },
+  { name: "profile", label: "Profil", emoji: "👤" },
 ];
 
 // Individual Tab Component
@@ -40,7 +38,7 @@ const TabButton: React.FC<{
 }> = ({ item, isActive, onPress }) => {
   return (
     <TouchableOpacity style={styles.tabButton} onPress={onPress}>
-      <AppIcon name={item.iconName} size={20} color={isActive ? "#007AFF" : "#636360"} />
+      <Text style={[styles.tabEmoji, isActive && styles.activeTabEmoji]}>{item.emoji}</Text>
       <Text style={[styles.tabLabel, isActive && styles.activeTabLabel]}>{item.label}</Text>
     </TouchableOpacity>
   );
@@ -91,13 +89,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
   },
+  tabEmoji: {
+    fontSize: 20,
+    opacity: 1,
+  },
+  activeTabEmoji: {
+    opacity: 1,
+  },
   tabLabel: {
     marginTop: 4,
     fontSize: 12,
     fontWeight: "600",
     color: "#636360",
     textAlign: "center",
-    fontFamily: "Hanken Grotesk",
+    fontFamily: "HankenGrotesk",
   },
   activeTabLabel: {
     color: "#007AFF",
