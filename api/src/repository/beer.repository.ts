@@ -29,6 +29,23 @@ export default class BeerRepository implements IBeer {
   getBeersByBrewery = async (breweryId: string) => {
     return await this.prisma.beer.findMany({
       where: { brewery_id: breweryId },
+      include: {
+        beer_style: {
+          select: {
+            label: true,
+          },
+        },
+        brewery: {
+          select: {
+            name: true,
+          },
+        },
+        beer_color: {
+          select: {
+            label: true,
+          },
+        },
+      },
     });
   };
 

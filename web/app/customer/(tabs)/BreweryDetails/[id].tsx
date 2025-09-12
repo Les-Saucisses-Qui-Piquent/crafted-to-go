@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useClientData } from "@/contexts/CostumerDataProvider";
 import { BreweryProps } from "@/components/brewery/BreweryCardSmall";
 import { OpeningHoursDetail } from "@/app/registerBrewery";
@@ -9,9 +9,11 @@ import FilterBar from "@/components/filterBars/FilterBar";
 export default function BreweryDetails() {
   const params = useLocalSearchParams();
   const id = params.id as string | undefined;
-  const { getBreweryById } = useClientData();
+  const { getBreweryById, getBeersByBrewery } = useClientData();
+  const router = useRouter();
 
   const [breweryData, setBreweryData] = useState<BreweryProps | null>(null);
+  const [breweryBeers, setBreweryBeers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedTab, setSelectedTab] = useState<number>(0);
   
@@ -21,11 +23,19 @@ export default function BreweryDetails() {
     if (!id) return;
     let mounted = true;
     setLoading(true);
-    getBreweryById(id)
-      .then((b) => {
-        if (mounted) setBreweryData(b ?? null);
+    
+    Promise.all([
+      getBreweryById(id),
+      getBeersByBrewery(id)
+    ])
+      .then(([brewery, beers]) => {
+        console.log("📦 Données reçues:", { brewery, beers });
+        if (mounted) {
+          setBreweryData(brewery ?? null);
+          setBreweryBeers(beers ?? []);
+        }
       })
-      .catch((err) => console.error("Erreur fetch brewery:", err))
+      .catch((err) => console.error("❌ Erreur fetch brewery:", err))
       .finally(() => mounted && setLoading(false));
     return () => {
       mounted = false;
@@ -165,9 +175,61 @@ export default function BreweryDetails() {
     </>
   );
 
+  const handleBeerPress = (beerId: string) => {
+    router.push(`/customer/BeerDetails/${beerId}`);
+  };
+
+  const renderBeerItem = (beer: any) => (
+    <TouchableOpacity 
+      key={beer.id} 
+      style={styles.beerItem}
+      onPress={() => handleBeerPress(beer.id)}
+      activeOpacity={0.7}
+    >
+      {beer.image && (
+        <Image 
+          source={{ uri: beer.image }} 
+          style={styles.beerImage} 
+          resizeMode="cover"
+        />
+      )}
+      <View style={styles.beerInfo}>
+        <Text style={styles.beerName}>{beer.name}</Text>
+        <View style={styles.beerDetails}>
+          <View style={styles.beerDetailRow}>
+            <Text style={styles.beerDetailLabel}>Style:</Text>
+            <Text style={styles.beerDetailValue}>{beer.beer_style?.label || 'N/A'}</Text>
+          </View>
+          <View style={styles.beerDetailRow}>
+            <Text style={styles.beerDetailLabel}>Couleur:</Text>
+            <Text style={styles.beerDetailValue}>{beer.beer_color?.label || 'N/A'}</Text>
+          </View>
+          <View style={styles.beerDetailRow}>
+            <Text style={styles.beerDetailLabel}>ABV:</Text>
+            <Text style={styles.beerDetailValue}>{beer.abv_rate}°</Text>
+          </View>
+          <View style={styles.beerDetailRow}>
+            <Text style={styles.beerDetailLabel}>Prix:</Text>
+            <Text style={styles.beerDetailValue}>{beer.price}€</Text>
+          </View>
+          <View style={styles.beerDetailRow}>
+            <Text style={styles.beerDetailLabel}>Stock:</Text>
+            <Text style={styles.beerDetailValue}>{beer.quantity}</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   const renderCatalogueTab = () => (
     <View style={styles.section}>
-      <Text style={styles.text}>test</Text>
+      {breweryBeers.length > 0 ? (
+        <View>
+          {breweryBeers.map(renderBeerItem)}
+        </View>
+      ) : (
+        <Text style={styles.text}>Aucune bière disponible pour cette brasserie.</Text>
+      )}
     </View>
   );
 
@@ -324,5 +386,57 @@ const styles = StyleSheet.create({
   },
   hourColumn: {
     flex: 1,
+  },
+  beerItem: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  beerImage: {
+    width: 80,
+    height: 120,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  beerInfo: {
+    flex: 1,
+  },
+  beerName: {
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: "HankenGrotesk",
+    color: "#000",
+    marginBottom: 8,
+  },
+  beerDetails: {
+    gap: 2,
+  },
+  beerDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  beerDetailLabel: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "300",
+    color: "#666",
+    flex: 1,
+  },
+  beerDetailValue: {
+    fontSize: 14,
+    fontFamily: "HankenGrotesk",
+    fontWeight: "600",
+    color: "#000",
+    flex: 1,
+    textAlign: "right",
+    textTransform: "uppercase",
   },
 });
