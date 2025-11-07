@@ -40,6 +40,6 @@ export default function CustomerTabsLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.tansparentPrimary,
+    backgroundColor: "#fff",
   },
 });

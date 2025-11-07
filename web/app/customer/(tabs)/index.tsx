@@ -21,11 +21,13 @@ export default function HomePage() {
     <ScrollView style={styles.container}>
       <View style={styles.banner}>
         <Image
-          source={{ uri: "https://images.unsplash.com/photo-1506744038136-46273834b3fb" }}
+          source={{ uri: "https://images.unsplash.com/photo-1714668204578-797e15d56eb8?q=80&w=1154&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" }}
           style={styles.bannerImage}
         />
-        <View style={styles.bannerOverlay} />
-        <Text style={styles.bannerTitle}>Bienvenue sur Crafted to Go 🍺</Text>
+      </View>
+      
+      <View style={styles.bannerText}>
+        <Text style={styles.bannerTitle}>Bienvenue sur Crafted to Go</Text>
         <Text style={styles.bannerSubtitle}>
           Commande ta bière préférée en Click & Collect, près de chez toi !
         </Text>
@@ -50,16 +52,31 @@ const styles = StyleSheet.create({
   container: { backgroundColor: "#fff", flex: 1 },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   banner: {
-    position: "relative",
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
+    height: 150,
+    marginBottom: 10,
   },
-  bannerImage: { width: "100%", height: "100%", position: "absolute", top: 0, left: 0 },
-  bannerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.4)" },
-  bannerTitle: { color: "#fff", fontSize: 28, fontWeight: "bold", marginBottom: 10, zIndex: 2 },
-  bannerSubtitle: { color: "#fff", fontSize: 16, zIndex: 2 },
+  bannerImage: { width: "100%", height: "100%"},
+  bannerText: {
+    padding: 10,
+    alignItems: "flex-start",
+  },
+  bannerTitle: { 
+    fontSize: 26,
+    fontWeight: "800",
+    color: "black",
+    fontFamily: "HankenGrotesk",
+    lineHeight: 30,
+    textAlign: "left",
+  },
+  bannerSubtitle: { 
+    color: "#666", 
+    fontSize: 16, 
+    fontWeight: "400", 
+    textAlign: "left", 
+    fontFamily: "HankenGrotesk",
+    marginTop: 10,
+  },
+  
   sectionTitle: {
     fontSize: 22,
     fontWeight: "600",

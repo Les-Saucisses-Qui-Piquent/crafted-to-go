@@ -2,8 +2,9 @@ import { useNotifications } from "@/contexts/NotificationContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import React, { useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import CartModal from "./modals/CartModal";
+import { usePathname } from "expo-router";
 
 interface TopBarProps {
   variant: "client" | "brewery";
@@ -13,10 +14,12 @@ interface TopBarProps {
 
 const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPress }) => {
   const { unreadCount } = useNotifications();
-  const { totalItems } = useCart();
+  const { totalItems, clearCart, items } = useCart();
   const { user } = useAuth();
+  const pathname = usePathname();
   const isClient = variant === "client";
   const [cartVisible, setCartVisible] = useState(false);
+  const isBasketPage = pathname?.includes('/basket');
 
   const handleCartPress = () => {
     if (onCartPress) {
@@ -24,6 +27,24 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
     } else {
       setCartVisible(true);
     }
+  };
+
+  const handleClearCart = () => {
+    Alert.alert(
+      "Vider le panier",
+      "Êtes-vous sûr de vouloir vider votre panier ?",
+      [
+        {
+          text: "Annuler",
+          style: "cancel",
+        },
+        {
+          text: "Vider",
+          style: "destructive",
+          onPress: clearCart,
+        },
+      ]
+    );
   };
 
   const renderBadge = (count: number) => {
@@ -38,21 +59,27 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
 
   return (
     <View style={styles.topBarContainer}>
-      {/* Greeting */}
+      {/* Greeting or Page Title */}
       <Text style={styles.greeting}>
-        Hi, {(() => {
+        {isBasketPage ? "Mon Panier" : (() => {
           const username = user?.email?.split('@')[0];
-          return username ? username.charAt(0).toUpperCase() + username.slice(1) : 'there';
-        })()} 
+          return `Hi, ${username ? username.charAt(0).toUpperCase() + username.slice(1) : 'there'}`;
+        })()}
       </Text>
       
       <View style={styles.iconsContainer}>
-        {/* Cart Icon (only for client) */}
+        {/* Cart Icon or Clear Button */}
         {isClient && (
-          <TouchableOpacity style={styles.iconButton} onPress={handleCartPress} activeOpacity={0.7}>
-            <Text style={styles.iconEmoji}>🛒</Text>
-            {renderBadge(totalItems)}
-          </TouchableOpacity>
+          isBasketPage && items.length > 0 ? (
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearCart} activeOpacity={0.7}>
+              <Text style={styles.clearButtonText}>Vider</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.iconButton} onPress={handleCartPress} activeOpacity={0.7}>
+              <Text style={styles.iconEmoji}>🛒</Text>
+              {renderBadge(totalItems)}
+            </TouchableOpacity>
+          )
         )}
 
         {/* Notification Bell */}
@@ -104,6 +131,19 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 22,
+  },
+  clearButton: {
+    backgroundColor: "#FF4444",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clearButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
   },
   badge: {
     position: "absolute",

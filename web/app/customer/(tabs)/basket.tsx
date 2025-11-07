@@ -101,15 +101,6 @@ const BasketScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mon Panier</Text>
-        {items.length > 0 && (
-          <TouchableOpacity onPress={handleClearCart} style={styles.clearButton}>
-            <Text style={styles.clearButtonText}>Vider</Text>
-          </TouchableOpacity>
-        )}
-      </View>
 
       {/* Cart Items */}
       {items.length > 0 ? (
@@ -158,33 +149,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f9fa",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#212529",
-  },
-  clearButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: "#dc3545",
-    borderRadius: 6,
-  },
-  clearButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: "HankenGrotesk",
   },
   cartList: {
     flex: 1,
