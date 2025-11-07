@@ -1,9 +1,10 @@
-import AppIcon from "@/utils/AppIcon";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import React, { useState } from "react";
-import { View, ImageBackground, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import CartModal from "./modals/CartModal";
+import { usePathname } from "expo-router";
 
 interface TopBarProps {
   variant: "client" | "brewery";
@@ -13,9 +14,12 @@ interface TopBarProps {
 
 const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPress }) => {
   const { unreadCount } = useNotifications();
-  const { totalItems } = useCart();
+  const { totalItems, clearCart, items } = useCart();
+  const { user } = useAuth();
+  const pathname = usePathname();
   const isClient = variant === "client";
   const [cartVisible, setCartVisible] = useState(false);
+  const isBasketPage = pathname?.includes('/basket');
 
   const handleCartPress = () => {
     if (onCartPress) {
@@ -23,6 +27,24 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
     } else {
       setCartVisible(true);
     }
+  };
+
+  const handleClearCart = () => {
+    Alert.alert(
+      "Vider le panier",
+      "Êtes-vous sûr de vouloir vider votre panier ?",
+      [
+        {
+          text: "Annuler",
+          style: "cancel",
+        },
+        {
+          text: "Vider",
+          style: "destructive",
+          onPress: clearCart,
+        },
+      ]
+    );
   };
 
   const renderBadge = (count: number) => {
@@ -37,30 +59,39 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
 
   return (
     <View style={styles.topBarContainer}>
-      <ImageBackground
-        style={styles.image}
-        source={{
-          uri: "https://dummyimage.com/41.700565338134766x37.59886932373047/000/fff.png",
-        }}
-      />
+      {/* Greeting or Page Title */}
+      <Text style={styles.greeting}>
+        {isBasketPage ? "Mon Panier" : (() => {
+          const username = user?.email?.split('@')[0];
+          return `Hi, ${username ? username.charAt(0).toUpperCase() + username.slice(1) : 'there'}`;
+        })()}
+      </Text>
+      
+      <View style={styles.iconsContainer}>
+        {/* Cart Icon or Clear Button */}
+        {isClient && (
+          isBasketPage && items.length > 0 ? (
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearCart} activeOpacity={0.7}>
+              <Text style={styles.clearButtonText}>Vider</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.iconButton} onPress={handleCartPress} activeOpacity={0.7}>
+              <Text style={styles.iconEmoji}>🛒</Text>
+              {renderBadge(totalItems)}
+            </TouchableOpacity>
+          )
+        )}
 
-      {/* Notification Bell */}
-      <TouchableOpacity
-        style={[styles.bell, isClient ? styles.bellClient : styles.bellBrewery]}
-        onPress={onNotificationPress}
-        activeOpacity={0.7}
-      >
-        <AppIcon name="notifications-outline" size={27} color="#1E1E1E" />
-        {renderBadge(unreadCount)}
-      </TouchableOpacity>
-
-      {/* Cart Icon (only for client) */}
-      {isClient && (
-        <TouchableOpacity style={styles.rightIcon} onPress={handleCartPress} activeOpacity={0.7}>
-          <AppIcon name="cart-outline" size={28} color="#040404" />
-          {renderBadge(totalItems)}
+        {/* Notification Bell */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={onNotificationPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.iconEmoji}>🔔</Text>
+          {renderBadge(unreadCount)}
         </TouchableOpacity>
-      )}
+      </View>
 
       {/* Cart modal */}
       <CartModal visible={cartVisible} onClose={() => setCartVisible(false)} />
@@ -70,53 +101,54 @@ const TopBar: React.FC<TopBarProps> = ({ variant, onNotificationPress, onCartPre
 
 const styles = StyleSheet.create({
   topBarContainer: {
+    height: 90,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderBottomWidth: 2,
+    borderBottomColor: "#E0E0E0",
+  },
+  greeting: {
+    fontSize: 35,
+    fontWeight: "800",
+    color: "black",
+    fontFamily: "HankenGrotesk",
+  },
+  iconsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  iconButton: {
     position: "relative",
-    flexShrink: 0,
-    height: 38,
-    width: 331,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-  },
-  image: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 0,
-    right: 289,
-    bottom: 0,
-    left: 0,
-  },
-  bell: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 0,
-    bottom: 4,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
-  },
-  bellClient: {
-    left: 252,
-    right: 46,
-  },
-  bellBrewery: {
-    left: 298,
-    right: 0,
-  },
-  rightIcon: {
-    position: "absolute",
-    top: 8,
-    right: 0,
-    bottom: 13,
-    left: 303,
+    padding: 8,
     justifyContent: "center",
     alignItems: "center",
   },
+  iconEmoji: {
+    fontSize: 22,
+  },
+  clearButton: {
+    backgroundColor: "#FF4444",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clearButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
   badge: {
     position: "absolute",
-    top: -5,
-    right: -5,
+    top: 0,
+    right: 0,
     backgroundColor: "#FF4444",
     borderRadius: 10,
     minWidth: 18,
